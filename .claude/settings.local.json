@@ -6,7 +6,8 @@
       "Bash(npm run:*)",
       "Bash(pkill:*)",
       "Bash(python3:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
