@@ -4,141 +4,200 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-THEA is a PDF text extraction and analysis system that uses Ollama's vision models to process PDF documents. It converts PDFs to images and sends them to language models for text extraction, character counting, document classification, and content summarization.
+THEA is a PDF text extraction and analysis system that uses Ollama's vision models to process PDF documents. It converts PDFs to images and sends them to language models for text extraction, character counting, document classification, and content summarization with bilingual German/English output.
 
 ## Architecture
 
-### Core Components
+The system consists of a single Python script (`thea.py`) that:
+1. Converts PDF files to PNG images using pdf2image/poppler (configurable DPI, default: 300)
+2. Sends images to Ollama models via the Ollama API endpoint
+3. Processes streaming JSON responses with character-by-character output to stdout
+4. Implements progressive temperature increase (0.1 → 1.0) during retries
+5. Detects and breaks stuck patterns (1-100 character repetitive sequences)
+6. Saves results to timestamped `.thea` files in JSON v2.0 format
+7. Optionally exports processed images as PNG files
 
-The system (`thea.py`) consists of six main functions:
+### Core Processing Flow (`process_with_model` function, line 227)
+1. Check for existing `.thea` files (skip mode logic)
+2. Build Ollama API payload with temperature and token limits
+3. Stream response and detect stuck patterns (up to 100 char patterns)
+4. Handle timeouts (default: 100s) and token limits (default: 50000)
+5. Save results to `.thea` file with comprehensive metadata
+6. Display processing statistics
 
-1. **`load_prompt_file(prompt_path)`** - Loads JSON or plain text prompt configurations. Returns a dict with prompt config or None.
+### Safety Features (Recent Enhancements)
+- **Pattern Detection**: Detects 1-100 character repetitive patterns with adaptive thresholds
+- **Timeout Protection**: Overall request timeout (configurable via `--timeout`)
+- **Token Limiting**: Max token generation via Ollama's `num_predict` parameter
+- **Proper Error Handling**: Saves partial responses even on failure
 
-2. **`build_system_prompt(prompt_config)`** - Constructs the complete system prompt by combining:
-   - Hardcoded prefix: "You are a vision-based text extractor and analyzer. "
-   - Configurable suffix from prompt config
-   - Output format instructions from schema
+### Output File Naming Convention
+- **Default**: `<pdf>.<timestamp>.<model>.thea`
+- **With suffix**: `<pdf>.<timestamp>.<model>.<suffix>.thea`
+- **With prompt file**: `<pdf>.<timestamp>.<model>.<promptname>.thea`
+- **Saved images**: `<pdf>.<timestamp>.<model>[.<suffix>].<dpi>p<n>.png`
 
-3. **`build_user_prompt(prompt_config, pdf_path)`** - Creates user prompts from templates with `{{variable}}` substitution.
+### Key Technical Details
+- **Ollama API Endpoint**: Configurable, defaults to `https://b1s.hey.bahn.business/api/chat`
+- **Model Override**: Use `-m/--model` to specify any Ollama model (default: gemma3:27b)
+- **Temperature Control**: Initial temperature 0.1, increases progressively with retries
+- **Pattern Detection**: 3000-chunk buffer for detecting patterns up to 100 characters
+- **Output Format**: JSON v2.0 with `extracted_text`, `character_count`, bilingual descriptions
+- **Processing Modes**: `skip` (default) or `overwrite`, suffix-specific
+- **Custom Prompts**: Load via `.prompt` files, filename becomes suffix
+- **Retry Logic**: Configurable 1-10 attempts with progressive temperature increase
 
-4. **`pdf_to_base64_images(pdf_path, dpi)`** - Converts PDFs to base64-encoded PNG images using pdf2image/poppler. Returns tuple of (base64_images, pil_images).
+## Quick Start
 
-5. **`process_with_model(...)`** - Main processing orchestrator that:
-   - Manages retry logic with progressive temperature increases
-   - Detects and handles stuck pattern repetitions
-   - Streams responses from Ollama API
-   - Saves results as JSON v2.0 format
-
-6. **`clean_thea_files(directory, force, dry_run)`** - Cleans THEA-generated files:
-   - Identifies files using timestamp and naming patterns
-   - Safely removes only THEA-created `.thea` and `.png` files
-   - Supports dry-run mode and forced deletion
-
-### Processing Pipeline
-
-1. **Configuration Loading**
-   - Priority: Command-line args > `.prompt` file > hardcoded defaults
-   - Auto-loads `.prompt` from root if present
-   - Supports both JSON and legacy plain text formats
-
-2. **PDF Processing**
-   - Converts each page to PNG at specified DPI
-   - Encodes images as base64 for API transmission
-   - Optionally saves images with pattern: `<pdf>.<timestamp>.<model>.<dpi>p<page>.png`
-
-3. **Model Communication**
-   - Streams responses character-by-character to stdout
-   - Implements retry logic with temperature progression formula: `initial_temp + (retry_count * (1.0 - initial_temp) / (max_retries - 1))`
-   - Detects stuck patterns (single chunk, two-chunk alternating, three-chunk cycle) after 50+ repetitions
-
-4. **Result Storage**
-   - Saves as `.thea` files in JSON v2.0 format
-   - Contains complete metadata, settings, prompts, response, and statistics
-   - Backward compatible with legacy text format detection
-
-## Commands
-
-### Running THEA
 ```bash
-# Default processing (Belege/ folder, gemma3:27b, --max-retries 10, --save-image)
+# First-time setup
+npm run setup              # Linux/macOS
+npm run setup-windows      # Windows
+
+# Process PDFs (default: Belege/ folder)
 npm run thea               # Linux/macOS
 npm run thea-windows       # Windows
 
-# Direct execution with options
-python3 thea.py [OPTIONS] <file_pattern> [file_pattern2] ...
-python3 thea.py --clean [--force] [--dry-run] [directory]
+# Process specific files
+. venv/bin/activate && python3 thea.py "sample_document.pdf"
+```
 
-# Common patterns
-python3 thea.py sample_document.pdf                    # Single file
-python3 thea.py --mode overwrite "*.pdf"              # Force reprocess
-python3 thea.py --prompt invoice.prompt "*.pdf"       # Custom prompt
-python3 thea.py -m gemma:14b -t 0.5 "*.pdf"          # Different model/temp
+## Common Development Tasks
+
+### Testing with Sample Document
+```bash
+. venv/bin/activate
+python3 thea.py sample_document.pdf                    # Basic test
+python3 thea.py -m gemma:14b sample_document.pdf      # Test with different model
+python3 thea.py --mode overwrite sample_document.pdf  # Force reprocess
+python3 thea.py --timeout 200 --max-tokens 10000 "*.pdf"  # Custom limits
+```
+
+### Debugging Stuck Patterns
+```bash
+# Increase retries and watch temperature progression
+python3 thea.py --max-retries 10 -t 0.1 "problematic.pdf"
+# Temperature will progress: 0.1 → 0.2 → 0.3 → ... → 1.0
+```
+
+### Working with Different Models
+```bash
+# Check available models
+ollama list
+
+# Use a specific model
+python3 thea.py -m gemma3:27b "*.pdf"    # Default
+python3 thea.py -m gemma:14b "*.pdf"     # Smaller, faster
+python3 thea.py -m llama2:13b "*.pdf"    # Alternative model
+```
+
+### Custom Prompts
+```bash
+# Create a custom prompt file
+echo '{"version": "1.0", "system_prompt": {"suffix": "..."}}' > custom.prompt
+
+# Use the custom prompt (creates *.custom.thea files)
+python3 thea.py --prompt custom.prompt "*.pdf"
 ```
 
 ### Cleaning THEA Files
 ```bash
-# Clean THEA files from Belege/ directory
-npm run thea:clean           # With confirmation
-npm run thea:clean-force     # Without confirmation
-npm run thea:clean-dry       # Preview only
+# Clean with confirmation
+python3 thea.py --clean Belege/
 
-# Direct CLI usage
-python3 thea.py --clean [directory]
+# Force clean without confirmation
 python3 thea.py --clean --force Belege/
-python3 thea.py --clean --dry-run .
-```
 
-### Development Setup
-```bash
-# Initial setup
-npm run setup              # Linux/macOS
-npm run setup-windows      # Windows
+# Preview what would be deleted
+python3 thea.py --clean --dry-run Belege/
 
-# Activate virtual environment
-. venv/bin/activate        # Linux/macOS
-venv\Scripts\activate      # Windows
-
-# Install/update dependencies
-npm run install            # Linux/macOS
-npm run install-windows    # Windows
+# Or use npm scripts
+npm run thea:clean
+npm run thea:clean-force
+npm run thea:clean-dry
 ```
 
 ### Building Executables
 ```bash
-npm run build-windows      # Creates thea.exe
+npm run build-windows      # Creates thea-windows.exe
 npm run build-linux        # Creates thea-linux
 npm run build-macos        # Creates thea-macos
-npm run build-spec         # Build using thea.spec
 npm run clean-build        # Clean build artifacts
 ```
 
-## Command-Line Options
+## Command-Line Interface
 
-- `--help, -h` - Show help message
-- `--clean` - Clean THEA-generated files
-  - `--force` - Skip confirmation prompt
-  - `--dry-run` - Preview without deleting
+### Synopsis
+```bash
+python thea.py [OPTIONS] <file_pattern> [file_pattern2] ...
+python thea.py --clean [--force] [--dry-run] [directory]
+```
+
+### Key Options
 - `--mode <skip|overwrite>` - Processing mode (default: skip)
-- `-m, --model <name>` - Override model (default: gemma3:27b)
+- `-m, --model <name>` - Override model (e.g., gemma:14b)
 - `-t, --temperature <value>` - Initial temperature (0.0-2.0, default: 0.1)
+- `--timeout <secs>` - Overall timeout (1-3600, default: 100)
+- `--max-tokens <n>` - Max tokens to generate (100-100000, default: 50000)
 - `--prompt <file.prompt>` - Load custom prompt configuration
-- `--suffix <text>` - Add suffix to output filename
-- `--save-image` - Export processed images as PNG
-- `--dpi <number>` - PDF conversion DPI (50-600, default: 300)
+- `--suffix <text>` - Add custom suffix to output filename
+- `--save-image` - Save extracted images as PNG files
+- `--dpi <number>` - Set DPI for PDF conversion (50-600, default: 300)
 - `--max-retries <n>` - Max retry attempts (1-10, default: 3)
 
-## Prompt File Format
+## Project Structure
 
-### Structure (`.prompt` or `<name>.prompt`)
+- `thea.py` - Main application with all processing logic
+- `requirements.txt` - Python dependencies (pdf2image, Pillow, requests, pyinstaller)
+- `.prompt` - Default JSON prompt configuration with bilingual output schema
+- `package.json` - npm scripts for convenient command execution
+- `*.thea` - Output files containing extraction results (JSON v2.0)
+- `*.prompt` - Custom prompt files (optional)
+
+## Critical Code Locations
+
+- **Main entry point**: Line 731 (`if __name__ == "__main__"`)
+- **Process function**: Line 227 (`process_with_model`)
+- **Pattern detection**: Lines 484-540 (stuck pattern logic with 1-100 char support)
+- **Temperature calculation**: Line 397 (progressive increase formula)
+- **Timeout/token monitoring**: Lines 447-473 (safety limits)
+- **Clean function**: Line 86 (`clean_thea_files`)
+
+## Temperature Progression Formula
+```python
+current_temperature = initial_temperature + (retry_count * (1.0 - initial_temperature) / (max_retries - 1))
+```
+- Default: 0.1 initial, reaches 1.0 on final retry
+- With 3 retries: 0.10 → 0.55 → 1.00
+- With 10 retries: 0.10 → 0.20 → 0.30 → ... → 1.00
+
+## Pattern Detection Enhancement
+The system now detects patterns from 1 to 100 characters:
+- **Buffer size**: 3000 chunks (increased from 300)
+- **Adaptive thresholds**:
+  - 1-char patterns: 50 repetitions required
+  - 2-char patterns: 25 repetitions
+  - 3-10 char patterns: 10 repetitions or 60/length
+  - 11-30 char patterns: 8 repetitions
+  - 31-60 char patterns: 5 repetitions
+  - 61-100 char patterns: 3 repetitions
+
+## JSON Prompt File Format
 ```json
 {
   "version": "1.0",
   "system_prompt": {
-    "suffix": "Extraction instructions...",
+    "suffix": "Extract all text... provide bilingual output...",
     "output_format": {
       "type": "json",
-      "schema": { "field": "type" },
-      "instructions": "Format guidance"
+      "schema": {
+        "extracted_text": "string",
+        "character_count": "number",
+        "one_word_description_german": "string",
+        "one_word_description_english": "string",
+        "content_summary_german": "string",
+        "content_summary_english": "string"
+      }
     }
   },
   "user_prompt": {
@@ -148,88 +207,39 @@ npm run clean-build        # Clean build artifacts
     "model": "gemma3:27b",
     "temperature": 0.1,
     "max_retries": 3,
-    "mode": "skip",
-    "save_image": false,
-    "dpi": 300,
-    "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+    "timeout": 100,
+    "max_tokens": 50000
   }
 }
 ```
 
-### Parameter Priority
-1. Command-line arguments (highest)
-2. Prompt file settings
-3. Hardcoded defaults (lowest)
+## Prerequisites Installation
 
-## Output Format (.thea v2.0)
+### Poppler (Required for PDF Processing)
+```bash
+# Ubuntu/Debian
+sudo apt-get update && sudo apt-get install poppler-utils
 
-```json
-{
-  "version": "2.0",
-  "metadata": {
-    "file": { "pdf_path", "pdf_size_bytes", "pdf_pages", "output_file" },
-    "processing": { "timestamp", "start_time", "end_time", "processing_time_seconds", "hostname", "platform" },
-    "model": { "name", "endpoint", "stream", "format" }
-  },
-  "settings": { "mode", "suffix", "prompt_file", "save_image", "dpi", "max_retries", "initial_temperature", "temperature_progression" },
-  "execution": { "retry_count", "final_temperature", "stuck_pattern_detected", "pattern_type", "chunks_received", "images_processed" },
-  "prompt": { "system", "user", "prompt_file", "prompt_config" },
-  "response": { "text", "thinking", "json" },
-  "statistics": { "tokens", "characters" },
-  "errors": [],
-  "warnings": []
-}
+# macOS
+brew install poppler
+
+# Windows
+# Download from https://github.com/oschwartz10612/poppler-windows/releases/
+# Extract and add bin folder to PATH
 ```
 
-## Key Technical Details
+### Ollama Setup
+```bash
+# Start Ollama service
+ollama serve
 
-### Ollama Configuration
-- Default endpoint: `https://b1s.hey.bahn.business/api/chat`
-- Requires vision-capable models (gemma3:27b, gemma:14b, etc.)
-- Enforces JSON output with `format: "json"`
-- Streaming enabled for real-time output
-- Temperature progression: Linearly increases from initial to 1.0 across retries
+# Pull required model (default: gemma3:27b)
+ollama pull gemma3:27b
+```
 
-### Pattern Detection
-Monitors for repetitive output patterns (50+ repetitions):
-- Single chunk: Same content repeated
-- Two-chunk: Alternating between two values  
-- Three-chunk: Cycling through three values
-
-### File Naming Patterns
-- Output: `<pdf>.<timestamp>.<model>[.<suffix>].thea`
-- Images: `<pdf>.<timestamp>.<model>[.<suffix>].<dpi>p<page>.png`
-- Timestamp format: `YYYYMMDD_HHMMSS`
-- Model name has colons replaced with dots (e.g., `gemma3:27b` → `gemma3.27b`)
-
-### Skip Mode Logic
-- Only skips files matching both model AND suffix
-- Detects both JSON v2.0 and legacy text formats
-- Enables parallel processing with different configurations
-
-### Clean Function Patterns
-THEA-generated file identification:
-- `.thea` files: `^.*\.\d{8}_\d{6}\.[^.]+\.thea$` (without suffix)
-- `.thea` files: `^.*\.\d{8}_\d{6}\.[^.]+\.[^.]+\.thea$` (with suffix)
-- `.png` files: `^.*\.\d{8}_\d{6}\.[^.]+\.\d+p\d+\.png$` (without suffix)
-- `.png` files: `^.*\.\d{8}_\d{6}\.[^.]+\.[^.]+\.\d+p\d+\.png$` (with suffix)
-
-## Prerequisites
-
-1. **Python 3.8+** with venv module
-2. **Node.js** for npm scripts
-3. **Poppler** for PDF processing:
-   - Ubuntu/Debian: `sudo apt-get install poppler-utils`
-   - macOS: `brew install poppler`
-   - Windows: Download from https://github.com/oschwartz10612/poppler-windows/releases/, add bin/ to PATH
-4. **Ollama** with vision models:
-   ```bash
-   ollama serve
-   ollama pull gemma3:27b
-   ```
-
-## Dependencies (requirements.txt)
-- pdf2image==1.17.0 - PDF to image conversion
-- Pillow==10.4.0 - Image processing
-- requests==2.32.3 - API communication
-- pyinstaller==6.3.0 - Executable building
+## Recent Bug Fixes
+- Fixed request_time calculation to occur after streaming completes
+- Removed unused repetitive_pattern_count variable
+- Initialize chunk_count and request_time at start of each retry
+- Added proper data saving when timeout/token limits are hit
+- Improved error handling for stuck pattern detection on final retry
