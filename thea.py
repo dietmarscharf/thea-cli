@@ -2,12 +2,14 @@ import base64
 import io
 import json
 import sys
-from typing import Any, List
+from typing import Any, List, Optional, Dict
 import requests
 import glob
 import os
 import datetime
 import time
+import platform
+import socket
 try:
     from pdf2image import convert_from_path
 except ImportError:
@@ -57,7 +59,20 @@ def pdf_to_base64_images(pdf_path, dpi=300) -> tuple[list[Any], list[Any]]:
         return [], []
 
 
-def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_prompt, mode='skip', suffix='', save_image=False, pil_images=None, max_retries=3, dpi=300, initial_temperature=0.1):
+def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_prompt, mode='skip', suffix='', save_image=False, pil_images=None, max_retries=3, dpi=300, initial_temperature=0.1, prompt_file=None, custom_prompt_content=None, endpoint_url="https://b1s.hey.bahn.business/api/chat"):
+    # Track all execution details for the new JSON format
+    execution_data = {
+        "version": "2.0",
+        "metadata": {},
+        "settings": {},
+        "execution": {},
+        "prompt": {},
+        "response": {},
+        "statistics": {},
+        "errors": [],
+        "warnings": []
+    }
+    
     # Generate model part (e.g., gemma3.12b)
     model_part: Any = model_name.replace(":", ".")
     
@@ -70,7 +85,18 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
         existing_files = glob.glob(existing_pattern)
         if existing_files:
             suffix_msg = f" with suffix '{suffix}'" if suffix else ""
-            print(f"Skipping {pdf_path} with model {model_name}{suffix_msg} - already processed ({len(existing_files)} existing file(s))")
+            # Check if any are in new JSON format (for info)
+            json_format_count = 0
+            for existing_file in existing_files:
+                try:
+                    with open(existing_file, 'r', encoding='utf-8') as f:
+                        first_char = f.read(1)
+                        if first_char == '{':
+                            json_format_count += 1
+                except:
+                    pass
+            format_info = f" ({json_format_count} JSON format)" if json_format_count > 0 else ""
+            print(f"Skipping {pdf_path} with model {model_name}{suffix_msg} - already processed ({len(existing_files)} existing file(s){format_info})")
             return
     
     # Messages: Combine system and user, with images in the user message
@@ -82,16 +108,72 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
     ]
     
     # Ollama API endpoint
-    url = "https://b1s.hey.bahn.business/api/chat" # "http://localhost:11434/api/chat" #
+    url = endpoint_url
     
-    # Generate timestamp
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    # Generate timestamp and datetime objects
+    now = datetime.datetime.now()
+    timestamp = now.strftime("%Y%m%d_%H%M%S")
+    iso_start_time = now.isoformat() + "Z"
     
     # Output filename: append to the original filename with optional suffix
     if suffix:
         output_file: Any = pdf_path + "." + timestamp + "." + model_part + "." + suffix + ".thea"
     else:
         output_file: Any = pdf_path + "." + timestamp + "." + model_part + ".thea"
+    
+    # Populate metadata
+    execution_data["metadata"]["file"] = {
+        "pdf_path": pdf_path,
+        "pdf_absolute_path": os.path.abspath(pdf_path),
+        "pdf_size_bytes": os.path.getsize(pdf_path) if os.path.exists(pdf_path) else 0,
+        "pdf_pages": len(base64_images),
+        "output_file": output_file
+    }
+    
+    execution_data["metadata"]["processing"] = {
+        "timestamp": timestamp,
+        "start_time": iso_start_time,
+        "end_time": None,  # Will be set later
+        "processing_time_seconds": None,  # Will be set later
+        "hostname": socket.gethostname(),
+        "platform": platform.system().lower()
+    }
+    
+    execution_data["metadata"]["model"] = {
+        "name": model_name,
+        "endpoint": url,
+        "stream": True,
+        "format": "json"
+    }
+    
+    # Populate settings
+    execution_data["settings"] = {
+        "mode": mode,
+        "suffix": suffix,
+        "prompt_file": prompt_file,
+        "save_image": save_image,
+        "dpi": dpi,
+        "max_retries": max_retries,
+        "initial_temperature": initial_temperature,
+        "temperature_progression": []  # Will be populated during retries
+    }
+    
+    # Populate prompt information
+    execution_data["prompt"] = {
+        "system": system_prompt,
+        "custom_prompt_file": prompt_file,
+        "custom_prompt_content": custom_prompt_content
+    }
+    
+    # Initialize execution images data
+    images_processed = []
+    for i in range(len(base64_images)):
+        images_processed.append({
+            "page": i + 1,
+            "resolution": None,  # Will be set if we have PIL images
+            "dpi": dpi,
+            "saved_as": None
+        })
     
     # Save images if requested
     if save_image and pil_images:
@@ -103,8 +185,16 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
             try:
                 image.save(image_file, format='PNG')
                 print(f"Saved image: {image_file}")
+                # Update images_processed
+                images_processed[i-1]["saved_as"] = image_file
+                images_processed[i-1]["resolution"] = f"{image.width}x{image.height}"
             except Exception as e:
                 print(f"Error saving image {image_file}: {e}")
+                execution_data["errors"].append(f"Failed to save image {i}: {str(e)}")
+    elif pil_images:
+        # Still populate resolution even if not saving
+        for i, image in enumerate(pil_images):
+            images_processed[i]["resolution"] = f"{image.width}x{image.height}"
     
     # Statistics tracking
     start_time = time.time()
@@ -118,11 +208,20 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
     # Add image tokens (estimate: 1 image ≈ 1000 tokens per page)
     total_input_tokens += len(base64_images) * 1000
     
+    # Variables to track across retries
+    final_retry_count = 0
+    final_temperature = initial_temperature
+    stuck_pattern_detected = False
+    pattern_type = None
+    
     # Retry loop for handling stuck model responses
     for retry_count in range(max_retries):
         # Calculate progressive temperature: starts at initial_temperature, increases to approach 1.0
         # Formula: temperature = initial_temp + (retry_count * (1.0 - initial_temp) / max_retries)
         current_temperature = initial_temperature + (retry_count * (1.0 - initial_temperature) / max_retries)
+        execution_data["settings"]["temperature_progression"].append(current_temperature)
+        final_retry_count = retry_count
+        final_temperature = current_temperature
         
         if retry_count > 0:
             print(f"\n=== RETRY {retry_count}/{max_retries - 1} for Model: {model_name} for File: {pdf_path} ===")
@@ -158,8 +257,10 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
             repetitive_pattern_count = 0
             last_contents = []  # Store last few content values for pattern detection
             stuck_detected = False
+            local_pattern_type = None
             
             chunk_count = 0
+            request_time = time.time() - request_start
             
             # Log incoming streaming chunks to stdout
             print(f"\n=== Incoming Streaming Response from Model: {model_name} for File: {pdf_path} ===")
@@ -193,6 +294,7 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
                                 # Check for 1-chunk pattern (same content repeated)
                                 if len(set(last_contents[-50:])) == 1:
                                     stuck_detected = True
+                                    local_pattern_type = "single_chunk"
                                     pattern_description = f"single chunk '{last_contents[-1]}' repeated"
                                 
                                 # Check for 2-chunk pattern (alternating between two values)
@@ -206,6 +308,7 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
                                             break
                                     if is_pattern:
                                         stuck_detected = True
+                                        local_pattern_type = "two_chunk_alternating"
                                         pattern_description = f"alternating pattern '{potential_pattern[0]}', '{potential_pattern[1]}'"
                                 
                                 # Check for 3-chunk pattern
@@ -219,6 +322,7 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
                                             break
                                     if is_pattern:
                                         stuck_detected = True
+                                        local_pattern_type = "three_chunk_cycle"
                                         pattern_description = f"3-chunk pattern '{potential_pattern[0]}', '{potential_pattern[1]}', '{potential_pattern[2]}'"
                                 
                                 if stuck_detected:
@@ -231,6 +335,8 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
             
             # If stuck was detected, retry
             if stuck_detected:
+                stuck_pattern_detected = True
+                pattern_type = local_pattern_type
                 print(f"Terminating connection and retrying... (Attempt {retry_count + 1}/{max_retries})")
                 continue  # Go to next retry iteration
             
@@ -239,19 +345,51 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
             try:
                 json_response = json.loads(full_response.strip())
                 
-                # Save to file: system prompt (as 'thinking') and final response
-                with open(output_file, 'w', encoding='utf-8') as f:
-                    f.write("System Prompt:\n")
-                    f.write(system_prompt + "\n\n")
-                    f.write("Final Ollama Response:\n")
-                    f.write(full_response)
-                
-                print(f"Successfully saved response to: {output_file}")
-                
-                # Calculate and display statistics
+                # Calculate and collect statistics
                 end_time = time.time()
                 processing_time = end_time - start_time
+                iso_end_time = datetime.datetime.now().isoformat() + "Z"
                 total_output_tokens = len(full_response) // 4  # Rough estimate
+                
+                # Update execution data
+                execution_data["metadata"]["processing"]["end_time"] = iso_end_time
+                execution_data["metadata"]["processing"]["processing_time_seconds"] = processing_time
+                
+                execution_data["execution"] = {
+                    "retry_count": final_retry_count,
+                    "final_temperature": final_temperature,
+                    "stuck_pattern_detected": stuck_pattern_detected,
+                    "pattern_type": pattern_type,
+                    "chunks_received": chunk_count,
+                    "request_time_seconds": request_time,
+                    "images_processed": images_processed
+                }
+                
+                execution_data["response"] = {
+                    "text": full_response,
+                    "thinking": None,  # Future enhancement
+                    "json": json_response
+                }
+                
+                execution_data["statistics"] = {
+                    "tokens": {
+                        "input_estimated": total_input_tokens,
+                        "output_estimated": total_output_tokens,
+                        "total_estimated": total_input_tokens + total_output_tokens,
+                        "tokens_per_second": total_output_tokens / processing_time if processing_time > 0 else 0
+                    },
+                    "characters": {
+                        "response_total": len(full_response),
+                        "extracted_text": len(json_response.get("extracted_text", "")),
+                        "json_formatted": len(json.dumps(json_response, indent=2))
+                    }
+                }
+                
+                # Save to file in new JSON format
+                with open(output_file, 'w', encoding='utf-8') as f:
+                    json.dump(execution_data, f, indent=2, ensure_ascii=False)
+                
+                print(f"Successfully saved response to: {output_file}")
                 
                 # Display statistics
                 print("\n=== Processing Statistics ===")
@@ -269,20 +407,57 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
                 
                 return  # Success, exit the function
                 
-            except json.JSONDecodeError:
+            except json.JSONDecodeError as e:
                 print("Failed to parse JSON from response:", full_response)
-                # Still save the response even if JSON parsing fails
-                with open(output_file, 'w', encoding='utf-8') as f:
-                    f.write("System Prompt:\n")
-                    f.write(system_prompt + "\n\n")
-                    f.write("Final Ollama Response (JSON parse failed):\n")
-                    f.write(full_response)
+                execution_data["errors"].append(f"JSON parse error: {str(e)}")
                 
-                # Display statistics even on JSON parse failure
+                # Calculate and collect statistics even on failure
                 end_time = time.time()
                 processing_time = end_time - start_time
+                iso_end_time = datetime.datetime.now().isoformat() + "Z"
                 total_output_tokens = len(full_response) // 4
                 
+                # Update execution data with error state
+                execution_data["metadata"]["processing"]["end_time"] = iso_end_time
+                execution_data["metadata"]["processing"]["processing_time_seconds"] = processing_time
+                
+                execution_data["execution"] = {
+                    "retry_count": final_retry_count,
+                    "final_temperature": final_temperature,
+                    "stuck_pattern_detected": stuck_pattern_detected,
+                    "pattern_type": pattern_type,
+                    "chunks_received": chunk_count,
+                    "request_time_seconds": request_time,
+                    "images_processed": images_processed
+                }
+                
+                execution_data["response"] = {
+                    "text": full_response,
+                    "thinking": None,
+                    "json": None  # Failed to parse
+                }
+                
+                execution_data["statistics"] = {
+                    "tokens": {
+                        "input_estimated": total_input_tokens,
+                        "output_estimated": total_output_tokens,
+                        "total_estimated": total_input_tokens + total_output_tokens,
+                        "tokens_per_second": total_output_tokens / processing_time if processing_time > 0 else 0
+                    },
+                    "characters": {
+                        "response_total": len(full_response),
+                        "extracted_text": 0,
+                        "json_formatted": 0
+                    }
+                }
+                
+                # Still save the response in new JSON format
+                with open(output_file, 'w', encoding='utf-8') as f:
+                    json.dump(execution_data, f, indent=2, ensure_ascii=False)
+                
+                print(f"Successfully saved response to: {output_file} (with JSON parse error)")
+                
+                # Display statistics even on JSON parse failure
                 print("\n=== Processing Statistics (JSON parse failed) ===")
                 print(f"Processing time: {processing_time:.2f} seconds")
                 print(f"Input tokens (estimated): ~{total_input_tokens:,}")
@@ -295,8 +470,52 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
                 
         except Exception as e:
             print(f"Error during request (attempt {retry_count + 1}/{max_retries}): {e}")
+            execution_data["errors"].append(f"Request error (attempt {retry_count + 1}): {str(e)}")
             if retry_count == max_retries - 1:
                 print(f"Failed after {max_retries} attempts. Giving up on {pdf_path} with model {model_name}")
+                # Save error state to file
+                end_time = time.time()
+                processing_time = end_time - start_time
+                iso_end_time = datetime.datetime.now().isoformat() + "Z"
+                
+                execution_data["metadata"]["processing"]["end_time"] = iso_end_time
+                execution_data["metadata"]["processing"]["processing_time_seconds"] = processing_time
+                
+                execution_data["execution"] = {
+                    "retry_count": final_retry_count,
+                    "final_temperature": final_temperature,
+                    "stuck_pattern_detected": stuck_pattern_detected,
+                    "pattern_type": pattern_type,
+                    "chunks_received": 0,
+                    "request_time_seconds": 0,
+                    "images_processed": images_processed
+                }
+                
+                execution_data["response"] = {
+                    "text": None,
+                    "thinking": None,
+                    "json": None
+                }
+                
+                execution_data["statistics"] = {
+                    "tokens": {
+                        "input_estimated": total_input_tokens,
+                        "output_estimated": 0,
+                        "total_estimated": total_input_tokens,
+                        "tokens_per_second": 0
+                    },
+                    "characters": {
+                        "response_total": 0,
+                        "extracted_text": 0,
+                        "json_formatted": 0
+                    }
+                }
+                
+                # Save error state
+                with open(output_file, 'w', encoding='utf-8') as f:
+                    json.dump(execution_data, f, indent=2, ensure_ascii=False)
+                
+                print(f"Saved error state to: {output_file}")
                 return
 
 if __name__ == "__main__":
@@ -439,6 +658,7 @@ if __name__ == "__main__":
         sys.exit(1)
     
     # Load prompt file if specified
+    custom_prompt = None  # Initialize variable
     if prompt_file:
         custom_prompt = load_prompt_file(prompt_file)
         if custom_prompt:
@@ -526,4 +746,11 @@ if __name__ == "__main__":
             # User prompt per file
             user_prompt: str = f"Extract the text from this PDF document '{pdf_path}', count its characters, describe it with one word, and summarize its content as instructed."
             
-            process_with_model(model, base64_images, pdf_path, system_prompt, user_prompt, mode, suffix, save_image, pil_images, max_retries, dpi, temperature)
+            # Pass additional parameters for the new JSON format
+            process_with_model(
+                model, base64_images, pdf_path, system_prompt, user_prompt, 
+                mode, suffix, save_image, pil_images, max_retries, dpi, temperature,
+                prompt_file=prompt_file,
+                custom_prompt_content=custom_prompt if prompt_file else None,
+                endpoint_url="https://b1s.hey.bahn.business/api/chat"
+            )
