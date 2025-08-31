@@ -12,7 +12,7 @@ THEA is a dual-pipeline PDF processing system that can either convert PDFs to im
 
 The system dynamically selects between two processing pipelines based on model capabilities:
 
-1. **Image Pipeline (`pdf-convert-png`)**: Converts PDFs to base64 PNG images for vision models
+1. **Image Pipeline (`pdf-extract-png`)**: Extracts PDFs as base64 PNG images for vision models
 2. **Text Pipeline (`pdf-extract-txt`)**: Extracts text using PyPDF2, pdfplumber, and pymupdf in parallel
 
 Pipeline selection is determined by:
@@ -79,7 +79,7 @@ npm run thea:kontoauszug:qwen    # Qwen for bank statements
 
 # Direct execution with options
 python3 thea.py --pipeline pdf-extract-txt --model qwen3:14b "*.pdf"
-python3 thea.py --prompt prompts/bank_gemma.prompt --save-image "document.pdf"
+python3 thea.py --prompt prompts/bank_gemma.prompt --save-sidecars "document.pdf"
 ```
 
 ### Building Executables
@@ -105,13 +105,13 @@ python3 thea.py --clean --dry-run        # Preview only
 
 ## Key Parameters
 
-- `--pipeline <type>`: Force `pdf-convert-png` or `pdf-extract-txt`
+- `--pipeline <type>`: Force `pdf-extract-png` or `pdf-extract-txt`
 - `--prompt <file>`: Load prompt configuration (determines pipeline)
 - `--model <name>`: Override model (default: gemma3:12b)
 - `--max-attempts <n>`: Retries for stuck patterns (1-10, default: 3)
 - `--temperature <value>`: Initial temperature (0.0-2.0, default: 0.1)
 - `--format <json|none>`: Control thinking output (none allows thinking tags)
-- `--save-image`: Export processed images as PNG (image pipeline only)
+- `--save-sidecars`: Save sidecar files (PNG for image pipeline, TXT for text pipeline)
 - `--dpi <number>`: PDF conversion resolution (50-600, default: 300)
 
 ## File Structure

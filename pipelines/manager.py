@@ -1,15 +1,15 @@
 from typing import Dict, Any, Optional
 from .base import Pipeline
-from .pdf_to_png import PdfToPngPipeline
-from .pdf_to_text import PdfToTextPipeline
+from .pdf_extract_png import PdfExtractPngPipeline
+from .pdf_extract_txt import PdfExtractTxtPipeline
 
 class PipelineManager:
     """Manages pipeline selection and execution."""
     
     # Available pipeline types
     PIPELINES = {
-        "pdf-convert-png": PdfToPngPipeline,
-        "pdf-extract-txt": PdfToTextPipeline
+        "pdf-extract-png": PdfExtractPngPipeline,
+        "pdf-extract-txt": PdfExtractTxtPipeline
     }
     
     @classmethod
@@ -45,11 +45,11 @@ class PipelineManager:
             prompt_config: Prompt configuration dictionary
             
         Returns:
-            Pipeline instance (defaults to pdf-convert-png if not specified)
+            Pipeline instance (defaults to pdf-extract-png if not specified)
         """
         # Get pipeline type from settings
         settings = prompt_config.get("settings", {})
-        pipeline_type = settings.get("pipeline", "pdf-convert-png")
+        pipeline_type = settings.get("pipeline", "pdf-extract-png")
         
         # Get pipeline-specific configuration
         pipeline_config = settings.get("pipeline_config", {})
@@ -86,4 +86,4 @@ class PipelineManager:
                 return "pdf-extract-txt"
         
         # Default to image pipeline for vision models
-        return "pdf-convert-png"
+        return "pdf-extract-png"

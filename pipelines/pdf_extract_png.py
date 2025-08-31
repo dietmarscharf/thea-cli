@@ -11,25 +11,25 @@ except ImportError:
     convert_from_path = None
     Image = None
 
-class PdfToPngPipeline(Pipeline):
-    """Pipeline for converting PDF pages to PNG images."""
+class PdfExtractPngPipeline(Pipeline):
+    """Pipeline for extracting PDF pages as PNG images."""
     
     @property
     def pipeline_type(self) -> str:
-        return "pdf-convert-png"
+        return "pdf-extract-png"
     
     @property
     def requires_vision_model(self) -> bool:
         return True
     
-    def process(self, pdf_path: str, dpi: int = 300, save_images: bool = False, **kwargs) -> Tuple[Tuple[List[str], List[Any]], Dict[str, Any]]:
+    def process(self, pdf_path: str, dpi: int = 300, save_sidecars: bool = False, **kwargs) -> Tuple[Tuple[List[str], List[Any]], Dict[str, Any]]:
         """
         Convert PDF to base64-encoded PNG images.
         
         Args:
             pdf_path: Path to the PDF file
             dpi: Resolution for image conversion
-            save_images: Whether to keep PIL images for saving
+            save_sidecars: Whether to save PNG images as sidecar files
             
         Returns:
             Tuple of ((base64_images, pil_images), metadata)
@@ -46,7 +46,7 @@ class PdfToPngPipeline(Pipeline):
             "pipeline": self.pipeline_type,
             "dpi": dpi,
             "pages_processed": 0,
-            "save_images": save_images,
+            "save_sidecars": save_sidecars,
             "saved_files": []  # Track saved image files
         }
         
@@ -57,7 +57,7 @@ class PdfToPngPipeline(Pipeline):
             
             for i, image in enumerate(images, 1):
                 # Keep PIL image for potential saving
-                if save_images:
+                if save_sidecars:
                     pil_images.append(image)
                 
                 # Track image information

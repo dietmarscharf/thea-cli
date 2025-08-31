@@ -14,7 +14,7 @@ import re
 
 # Import pipeline system
 from pipelines.manager import PipelineManager
-from pipelines.pdf_to_png import PdfToPngPipeline
+from pipelines.pdf_extract_png import PdfExtractPngPipeline
 
 try:
     from PIL import Image
@@ -89,10 +89,11 @@ def build_user_prompt(prompt_config, pdf_path):
 def clean_thea_files(directory=".", force=False, dry_run=False):
     """Clean THEA-generated files from directory."""
     # Patterns for THEA files (with timestamp pattern YYYYMMDD_HHMMSS)
-    # Format: <original>.<timestamp>.<model>.<suffix>.thea or <original>.<timestamp>.<model>.thea
+    # Format: <original>.<timestamp>.<model>.<suffix>.thea_extract or .thea (legacy)
     # Model names can contain dots (e.g., gemma3.27b)
     thea_patterns = [
-        r'^.*\.\d{8}_\d{6}\..*\.thea$'  # Any THEA file with timestamp
+        r'^.*\.\d{8}_\d{6}\..*\.thea_extract$',  # New THEA extract files
+        r'^.*\.\d{8}_\d{6}\..*\.thea$'  # Legacy THEA files
     ]
     
     # Patterns for THEA-generated PNG files (must have DPI+page pattern)
@@ -340,8 +341,8 @@ def clean_json_response(response_text):
 # Legacy function for backward compatibility - now handled by pipeline
 def pdf_to_base64_images(pdf_path, dpi=300) -> tuple[list[Any], list[Any]]:
     """Legacy wrapper for image pipeline."""
-    pipeline = PdfToPngPipeline()
-    result, metadata = pipeline.process(pdf_path, dpi=dpi, save_images=True)
+    pipeline = PdfExtractPngPipeline()
+    result, metadata = pipeline.process(pdf_path, dpi=dpi, save_sidecars=True)
     return result
 
 
@@ -365,9 +366,9 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
     # Check if a .thea file already exists for this PDF and model with the same suffix
     if mode == 'skip':
         if suffix:
-            existing_pattern = f"{pdf_path}.*.{model_part}.{suffix}.thea"
+            existing_pattern = f"{pdf_path}.*.{model_part}.{suffix}.thea_extract"
         else:
-            existing_pattern = f"{pdf_path}.*.{model_part}.thea"
+            existing_pattern = f"{pdf_path}.*.{model_part}.thea_extract"
         existing_files = glob.glob(existing_pattern)
         if existing_files:
             suffix_msg = f" with suffix '{suffix}'" if suffix else ""
@@ -386,7 +387,7 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
             return
     
     # Messages: Combine system and user, with pipeline data
-    if pipeline_type == "pdf-convert-png":
+    if pipeline_type == "pdf-extract-png":
         # Image pipeline - use base64 images
         base64_images, _ = pipeline_data if isinstance(pipeline_data, tuple) else (pipeline_data, [])
         user_message = {"role": "user", "content": user_prompt, "images": base64_images}
@@ -411,13 +412,13 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
     
     # Output filename: append to the original filename with optional suffix
     if suffix:
-        output_file: Any = pdf_path + "." + timestamp + "." + model_part + "." + suffix + ".thea"
+        output_file: Any = pdf_path + "." + timestamp + "." + model_part + "." + suffix + ".thea_extract"
     else:
-        output_file: Any = pdf_path + "." + timestamp + "." + model_part + ".thea"
+        output_file: Any = pdf_path + "." + timestamp + "." + model_part + ".thea_extract"
     
     # Populate metadata
     # Determine page count based on pipeline
-    if pipeline_type == "pdf-convert-png":
+    if pipeline_type == "pdf-extract-png":
         base64_images, _ = pipeline_data if isinstance(pipeline_data, tuple) else (pipeline_data, [])
         page_count = len(base64_images)
     else:
@@ -455,7 +456,7 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
         "mode": mode,
         "suffix": suffix,
         "prompt_file": prompt_file,
-        "save_image": save_image,
+        "save_sidecars": save_sidecars,
         "dpi": dpi,
         "max_attempts": max_attempts,
         "initial_temperature": initial_temperature,
@@ -473,7 +474,7 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
     }
     
     # Initialize execution data based on pipeline type
-    if pipeline_type == "pdf-convert-png":
+    if pipeline_type == "pdf-extract-png":
         base64_images, _ = pipeline_data if isinstance(pipeline_data, tuple) else (pipeline_data, [])
         files_processed = []
         
@@ -510,7 +511,7 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
             files_processed = pipeline_metadata["saved_files"]
     
     # Save images if requested
-    if save_image and pil_images:
+    if save_sidecars and pil_images:
         for i, image in enumerate(pil_images, 1):
             if suffix:
                 image_file = f"{pdf_path}.{timestamp}.{model_part}.{suffix}.{dpi}p{i}.png"
@@ -540,7 +541,7 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
     total_output_tokens = 0
     
     # Estimate input tokens (rough approximation: 1 token ≈ 4 chars)
-    if pipeline_type == "pdf-convert-png":
+    if pipeline_type == "pdf-extract-png":
         # Count prompt tokens for image pipeline
         input_text = system_prompt + user_prompt
         total_input_tokens = len(input_text) // 4
@@ -1094,8 +1095,7 @@ if __name__ == "__main__":
     mode = 'skip'  # Default mode
     suffix = ''  # Default no suffix
     prompt_file = None  # Default no prompt file
-    save_image = False  # Default don't save images
-    save_extractions = False  # Default don't save text extractions
+    save_sidecars = False  # Default don't save sidecar files (images or text extractions)
     dpi = 300  # Default DPI for PDF to image conversion
     max_attempts = 3  # Default max attempts for stuck model responses
     model_override = None  # Default: use built-in model list
@@ -1154,12 +1154,9 @@ if __name__ == "__main__":
         elif args[0] == '--prompt' and len(args) >= 2:
             prompt_file = args[1]
             args = args[2:]  # Remove prompt arguments from args
-        elif args[0] == '--save-image':
-            save_image = True
-            args = args[1:]  # Remove save-image flag from args
-        elif args[0] == '--save-extractions':
-            save_extractions = True
-            args = args[1:]  # Remove save-extractions flag from args
+        elif args[0] == '--save-sidecars':
+            save_sidecars = True
+            args = args[1:]  # Remove save-sidecars flag from args
         elif args[0] == '--dpi' and len(args) >= 2:
             try:
                 dpi = int(args[1])
@@ -1250,8 +1247,7 @@ if __name__ == "__main__":
         print("                    The filename (without .prompt) becomes the default suffix")
         print("  --suffix <text>   Add custom suffix to output filename before .thea extension")
         print("                    Overrides the automatic suffix from prompt filename")
-        print("  --save-image      Save extracted images as PNG files (for image pipeline)")
-        print("  --save-extractions Save text extraction results as .txt files (for text pipeline)")
+        print("  --save-sidecars   Save sidecar files (PNG images for image pipeline, text files for text pipeline)")
         print("  --dpi <number>    Set DPI resolution for PDF to image conversion (50-600, default: 300)")
         print("  --max-attempts <n> Max attempts when model gets stuck (1-10, default: 3)")
         print("  -m, --model <name> Override default model (e.g., gemma:14b, llama2:13b)")
@@ -1267,9 +1263,9 @@ if __name__ == "__main__":
         print("                    'pdf-extract-txt': Extract text using multiple methods (for text models)")
         print("                    Default: determined by prompt file or model type")
         print("\nOutput File Format:")
-        print("  Default:          <pdf>.<timestamp>.<model>.thea")
-        print("  With suffix:      <pdf>.<timestamp>.<model>.<suffix>.thea")
-        print("  With prompt:      <pdf>.<timestamp>.<model>.<promptname>.thea")
+        print("  Default:          <pdf>.<timestamp>.<model>.thea_extract")
+        print("  With suffix:      <pdf>.<timestamp>.<model>.<suffix>.thea_extract")
+        print("  With prompt:      <pdf>.<timestamp>.<model>.<promptname>.thea_extract")
         print("  Saved images:     <pdf>.<timestamp>.<model>[.<suffix>].<dpi>p<n>.png")
         print("\nExamples:")
         print("  # Basic usage - process all PDFs, skip existing")
@@ -1287,9 +1283,9 @@ if __name__ == "__main__":
         print("\n  # Skip only files with specific suffix")
         print("  python thea.py --mode skip --suffix images '*.pdf'")
         print("\n  # Save images with custom DPI")
-        print("  python thea.py --save-image --dpi 150 '*.pdf'")
+        print("  python thea.py --save-sidecars --dpi 150 '*.pdf'")
         print("\n  # High quality image extraction")
-        print("  python thea.py --save-image --dpi 600 --suffix hq 'important.pdf'")
+        print("  python thea.py --save-sidecars --dpi 600 --suffix hq 'important.pdf'")
         print("\n  # Increase attempts for unstable model")
         print("  python thea.py --max-attempts 5 '*.pdf'")
         print("\n  # Use a different model")
@@ -1313,7 +1309,7 @@ if __name__ == "__main__":
         print("  - Skip mode is suffix-specific: only skips files with matching suffix")
         print("  - Prompt files use JSON format (or legacy plain text)")
         print("  - Default DPI: 300 (higher = better quality but larger files)")
-        print("  - Images saved as PNG when --save-image is used")
+        print("  - Sidecar files saved when --save-sidecars is used")
         print("  - Automatically retries if model gets stuck in repetitive patterns")
         print("\nEnvironment:")
         print("  - Python 3.x with virtual environment")
@@ -1408,15 +1404,20 @@ if __name__ == "__main__":
         mode = prompt_settings["mode"]
         print(f"  Using mode from prompt: {mode}")
     
-    if not save_image and "save_image" in prompt_settings:
-        save_image = prompt_settings["save_image"]
-        if save_image:
-            print(f"  Using save_image from prompt: {save_image}")
-    
-    if not save_extractions and "save_extractions" in prompt_settings:
-        save_extractions = prompt_settings["save_extractions"]
-        if save_extractions:
-            print(f"  Using save_extractions from prompt: {save_extractions}")
+    # Check for legacy parameters in prompt
+    if not save_sidecars:
+        if "save_sidecars" in prompt_settings:
+            save_sidecars = prompt_settings["save_sidecars"]
+            if save_sidecars:
+                print(f"  Using save_sidecars from prompt: {save_sidecars}")
+        elif "save_image" in prompt_settings:
+            save_sidecars = prompt_settings["save_image"]
+            if save_sidecars:
+                print(f"  Using save_image from prompt as save_sidecars: {save_sidecars}")
+        elif "save_extractions" in prompt_settings:
+            save_sidecars = prompt_settings["save_extractions"]
+            if save_sidecars:
+                print(f"  Using save_extractions from prompt as save_sidecars: {save_sidecars}")
     
     if dpi == 300 and "dpi" in prompt_settings:
         dpi = prompt_settings["dpi"]
@@ -1431,8 +1432,8 @@ if __name__ == "__main__":
     print(f"Mode: {mode}")
     if suffix:
         print(f"Suffix: {suffix}")
-    if save_image:
-        print(f"Save images: enabled")
+    if save_sidecars:
+        print(f"Save sidecars: enabled")
     print(f"DPI: {dpi}")
     print(f"Max attempts: {max_attempts}")
     print(f"Initial temperature: {temperature}")
@@ -1483,9 +1484,9 @@ if __name__ == "__main__":
         print(f"\nProcessing file: {pdf_path}")
         
         # Process PDF through the selected pipeline
-        if pipeline_type == "pdf-convert-png":
+        if pipeline_type == "pdf-extract-png":
             # Image pipeline
-            pipeline_data, pipeline_metadata = pipeline.process(pdf_path, dpi=dpi, save_images=save_image)
+            pipeline_data, pipeline_metadata = pipeline.process(pdf_path, dpi=dpi, save_sidecars=save_sidecars)
             base64_images, pil_images = pipeline_data
             
             if not base64_images:
@@ -1500,7 +1501,7 @@ if __name__ == "__main__":
             
             pipeline_data, pipeline_metadata = pipeline.process(
                 pdf_path, 
-                save_extractions=save_extractions,
+                save_sidecars=save_sidecars,
                 timestamp=timestamp,
                 model_part=model_part,
                 suffix=suffix
@@ -1521,7 +1522,7 @@ if __name__ == "__main__":
             # Pass additional parameters for the new JSON format
             process_with_model(
                 model, pipeline_data, pdf_path, system_prompt, user_prompt, 
-                mode, suffix, save_image, pil_images, max_attempts, dpi, temperature,
+                mode, suffix, save_sidecars, pil_images, max_attempts, dpi, temperature,
                 prompt_file=prompt_file,
                 prompt_config=prompt_config,
                 endpoint_url=endpoint_url,

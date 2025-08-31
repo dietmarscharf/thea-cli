@@ -1,0 +1,39 @@
+{
+  "version": "1.0",
+  "name": "pdf-extract-txt",
+  "description": "Default THEA extraction prompt for general document processing",
+  
+  "system_prompt": {
+    "suffix": "Combine all text versions to one accurate text accurately. Then, count the total number of characters in the extracted text directly (do not count step-by-step or iteratively; just compute and output the exact count). Provide a three-word description of the document type in both German and English. Also, briefly summarize what the document is about content-wise in 1-2 sentences in both German and English.",
+    
+       "output_format": {
+      "type": "json",
+      "schema": {
+        "extracted_text": "string",
+        "character_count": "number",
+        "one_word_description_german": "string",
+        "one_word_description_english": "string",
+        "content_summary_german": "string",
+        "content_summary_english": "string"
+      },
+      "instructions": "Respond ONLY in this exact JSON format, nothing else!"
+    }
+  },
+  
+  "user_prompt": {
+    "template": "Extract the text from this PDF document '{{pdf_path}}', count its characters, describe it with three words in both German and English, and summarize its content in both German and English as instructed."
+  },
+  
+  "settings": {
+    "model": "qwen3:14b",
+    "temperature": 0.1,
+    "max_attempts": 3,
+    "timeout": 200,
+    "max_tokens": 50000,
+    "mode": "overwrite",
+    "save_sidecars": true,
+    "dpi": 150,
+    "pipeline": "pdf-extract-txt",
+    "extractors": ["pypdf2", "pdfplumber", "pymupdf"]
+  }
+}

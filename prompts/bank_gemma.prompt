@@ -47,9 +47,9 @@
     "timeout": 200,
     "max_tokens": 50000,
     "mode": "overwrite",
-    "save_image": true,
+    "save_sidecars": true,
     "dpi": 300,
-    "pipeline": "pdf-convert-png",
+    "pipeline": "pdf-extract-png",
     "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
   }
 }

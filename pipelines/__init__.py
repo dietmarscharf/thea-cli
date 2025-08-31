@@ -1,5 +1,5 @@
 from .base import Pipeline
-from .pdf_to_png import PdfToPngPipeline
-from .pdf_to_text import PdfToTextPipeline
+from .pdf_extract_png import PdfExtractPngPipeline
+from .pdf_extract_txt import PdfExtractTxtPipeline
 
-__all__ = ['Pipeline', 'PdfToPngPipeline', 'PdfToTextPipeline']
+__all__ = ['Pipeline', 'PdfExtractPngPipeline', 'PdfExtractTxtPipeline']

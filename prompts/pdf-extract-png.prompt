@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "name": "pdf-extract-png",
+  "description": "Default configuration for PDF to PNG extraction pipeline",
+  
+  "system_prompt": {
+    "suffix": "You are analyzing high-resolution images extracted from a PDF document. Extract all text content accurately, count the total characters, provide a one-word description in both German and English, and summarize the content in both languages."
+  },
+  
+  "user_prompt": {
+    "template": "Please analyze this PDF document '{{pdf_path}}' and extract its content."
+  },
+  
+  "settings": {
+    "model": "gemma3:12b",
+    "temperature": 0.1,
+    "max_attempts": 10,
+    "timeout": 200,
+    "max_tokens": 50000,
+    "mode": "skip",
+    "save_sidecars": true,
+    "dpi": 300,
+    "pipeline": "pdf-extract-png",
+    "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+  }
+}

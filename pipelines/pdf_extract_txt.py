@@ -10,7 +10,7 @@ from extractors.pypdf2_extractor import PyPDF2Extractor
 from extractors.pdfplumber_extractor import PdfPlumberExtractor
 from extractors.pymupdf_extractor import PyMuPDFExtractor
 
-class PdfToTextPipeline(Pipeline):
+class PdfExtractTxtPipeline(Pipeline):
     """Pipeline for extracting text from PDFs using multiple methods."""
     
     @property
@@ -54,7 +54,7 @@ class PdfToTextPipeline(Pipeline):
         
         return extractors
     
-    def process(self, pdf_path: str, parallel: bool = True, save_extractions: bool = False, 
+    def process(self, pdf_path: str, parallel: bool = True, save_sidecars: bool = False, 
                 timestamp: str = None, model_part: str = None, suffix: str = None, **kwargs) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         """
         Extract text from PDF using multiple methods.
@@ -62,7 +62,7 @@ class PdfToTextPipeline(Pipeline):
         Args:
             pdf_path: Path to the PDF file
             parallel: Whether to run extractors in parallel
-            save_extractions: Whether to save extraction results to files
+            save_sidecars: Whether to save extraction results as sidecar files
             timestamp: Timestamp for file naming
             model_part: Model name part for file naming
             suffix: Optional suffix for file naming
@@ -84,7 +84,7 @@ class PdfToTextPipeline(Pipeline):
             "extractors_available": list(self.extractors.keys()),
             "extractors_used": [],
             "parallel_extraction": parallel,
-            "save_extractions": save_extractions,
+            "save_sidecars": save_sidecars,
             "saved_files": []  # Track saved extraction files
         }
         
@@ -108,7 +108,7 @@ class PdfToTextPipeline(Pipeline):
                             print(f"    ✓ {extractor_name}: {len(result.get('text', ''))} chars extracted")
                             
                             # Save extraction to file if requested
-                            if save_extractions and timestamp and model_part:
+                            if save_sidecars and timestamp and model_part:
                                 self._save_extraction_file(result, pdf_path, timestamp, model_part, 
                                                          suffix, metadata)
                         else:
@@ -126,7 +126,7 @@ class PdfToTextPipeline(Pipeline):
                         print(f"    ✓ {name}: {len(result.get('text', ''))} chars extracted")
                         
                         # Save extraction to file if requested
-                        if save_extractions and timestamp and model_part:
+                        if save_sidecars and timestamp and model_part:
                             self._save_extraction_file(result, pdf_path, timestamp, model_part, 
                                                      suffix, metadata)
                     else:

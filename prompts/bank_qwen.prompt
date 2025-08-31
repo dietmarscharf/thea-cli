@@ -47,7 +47,7 @@
     "timeout": 200,
     "max_tokens": 50000,
     "mode": "overwrite",
-    "save_image": false,
+    "save_sidecars": false,
     "dpi": 150,
     "pipeline": "pdf-extract-txt",
     "extractors": ["pypdf2", "pdfplumber", "pymupdf"]
