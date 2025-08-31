@@ -86,28 +86,70 @@ def build_user_prompt(prompt_config, pdf_path):
     result = template.replace("{{pdf_path}}", pdf_path)
     return result
 
-def clean_thea_files(directory=".", force=False, dry_run=False):
-    """Clean THEA-generated files from directory."""
+def clean_thea_files(directory=".", force=False, dry_run=False, pipeline=None):
+    """Clean THEA-generated files from directory.
+    
+    Args:
+        directory: Directory to clean
+        force: Skip confirmation prompt
+        dry_run: Show what would be deleted without deleting
+        pipeline: Optional - clean only files from specific pipeline ('txt', 'png', 'docling', or None for all)
+    """
     # Patterns for THEA files (with timestamp pattern YYYYMMDD_HHMMSS)
     # Format: <original>.<timestamp>.<model>.<suffix>.thea_extract or .thea (legacy)
     # Model names can contain dots (e.g., gemma3.27b)
-    thea_patterns = [
-        r'^.*\.\d{8}_\d{6}\..*\.thea_extract$',  # New THEA extract files
-        r'^.*\.\d{8}_\d{6}\..*\.thea$'  # Legacy THEA files
-    ]
+    if pipeline:
+        # Filter by specific pipeline
+        if pipeline == 'txt':
+            thea_patterns = [r'^.*\.\d{8}_\d{6}\..*\.pdf-extract-txt\.thea_extract$']
+        elif pipeline == 'png':
+            thea_patterns = [r'^.*\.\d{8}_\d{6}\..*\.pdf-extract-png\.thea_extract$']
+        elif pipeline == 'docling':
+            thea_patterns = [r'^.*\.\d{8}_\d{6}\..*\.pdf-extract-docling\.thea_extract$']
+        else:
+            print(f"Unknown pipeline type: {pipeline}. Use 'txt', 'png', 'docling', or None for all.")
+            return 0, 0, 0
+    else:
+        # All THEA files
+        thea_patterns = [
+            r'^.*\.\d{8}_\d{6}\..*\.thea_extract$',  # New THEA extract files
+            r'^.*\.\d{8}_\d{6}\..*\.thea$'  # Legacy THEA files
+        ]
     
     # Patterns for THEA-generated PNG files (must have DPI+page pattern)
     # Format: <original>.<timestamp>.<model>.<suffix>.<dpi>p<page>.png or without suffix
-    png_patterns = [
-        r'^.*\.\d{8}_\d{6}\..*\.\d+p\d+\.png$'  # Any PNG with timestamp and DPI pattern
-    ]
+    if pipeline == 'png' or pipeline is None:
+        png_patterns = [
+            r'^.*\.\d{8}_\d{6}\..*\.\d+p\d+\.png$'  # Any PNG with timestamp and DPI pattern
+        ]
+    else:
+        png_patterns = []  # Don't clean PNG files if specific other pipeline requested
     
-    # Patterns for THEA-generated text extraction files
-    # Format: <original>.<timestamp>.<model>.<suffix>.<extractor>.txt or .json
-    # Extractors: pypdf2, pdfplumber, pymupdf
-    extraction_patterns = [
-        r'^.*\.\d{8}_\d{6}\..*\.(pypdf2|pdfplumber|pymupdf)\.(txt|json)$'  # Text extraction files
-    ]
+    # Patterns for pipeline-specific extraction files
+    # pdf-extract-txt: <original>.<timestamp>.<model>.pdf-extract-txt.<extractor>.(txt|json)
+    # pdf-extract-docling: <original>.<timestamp>.<model>.pdf-extract-docling.docling.(txt|json|md)
+    # pdf-extract-png: PNG files are handled above with png_patterns
+    if pipeline == 'txt':
+        extraction_patterns = [
+            r'^.*\.\d{8}_\d{6}\..*\.pdf-extract-txt\.(pypdf2|pdfplumber|pymupdf)\.(txt|json)$'
+        ]
+    elif pipeline == 'docling':
+        extraction_patterns = [
+            r'^.*\.\d{8}_\d{6}\..*\.pdf-extract-docling\.docling\.(txt|json|md)$'
+        ]
+    elif pipeline == 'png':
+        extraction_patterns = []  # PNG files are handled by png_patterns
+    elif pipeline is None:
+        extraction_patterns = [
+            # pdf-extract-txt pipeline files
+            r'^.*\.\d{8}_\d{6}\..*\.pdf-extract-txt\.(pypdf2|pdfplumber|pymupdf)\.(txt|json)$',
+            # pdf-extract-docling pipeline files
+            r'^.*\.\d{8}_\d{6}\..*\.pdf-extract-docling\.docling\.(txt|json|md)$',
+            # Legacy extraction files (older format)
+            r'^.*\.\d{8}_\d{6}\..*\.(pypdf2|pdfplumber|pymupdf)\.(txt|json)$'
+        ]
+    else:
+        extraction_patterns = []
     
     thea_files = []
     png_files = []
@@ -154,8 +196,9 @@ def clean_thea_files(directory=".", force=False, dry_run=False):
         return 0, 0, 0
     
     # Display files to be deleted
-    print(f"\n=== THEA Files to Clean in '{directory}' ===")
-    print(f"Found {total_thea} .thea file(s), {total_png} .png file(s), and {total_extraction} extraction file(s)")
+    pipeline_msg = f" (pipeline: {pipeline})" if pipeline else " (all pipelines)"
+    print(f"\n=== THEA Files to Clean in '{directory}'{pipeline_msg} ===")
+    print(f"Found {total_thea} .thea_extract file(s), {total_png} .png file(s), and {total_extraction} extraction file(s)")
     
     if dry_run:
         print("\n--- DRY RUN MODE - No files will be deleted ---")
@@ -363,28 +406,8 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
     # Generate model part (e.g., gemma3.12b)
     model_part: Any = model_name.replace(":", ".")
     
-    # Check if a .thea file already exists for this PDF and model with the same suffix
-    if mode == 'skip':
-        if suffix:
-            existing_pattern = f"{pdf_path}.*.{model_part}.{suffix}.thea_extract"
-        else:
-            existing_pattern = f"{pdf_path}.*.{model_part}.thea_extract"
-        existing_files = glob.glob(existing_pattern)
-        if existing_files:
-            suffix_msg = f" with suffix '{suffix}'" if suffix else ""
-            # Check if any are in new JSON format (for info)
-            json_format_count = 0
-            for existing_file in existing_files:
-                try:
-                    with open(existing_file, 'r', encoding='utf-8') as f:
-                        first_char = f.read(1)
-                        if first_char == '{':
-                            json_format_count += 1
-                except:
-                    pass
-            format_info = f" ({json_format_count} JSON format)" if json_format_count > 0 else ""
-            print(f"Skipping {pdf_path} with model {model_name}{suffix_msg} - already processed ({len(existing_files)} existing file(s){format_info})")
-            return
+    # Skip check has been moved to before pipeline processing to avoid creating duplicate sidecar files
+    # The check now happens in the main loop before calling pipeline.process()
     
     # Messages: Combine system and user, with pipeline data
     if pipeline_type == "pdf-extract-png":
@@ -1116,6 +1139,7 @@ if __name__ == "__main__":
         directory = "."
         force = False
         dry_run = False
+        pipeline = None
         
         # Parse clean-specific options
         args = args[1:]  # Remove --clean
@@ -1126,17 +1150,23 @@ if __name__ == "__main__":
             elif args[0] == '--dry-run':
                 dry_run = True
                 args = args[1:]
+            elif args[0] == '--pipeline' and len(args) >= 2:
+                pipeline = args[1]
+                if pipeline not in ['txt', 'png', 'docling']:
+                    print(f"Invalid pipeline: {pipeline}. Use 'txt', 'png', or 'docling'")
+                    sys.exit(1)
+                args = args[2:]
             elif not args[0].startswith('-'):
                 # This is the directory
                 directory = args[0]
                 args = args[1:]
             else:
                 print(f"Unknown clean option: {args[0]}")
-                print("Usage: python thea.py --clean [--force] [--dry-run] [directory]")
+                print("Usage: python thea.py --clean [--force] [--dry-run] [--pipeline <txt|png|docling>] [directory]")
                 sys.exit(1)
         
         # Execute clean and exit
-        deleted_thea, deleted_png, deleted_extraction = clean_thea_files(directory, force, dry_run)
+        deleted_thea, deleted_png, deleted_extraction = clean_thea_files(directory, force, dry_run, pipeline)
         sys.exit(0)
     
     # Parse optional arguments
@@ -1233,13 +1263,14 @@ if __name__ == "__main__":
         print("=" * 50)
         print("\nUsage:")
         print("  python thea.py [OPTIONS] <file_pattern> [file_pattern2] ...")
-        print("  python thea.py --clean [--force] [--dry-run] [directory]")
+        print("  python thea.py --clean [--force] [--dry-run] [--pipeline <type>] [directory]")
         print("  python thea.py --help")
         print("\nOptions:")
         print("  --help, -h        Show this help message and exit")
-        print("  --clean           Clean THEA-generated files (.thea and .png)")
+        print("  --clean           Clean THEA-generated files (.thea_extract, .png, extraction files)")
         print("                    Options: --force (skip confirmation)")
         print("                            --dry-run (show what would be deleted)")
+        print("                            --pipeline <txt|png|docling> (clean specific pipeline only)")
         print("  --mode <mode>     Processing mode:")
         print("                    - skip:      Skip PDFs that already have matching .thea files (default)")
         print("                    - overwrite: Always process PDFs even if .thea files exist")
@@ -1294,14 +1325,16 @@ if __name__ == "__main__":
         print("  python thea.py -t 0.7 '*.pdf'")
         print("\n  # Combine options: custom model with higher temperature")
         print("  python thea.py -m llama2:13b -t 0.5 --max-attempts 10 '*.pdf'")
-        print("\n  # Clean THEA files from current directory")
+        print("\n  # Clean ALL THEA files from current directory")
         print("  python thea.py --clean")
-        print("\n  # Clean THEA files from Belege/ directory with confirmation")
-        print("  python thea.py --clean Belege/")
+        print("\n  # Clean only pdf-extract-txt pipeline files")
+        print("  python thea.py --clean --pipeline txt Belege/")
+        print("\n  # Clean only pdf-extract-docling pipeline files")
+        print("  python thea.py --clean --pipeline docling Belege/")
         print("\n  # Clean without confirmation prompt")
         print("  python thea.py --clean --force Belege/")
         print("\n  # Preview what would be deleted (dry run)")
-        print("  python thea.py --clean --dry-run Belege/")
+        print("  python thea.py --clean --dry-run --pipeline txt Belege/")
         print("\nNotes:")
         print("  - Requires Ollama running on localhost:11434")
         print("  - Requires poppler-utils for PDF processing")
@@ -1483,6 +1516,20 @@ if __name__ == "__main__":
     for pdf_path in pdf_paths:
         print(f"\nProcessing file: {pdf_path}")
         
+        # Check if we should skip this file (do this BEFORE pipeline processing to avoid creating sidecar files)
+        if mode == 'skip' and models:
+            # Use the first model for the skip check
+            model_part = models[0].replace(":", ".")
+            if suffix:
+                existing_pattern = f"{pdf_path}.*.{model_part}.{suffix}.thea_extract"
+            else:
+                existing_pattern = f"{pdf_path}.*.{model_part}.thea_extract"
+            existing_files = glob.glob(existing_pattern)
+            if existing_files:
+                suffix_msg = f" with suffix '{suffix}'" if suffix else ""
+                print(f"Skipping {pdf_path} with model {models[0]}{suffix_msg} - already processed ({len(existing_files)} existing file(s))")
+                continue
+        
         # Process PDF through the selected pipeline
         if pipeline_type == "pdf-extract-png":
             # Image pipeline
@@ -1507,9 +1554,17 @@ if __name__ == "__main__":
                 suffix=suffix
             )
             
-            if not pipeline_data or pipeline_metadata.get("extraction_count", 0) == 0:
-                print(f"Skipping {pdf_path} - no text extracted")
-                continue
+            # Check if extraction was successful based on pipeline type
+            if pipeline_type == "pdf-extract-docling":
+                # Docling pipeline uses extraction_success flag
+                if not pipeline_data or not pipeline_metadata.get("extraction_success", False):
+                    print(f"Skipping {pdf_path} - extraction failed")
+                    continue
+            else:
+                # Text extraction pipeline uses extraction_count
+                if not pipeline_data or pipeline_metadata.get("extraction_count", 0) == 0:
+                    print(f"Skipping {pdf_path} - no text extracted")
+                    continue
             
             # Format for model
             pipeline_data = pipeline.format_for_model(pipeline_data, pipeline_metadata)
