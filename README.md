@@ -86,9 +86,31 @@ Each file contains:
   - One-word description
   - Content summary
 
+## Available Pipelines
+
+THEA supports three PDF extraction pipelines:
+
+1. **pdf-extract-png** - Vision-based extraction using Ollama models on PDF page images
+   - Best for: Complex layouts, scanned documents, documents with images
+   - Models: gemma3:27b (default), any vision-capable Ollama model
+
+2. **pdf-extract-txt** - Pure text extraction using multiple libraries 
+   - Best for: Text-heavy documents, fast processing, non-vision models
+   - Extractors: PyPDF2, pdfplumber, pymupdf (runs all in parallel)
+
+3. **pdf-extract-docling** - Advanced extraction using IBM's Docling deep learning models
+   - Best for: Complex documents with tables, formulas, multi-column layouts
+   - Features: Structure preservation, table extraction, layout analysis
+   - Fallback: Uses gemma3:27b when extraction confidence is low
+   - Note: Requires `pip install docling` (large download with torch dependencies)
+
 ## Available Scripts
 
-- `npm run thea` - Process all PDFs in current directory (Linux/macOS)
-- `npm run thea-windows` - Process all PDFs in current directory (Windows)
+### Pipeline-specific commands:
+- `npm run thea:pdf-extract-png` - Process PDFs using vision extraction
+- `npm run thea:pdf-extract-txt` - Process PDFs using text extraction  
+- `npm run thea:pdf-extract-docling` - Process PDFs using Docling (requires installation)
+
+### General commands:
 - `npm run setup` - Setup virtual environment and install dependencies
 - `npm run install` - Install/update Python dependencies
