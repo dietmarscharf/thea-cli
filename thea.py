@@ -19,16 +19,68 @@ from PIL import Image
 import os
 
 def load_prompt_file(prompt_path):
-    """Load system prompt from a .prompt file."""
+    """Load prompt configuration from a .prompt file (JSON or plain text)."""
     try:
         with open(prompt_path, 'r', encoding='utf-8') as f:
-            return f.read().strip()
+            content = f.read().strip()
+            
+        # Check if it's JSON format
+        if content.startswith('{'):
+            try:
+                prompt_config = json.loads(content)
+                return prompt_config
+            except json.JSONDecodeError as e:
+                print(f"Error parsing JSON in prompt file '{prompt_path}': {e}")
+                return None
+        else:
+            # Legacy plain text format - return as system prompt only
+            return {"legacy": True, "system_prompt": {"suffix": content}}
+            
     except FileNotFoundError:
         print(f"Warning: Prompt file '{prompt_path}' not found. Using default prompt.")
         return None
     except Exception as e:
         print(f"Error reading prompt file '{prompt_path}': {e}")
         return None
+
+def build_system_prompt(prompt_config):
+    """Build the complete system prompt from configuration."""
+    # Hardcoded prefix
+    prefix = "You are a vision-based text extractor and analyzer. "
+    
+    # Get suffix from config
+    suffix = prompt_config.get("system_prompt", {}).get("suffix", "")
+    
+    # Get output format instructions
+    output_format = prompt_config.get("system_prompt", {}).get("output_format", {})
+    format_instructions = ""
+    
+    if output_format:
+        instructions = output_format.get("instructions", "")
+        if output_format.get("type") == "json" and output_format.get("schema"):
+            # Build JSON format example from schema
+            schema_example = {}
+            for key, value in output_format["schema"].items():
+                if isinstance(value, dict):
+                    schema_example[key] = f"<{value.get('type', 'string')}>"
+                else:
+                    schema_example[key] = f"<{value}>"
+            format_instructions = f" {instructions}: {json.dumps(schema_example)}"
+        elif instructions:
+            format_instructions = f" {instructions}"
+    
+    return prefix + suffix + format_instructions
+
+def build_user_prompt(prompt_config, pdf_path):
+    """Build user prompt from template with variable substitution."""
+    template = prompt_config.get("user_prompt", {}).get("template", "")
+    if not template:
+        # Fallback to default
+        return f"Extract the text from this PDF document '{pdf_path}', count its characters, describe it with one word, and summarize its content as instructed."
+    
+    # Simple variable substitution
+    result = template.replace("{{pdf_path}}", pdf_path)
+    return result
 
 def pdf_to_base64_images(pdf_path, dpi=300) -> tuple[list[Any], list[Any]]:
     # Convert PDF to list of PIL images (one per page)
@@ -59,7 +111,7 @@ def pdf_to_base64_images(pdf_path, dpi=300) -> tuple[list[Any], list[Any]]:
         return [], []
 
 
-def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_prompt, mode='skip', suffix='', save_image=False, pil_images=None, max_retries=3, dpi=300, initial_temperature=0.1, prompt_file=None, custom_prompt_content=None, endpoint_url="https://b1s.hey.bahn.business/api/chat"):
+def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_prompt, mode='skip', suffix='', save_image=False, pil_images=None, max_retries=3, dpi=300, initial_temperature=0.1, prompt_file=None, prompt_config=None, endpoint_url="https://b1s.hey.bahn.business/api/chat"):
     # Track all execution details for the new JSON format
     execution_data = {
         "version": "2.0",
@@ -161,8 +213,9 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
     # Populate prompt information
     execution_data["prompt"] = {
         "system": system_prompt,
-        "custom_prompt_file": prompt_file,
-        "custom_prompt_content": custom_prompt_content
+        "user": user_prompt,
+        "prompt_file": prompt_file,
+        "prompt_config": prompt_config if prompt_config and not prompt_config.get("legacy") else None
     }
     
     # Initialize execution images data
@@ -647,7 +700,7 @@ if __name__ == "__main__":
         print("  - Requires poppler-utils for PDF processing")
         print("  - Default model: gemma3:27b (override with -m/--model)")
         print("  - Skip mode is suffix-specific: only skips files with matching suffix")
-        print("  - Prompt files should contain the system prompt in plain text")
+        print("  - Prompt files use JSON format (or legacy plain text)")
         print("  - Default DPI: 300 (higher = better quality but larger files)")
         print("  - Images saved as PNG when --save-image is used")
         print("  - Automatically retries if model gets stuck in repetitive patterns")
@@ -657,42 +710,91 @@ if __name__ == "__main__":
         print("  - Run 'npm run setup' for initial setup")
         sys.exit(1)
     
-    # Load prompt file if specified
-    custom_prompt = None  # Initialize variable
+    # Load prompt configuration
+    prompt_config = None
+    
+    # Priority 1: Try specified prompt file
     if prompt_file:
-        custom_prompt = load_prompt_file(prompt_file)
-        if custom_prompt:
-            system_prompt = custom_prompt
+        prompt_config = load_prompt_file(prompt_file)
+        if prompt_config:
+            print(f"Using prompt file: {prompt_file}")
             # Extract prompt name for suffix if no explicit suffix given
-            if not suffix:
+            if not suffix and not prompt_config.get("legacy"):
                 # Remove .prompt extension and use as suffix
                 prompt_name = os.path.splitext(os.path.basename(prompt_file))[0]
-                suffix = prompt_name
-                print(f"Using prompt file: {prompt_file} (suffix: {suffix})")
-            else:
-                print(f"Using prompt file: {prompt_file} (suffix override: {suffix})")
+                if prompt_name != ".prompt":  # Don't use empty suffix for default .prompt
+                    suffix = prompt_name
+                    print(f"  Auto-suffix: {suffix}")
         else:
-            # Fall back to default prompt
-            system_prompt = (
-                "You are a vision-based text extractor and analyzer. Extract all text from the provided PDF image(s) accurately. "
-                "Then, count the total number of characters in the extracted text directly (do not count step-by-step or iteratively; "
-                "just compute and output the exact count). Provide a one-word description of the document type. "
-                "Also, briefly summarize what the document is about content-wise in 1-2 sentences. "
-                "Respond ONLY in this exact JSON format, nothing else: "
-                "{\"extracted_text\": \"the full extracted text here\", \"character_count\": 123, "
-                "\"one_word_description\": \"example\", \"content_summary\": \"Brief content description here.\"}"
-            )
-    else:
-        # Default system prompt
-        system_prompt = (
-            "You are a vision-based text extractor and analyzer. Extract all text from the provided PDF image(s) accurately. "
-            "Then, count the total number of characters in the extracted text directly (do not count step-by-step or iteratively; "
-            "just compute and output the exact count). Provide a one-word description of the document type. "
-            "Also, briefly summarize what the document is about content-wise in 1-2 sentences. "
-            "Respond ONLY in this exact JSON format, nothing else: "
-            "{\"extracted_text\": \"the full extracted text here\", \"character_count\": 123, "
-            "\"one_word_description\": \"example\", \"content_summary\": \"Brief content description here.\"}"
-        )
+            print(f"Warning: Could not load prompt file '{prompt_file}', using defaults")
+    
+    # Priority 2: Try default .prompt file if no prompt file specified
+    if not prompt_config and not prompt_file:
+        if os.path.exists(".prompt"):
+            prompt_config = load_prompt_file(".prompt")
+            if prompt_config:
+                print("Using default .prompt file")
+    
+    # Priority 3: Fall back to hardcoded defaults
+    if not prompt_config:
+        prompt_config = {
+            "system_prompt": {
+                "suffix": "Extract all text from the provided PDF image(s) accurately. Then, count the total number of characters in the extracted text directly (do not count step-by-step or iteratively; just compute and output the exact count). Provide a one-word description of the document type. Also, briefly summarize what the document is about content-wise in 1-2 sentences.",
+                "output_format": {
+                    "type": "json",
+                    "instructions": "Respond ONLY in this exact JSON format, nothing else",
+                    "schema": {
+                        "extracted_text": "string",
+                        "character_count": "number",
+                        "one_word_description": "string",
+                        "content_summary": "string"
+                    }
+                }
+            },
+            "user_prompt": {
+                "template": "Extract the text from this PDF document '{{pdf_path}}', count its characters, describe it with one word, and summarize its content as instructed."
+            },
+            "settings": {}
+        }
+        if not prompt_file:  # Only show this if user didn't specify a prompt file
+            print("Using hardcoded default prompts")
+    
+    # Apply settings from prompt config (can be overridden by command-line args)
+    prompt_settings = prompt_config.get("settings", {})
+    
+    # Parameter priority: command-line > prompt file > defaults
+    # Only apply prompt file settings if not specified on command line
+    if not model_override and "model" in prompt_settings:
+        model_override = prompt_settings["model"]
+        print(f"  Using model from prompt: {model_override}")
+    
+    # For these, we check if they're still at default values
+    if temperature == 0.1 and "temperature" in prompt_settings:
+        temperature = prompt_settings["temperature"]
+        print(f"  Using temperature from prompt: {temperature}")
+    
+    if max_retries == 3 and "max_retries" in prompt_settings:
+        max_retries = prompt_settings["max_retries"]
+        print(f"  Using max_retries from prompt: {max_retries}")
+    
+    if mode == 'skip' and "mode" in prompt_settings:
+        mode = prompt_settings["mode"]
+        print(f"  Using mode from prompt: {mode}")
+    
+    if not save_image and "save_image" in prompt_settings:
+        save_image = prompt_settings["save_image"]
+        if save_image:
+            print(f"  Using save_image from prompt: {save_image}")
+    
+    if dpi == 300 and "dpi" in prompt_settings:
+        dpi = prompt_settings["dpi"]
+        print(f"  Using DPI from prompt: {dpi}")
+    
+    # Get endpoint URL
+    endpoint_url = prompt_settings.get("endpoint_url", "https://b1s.hey.bahn.business/api/chat")
+    
+    # Build system prompt from config
+    system_prompt = build_system_prompt(prompt_config)
     
     print(f"Mode: {mode}")
     if suffix:
@@ -743,14 +845,14 @@ if __name__ == "__main__":
             continue
         
         for model in models:
-            # User prompt per file
-            user_prompt: str = f"Extract the text from this PDF document '{pdf_path}', count its characters, describe it with one word, and summarize its content as instructed."
+            # Build user prompt from template
+            user_prompt = build_user_prompt(prompt_config, pdf_path)
             
             # Pass additional parameters for the new JSON format
             process_with_model(
                 model, base64_images, pdf_path, system_prompt, user_prompt, 
                 mode, suffix, save_image, pil_images, max_retries, dpi, temperature,
                 prompt_file=prompt_file,
-                custom_prompt_content=custom_prompt if prompt_file else None,
-                endpoint_url="https://b1s.hey.bahn.business/api/chat"
+                prompt_config=prompt_config,
+                endpoint_url=endpoint_url
             )
