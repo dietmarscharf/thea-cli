@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "PDF text extraction and analysis using Ollama vision models",
   "scripts": {
-    "thea": ". venv/bin/activate && python3 thea.py -m gemma3:27b --save-image \"Belege/*.pdf\" \"Belege/*.PDF\"",
-    "thea-windows": "venv\\Scripts\\activate && python thea.py -m gemma3:27b --save-image \"Belege\\*.pdf\" \"Belege\\*.PDF\"",
+    "thea": ". venv/bin/activate && python3 thea.py --max-retries 10 -m gemma3:27b --save-image \"Belege/*.pdf\" \"Belege/*.PDF\"",
+    "thea-windows": "venv\\Scripts\\activate && python thea.py --max-retries 10 -m gemma3:27b --save-image \"Belege\\*.pdf\" \"Belege\\*.PDF\"",
     "setup": "python3 -m venv venv && . venv/bin/activate && pip install -r requirements.txt",
     "setup-windows": "python -m venv venv && venv\\Scripts\\activate && pip install -r requirements.txt",
     "activate": ". venv/bin/activate",
