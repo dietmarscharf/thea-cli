@@ -10,13 +10,14 @@ import datetime
 import time
 import platform
 import socket
+import re
 try:
     from pdf2image import convert_from_path
+    from PIL import Image
 except ImportError:
     print("pdf2image not available")
     convert_from_path = None
-from PIL import Image
-import os
+    Image = None
 
 def load_prompt_file(prompt_path):
     """Load prompt configuration from a .prompt file (JSON or plain text)."""
@@ -76,11 +77,123 @@ def build_user_prompt(prompt_config, pdf_path):
     template = prompt_config.get("user_prompt", {}).get("template", "")
     if not template:
         # Fallback to default
-        return f"Extract the text from this PDF document '{pdf_path}', count its characters, describe it with one word, and summarize its content as instructed."
+        return f"Extract the text from this PDF document '{pdf_path}', count its characters, describe it with one word in both German and English, and summarize its content in both German and English as instructed."
     
     # Simple variable substitution
     result = template.replace("{{pdf_path}}", pdf_path)
     return result
+
+def clean_thea_files(directory=".", force=False, dry_run=False):
+    """Clean THEA-generated files from directory."""
+    # Patterns for THEA files (with timestamp pattern YYYYMMDD_HHMMSS)
+    thea_patterns = [
+        r'^.*\.\d{8}_\d{6}\.[^.]+\.thea$',  # Without suffix
+        r'^.*\.\d{8}_\d{6}\.[^.]+\.[^.]+\.thea$'  # With suffix
+    ]
+    
+    # Patterns for THEA-generated PNG files (must have DPI+page pattern)
+    png_patterns = [
+        r'^.*\.\d{8}_\d{6}\.[^.]+\.\d+p\d+\.png$',  # Without suffix
+        r'^.*\.\d{8}_\d{6}\.[^.]+\.[^.]+\.\d+p\d+\.png$'  # With suffix
+    ]
+    
+    thea_files = []
+    png_files = []
+    
+    # Find matching files
+    try:
+        for file in os.listdir(directory):
+            file_path = os.path.join(directory, file)
+            if os.path.isfile(file_path):
+                # Check THEA files
+                for pattern in thea_patterns:
+                    if re.match(pattern, file):
+                        thea_files.append(file_path)
+                        break
+                # Check PNG files
+                for pattern in png_patterns:
+                    if re.match(pattern, file):
+                        png_files.append(file_path)
+                        break
+    except FileNotFoundError:
+        print(f"Error: Directory '{directory}' not found.")
+        return 0, 0
+    except PermissionError:
+        print(f"Error: Permission denied accessing directory '{directory}'.")
+        return 0, 0
+    
+    # Sort files for consistent display
+    thea_files.sort()
+    png_files.sort()
+    
+    total_thea = len(thea_files)
+    total_png = len(png_files)
+    
+    if total_thea == 0 and total_png == 0:
+        print(f"No THEA-generated files found in '{directory}'")
+        return 0, 0
+    
+    # Display files to be deleted
+    print(f"\n=== THEA Files to Clean in '{directory}' ===")
+    print(f"Found {total_thea} .thea file(s) and {total_png} .png file(s)")
+    
+    if dry_run:
+        print("\n--- DRY RUN MODE - No files will be deleted ---")
+    
+    if thea_files:
+        print(f"\n.thea files ({total_thea}):")
+        for f in thea_files[:10]:  # Show first 10
+            print(f"  - {os.path.basename(f)}")
+        if total_thea > 10:
+            print(f"  ... and {total_thea - 10} more")
+    
+    if png_files:
+        print(f"\n.png files ({total_png}):")
+        for f in png_files[:10]:  # Show first 10
+            print(f"  - {os.path.basename(f)}")
+        if total_png > 10:
+            print(f"  ... and {total_png - 10} more")
+    
+    if dry_run:
+        print(f"\nDry run complete. Would delete {total_thea} .thea and {total_png} .png files.")
+        return 0, 0
+    
+    # Confirmation prompt
+    if not force:
+        print(f"\nAbout to delete {total_thea} .thea file(s) and {total_png} .png file(s)")
+        response = input("Are you sure? (y/N): ").strip().lower()
+        if response != 'y':
+            print("Cancelled.")
+            return 0, 0
+    
+    # Delete files
+    deleted_thea = 0
+    deleted_png = 0
+    
+    print("\nDeleting files...")
+    
+    for f in thea_files:
+        try:
+            os.remove(f)
+            deleted_thea += 1
+            if deleted_thea <= 5 or deleted_thea % 10 == 0:  # Progress indicator
+                print(f"  Deleted: {os.path.basename(f)}")
+        except Exception as e:
+            print(f"  Error deleting {f}: {e}")
+    
+    for f in png_files:
+        try:
+            os.remove(f)
+            deleted_png += 1
+            if deleted_png <= 5 or deleted_png % 10 == 0:  # Progress indicator
+                print(f"  Deleted: {os.path.basename(f)}")
+        except Exception as e:
+            print(f"  Error deleting {f}: {e}")
+    
+    print(f"\n=== Clean Complete ===")
+    print(f"Deleted {deleted_thea} .thea file(s) and {deleted_png} .png file(s)")
+    
+    return deleted_thea, deleted_png
 
 def pdf_to_base64_images(pdf_path, dpi=300) -> tuple[list[Any], list[Any]]:
     # Convert PDF to list of PIL images (one per page)
@@ -111,7 +224,7 @@ def pdf_to_base64_images(pdf_path, dpi=300) -> tuple[list[Any], list[Any]]:
         return [], []
 
 
-def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_prompt, mode='skip', suffix='', save_image=False, pil_images=None, max_retries=3, dpi=300, initial_temperature=0.1, prompt_file=None, prompt_config=None, endpoint_url="https://b1s.hey.bahn.business/api/chat"):
+def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_prompt, mode='skip', suffix='', save_image=False, pil_images=None, max_retries=3, dpi=300, initial_temperature=0.1, prompt_file=None, prompt_config=None, endpoint_url="https://b1s.hey.bahn.business/api/chat", timeout=100, max_tokens=50000):
     # Track all execution details for the new JSON format
     execution_data = {
         "version": "2.0",
@@ -207,7 +320,9 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
         "dpi": dpi,
         "max_retries": max_retries,
         "initial_temperature": initial_temperature,
-        "temperature_progression": []  # Will be populated during retries
+        "temperature_progression": [],  # Will be populated during retries
+        "timeout": timeout,
+        "max_tokens": max_tokens
     }
     
     # Populate prompt information
@@ -269,15 +384,19 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
     
     # Retry loop for handling stuck model responses
     for retry_count in range(max_retries):
-        # Calculate progressive temperature: starts at initial_temperature, increases to approach 1.0
-        # Formula: temperature = initial_temp + (retry_count * (1.0 - initial_temp) / max_retries)
-        current_temperature = initial_temperature + (retry_count * (1.0 - initial_temperature) / max_retries)
+        # Calculate progressive temperature: starts at initial_temperature, increases to 1.0
+        # Formula: temperature = initial_temp + (retry_count * (1.0 - initial_temp) / (max_retries - 1))
+        # Handle edge case where max_retries = 1
+        if max_retries == 1:
+            current_temperature = initial_temperature
+        else:
+            current_temperature = initial_temperature + (retry_count * (1.0 - initial_temperature) / (max_retries - 1))
         execution_data["settings"]["temperature_progression"].append(current_temperature)
         final_retry_count = retry_count
         final_temperature = current_temperature
         
         if retry_count > 0:
-            print(f"\n=== RETRY {retry_count}/{max_retries - 1} for Model: {model_name} for File: {pdf_path} ===")
+            print(f"\n=== RETRY {retry_count + 1}/{max_retries} for Model: {model_name} for File: {pdf_path} ===")
             print(f"Temperature adjusted to: {current_temperature:.2f}")
         
         # Build payload with current temperature
@@ -287,7 +406,8 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
             "stream": True,  # Enable streaming for chunked responses
             "format": "json",  # Force JSON output
             "options": {
-                "temperature": current_temperature
+                "temperature": current_temperature,
+                "num_predict": max_tokens  # Maximum tokens to generate
             }
         }
         
@@ -299,8 +419,8 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
             # Track request time
             request_start = time.time()
             
-            # Send request with streaming
-            response = requests.post(url, json=payload, stream=True)
+            # Send request with streaming (with timeout for initial connection)
+            response = requests.post(url, json=payload, stream=True, timeout=(10, None))  # 10s connect timeout, no read timeout
             response.raise_for_status()  # Raise error if request fails
             
             # Collect full response for final JSON parsing and file saving
@@ -323,6 +443,16 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
                     decoded_chunk = chunk.decode('utf-8')
                     chunk_count += 1
                     
+                    # Check overall timeout
+                    elapsed_time = time.time() - request_start
+                    if elapsed_time > timeout:
+                        print(f"\n!!! TIMEOUT: Response exceeded {timeout} seconds (elapsed: {elapsed_time:.1f}s) !!!")
+                        response.close()
+                        stuck_detected = True
+                        local_pattern_type = "timeout"
+                        pattern_description = f"Response timed out after {elapsed_time:.1f} seconds"
+                        break
+                    
                     try:
                         # Ollama streams as JSON lines; extract 'message' content if present
                         chunk_data = json.loads(decoded_chunk)
@@ -334,49 +464,78 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
                             sys.stdout.write(content)
                             sys.stdout.flush()
                             
-                            # Check for any repetitive pattern (1, 2, or 3 chunk patterns)
+                            # Check token limit (rough estimate: 1 token ≈ 4 chars)
+                            approx_tokens = len(full_response) // 4
+                            if approx_tokens > max_tokens:
+                                print(f"\n!!! TOKEN LIMIT: Exceeded {max_tokens} tokens (approx {approx_tokens}) !!!")
+                                response.close()
+                                stuck_detected = True
+                                local_pattern_type = "token_limit"
+                                pattern_description = f"Exceeded token limit of {max_tokens}"
+                                break
+                            
+                            # Check for any repetitive pattern (1 to 100 chunk patterns)
                             last_contents.append(content)
-                            if len(last_contents) > 150:  # Keep last 150 chunks for pattern detection
+                            if len(last_contents) > 3000:  # Keep last 3000 chunks for pattern detection (increased for much longer patterns)
                                 last_contents.pop(0)
                             
                             # Check if we're stuck in a repeating pattern
-                            if len(last_contents) >= 50:
+                            # We need enough chunks to detect patterns
+                            if len(last_contents) >= 20:  # Minimum chunks to start checking
                                 stuck_detected = False
                                 pattern_description = ""
                                 
-                                # Check for 1-chunk pattern (same content repeated)
-                                if len(set(last_contents[-50:])) == 1:
-                                    stuck_detected = True
-                                    local_pattern_type = "single_chunk"
-                                    pattern_description = f"single chunk '{last_contents[-1]}' repeated"
-                                
-                                # Check for 2-chunk pattern (alternating between two values)
-                                elif len(last_contents) >= 50:
-                                    # Get potential 2-chunk pattern
-                                    potential_pattern = last_contents[-2:]
-                                    is_pattern = True
-                                    for i in range(50):
-                                        if last_contents[-(50-i)] != potential_pattern[i % 2]:
-                                            is_pattern = False
-                                            break
-                                    if is_pattern:
-                                        stuck_detected = True
-                                        local_pattern_type = "two_chunk_alternating"
-                                        pattern_description = f"alternating pattern '{potential_pattern[0]}', '{potential_pattern[1]}'"
-                                
-                                # Check for 3-chunk pattern
-                                if not stuck_detected and len(last_contents) >= 51:
-                                    # Get potential 3-chunk pattern
-                                    potential_pattern = last_contents[-3:]
-                                    is_pattern = True
-                                    for i in range(51):
-                                        if last_contents[-(51-i)] != potential_pattern[i % 3]:
-                                            is_pattern = False
-                                            break
-                                    if is_pattern:
-                                        stuck_detected = True
-                                        local_pattern_type = "three_chunk_cycle"
-                                        pattern_description = f"3-chunk pattern '{potential_pattern[0]}', '{potential_pattern[1]}', '{potential_pattern[2]}'"
+                                # Check for patterns from 1 to 100 chunks in length
+                                for pattern_length in range(1, 101):
+                                    # Calculate minimum repetitions needed for confidence
+                                    # For shorter patterns, require more repetitions
+                                    # For longer patterns, require fewer repetitions but at least 10
+                                    if pattern_length == 1:
+                                        min_repetitions = 50  # Single chunk needs 50 repetitions
+                                    elif pattern_length == 2:
+                                        min_repetitions = 25  # 2-chunk pattern needs 25 cycles (50 chunks)
+                                    elif pattern_length <= 10:
+                                        # For 3-10 chunk patterns, require at least 10 repetitions
+                                        # or enough to fill 60 chunks, whichever is less
+                                        min_repetitions = max(10, 60 // pattern_length)
+                                    elif pattern_length <= 30:
+                                        min_repetitions = 8  # Medium patterns need 8 repetitions
+                                    elif pattern_length <= 60:
+                                        min_repetitions = 5  # Longer patterns need 5 repetitions
+                                    else:  # pattern_length <= 100
+                                        min_repetitions = 3  # Very long patterns need only 3 repetitions
+                                    
+                                    required_chunks = pattern_length * min_repetitions
+                                    
+                                    # Check if we have enough chunks to test this pattern
+                                    if len(last_contents) >= required_chunks:
+                                        # Get the potential pattern (last pattern_length chunks)
+                                        potential_pattern = last_contents[-pattern_length:]
+                                        
+                                        # Check if this pattern repeats for the required number of chunks
+                                        is_pattern = True
+                                        for i in range(required_chunks):
+                                            chunk_index = -(required_chunks - i)
+                                            pattern_index = i % pattern_length
+                                            if last_contents[chunk_index] != potential_pattern[pattern_index]:
+                                                is_pattern = False
+                                                break
+                                        
+                                        if is_pattern:
+                                            stuck_detected = True
+                                            if pattern_length == 1:
+                                                local_pattern_type = "single_chunk"
+                                                pattern_description = f"single chunk '{potential_pattern[0][:50]}' repeated {min_repetitions} times"
+                                            elif pattern_length == 2:
+                                                local_pattern_type = "two_chunk_alternating"
+                                                pattern_description = f"2-chunk alternating pattern repeated {min_repetitions} times"
+                                            elif pattern_length <= 10:
+                                                local_pattern_type = f"{pattern_length}_chunk_pattern"
+                                                pattern_description = f"{pattern_length}-chunk cyclic pattern repeated {min_repetitions} times"
+                                            else:
+                                                local_pattern_type = f"{pattern_length}_chunk_long_pattern"
+                                                pattern_description = f"{pattern_length}-character pattern repeated {min_repetitions} times"
+                                            break  # Found a pattern, stop checking
                                 
                                 if stuck_detected:
                                     print(f"\n!!! STUCK PATTERN DETECTED after {len(last_contents)} chunks !!!")
@@ -581,11 +740,42 @@ if __name__ == "__main__":
     max_retries = 3  # Default max retries for stuck model responses
     model_override = None  # Default: use built-in model list
     temperature = 0.1  # Default temperature (very low for precision)
+    timeout = 100  # Default timeout in seconds for overall response
+    max_tokens = 50000  # Default max tokens to generate
     args = sys.argv[1:]
     
     # Check for help flag first
     if len(args) >= 1 and args[0] in ['--help', '-h', 'help']:
         args = []
+    
+    # Check for clean mode
+    if len(args) >= 1 and args[0] == '--clean':
+        # Handle clean command
+        directory = "."
+        force = False
+        dry_run = False
+        
+        # Parse clean-specific options
+        args = args[1:]  # Remove --clean
+        while len(args) > 0:
+            if args[0] == '--force':
+                force = True
+                args = args[1:]
+            elif args[0] == '--dry-run':
+                dry_run = True
+                args = args[1:]
+            elif not args[0].startswith('-'):
+                # This is the directory
+                directory = args[0]
+                args = args[1:]
+            else:
+                print(f"Unknown clean option: {args[0]}")
+                print("Usage: python thea.py --clean [--force] [--dry-run] [directory]")
+                sys.exit(1)
+        
+        # Execute clean and exit
+        deleted_thea, deleted_png = clean_thea_files(directory, force, dry_run)
+        sys.exit(0)
     
     # Parse optional arguments
     while len(args) >= 1 and args[0].startswith('-'):
@@ -638,6 +828,26 @@ if __name__ == "__main__":
             except ValueError:
                 print(f"Error: Invalid temperature value '{args[1]}'. Must be a float.")
                 sys.exit(1)
+        elif args[0] == '--timeout' and len(args) >= 2:
+            try:
+                timeout = int(args[1])
+                if timeout < 1 or timeout > 3600:
+                    print(f"Error: Timeout must be between 1 and 3600 seconds. Got: {timeout}")
+                    sys.exit(1)
+                args = args[2:]  # Remove timeout arguments from args
+            except ValueError:
+                print(f"Error: Invalid timeout value '{args[1]}'. Must be an integer.")
+                sys.exit(1)
+        elif args[0] == '--max-tokens' and len(args) >= 2:
+            try:
+                max_tokens = int(args[1])
+                if max_tokens < 100 or max_tokens > 100000:
+                    print(f"Error: Max tokens must be between 100 and 100000. Got: {max_tokens}")
+                    sys.exit(1)
+                args = args[2:]  # Remove max-tokens arguments from args
+            except ValueError:
+                print(f"Error: Invalid max-tokens value '{args[1]}'. Must be an integer.")
+                sys.exit(1)
         else:
             print(f"Error: Unknown option '{args[0]}'")
             sys.exit(1)
@@ -647,9 +857,13 @@ if __name__ == "__main__":
         print("=" * 50)
         print("\nUsage:")
         print("  python thea.py [OPTIONS] <file_pattern> [file_pattern2] ...")
+        print("  python thea.py --clean [--force] [--dry-run] [directory]")
         print("  python thea.py --help")
         print("\nOptions:")
         print("  --help, -h        Show this help message and exit")
+        print("  --clean           Clean THEA-generated files (.thea and .png)")
+        print("                    Options: --force (skip confirmation)")
+        print("                            --dry-run (show what would be deleted)")
         print("  --mode <mode>     Processing mode:")
         print("                    - skip:      Skip PDFs that already have matching .thea files (default)")
         print("                    - overwrite: Always process PDFs even if .thea files exist")
@@ -663,6 +877,8 @@ if __name__ == "__main__":
         print("  -m, --model <name> Override default model (e.g., gemma:14b, llama2:13b)")
         print("  -t, --temperature <value> Set initial temperature (0.0-2.0, default: 0.1)")
         print("                    Temperature increases progressively with retries to reach ~1.0")
+        print("  --timeout <secs>  Overall request timeout in seconds (1-3600, default: 100)")
+        print("  --max-tokens <n>  Maximum tokens to generate (100-100000, default: 50000)")
         print("\nOutput File Format:")
         print("  Default:          <pdf>.<timestamp>.<model>.thea")
         print("  With suffix:      <pdf>.<timestamp>.<model>.<suffix>.thea")
@@ -695,6 +911,14 @@ if __name__ == "__main__":
         print("  python thea.py -t 0.7 '*.pdf'")
         print("\n  # Combine options: custom model with higher temperature")
         print("  python thea.py -m llama2:13b -t 0.5 --max-retries 10 '*.pdf'")
+        print("\n  # Clean THEA files from current directory")
+        print("  python thea.py --clean")
+        print("\n  # Clean THEA files from Belege/ directory with confirmation")
+        print("  python thea.py --clean Belege/")
+        print("\n  # Clean without confirmation prompt")
+        print("  python thea.py --clean --force Belege/")
+        print("\n  # Preview what would be deleted (dry run)")
+        print("  python thea.py --clean --dry-run Belege/")
         print("\nNotes:")
         print("  - Requires Ollama running on localhost:11434")
         print("  - Requires poppler-utils for PDF processing")
@@ -739,20 +963,22 @@ if __name__ == "__main__":
     if not prompt_config:
         prompt_config = {
             "system_prompt": {
-                "suffix": "Extract all text from the provided PDF image(s) accurately. Then, count the total number of characters in the extracted text directly (do not count step-by-step or iteratively; just compute and output the exact count). Provide a one-word description of the document type. Also, briefly summarize what the document is about content-wise in 1-2 sentences.",
+                "suffix": "Extract all text from the provided PDF image(s) accurately. Then, count the total number of characters in the extracted text directly (do not count step-by-step or iteratively; just compute and output the exact count). Provide a one-word description of the document type in both German and English. Also, briefly summarize what the document is about content-wise in 1-2 sentences in both German and English.",
                 "output_format": {
                     "type": "json",
                     "instructions": "Respond ONLY in this exact JSON format, nothing else",
                     "schema": {
                         "extracted_text": "string",
                         "character_count": "number",
-                        "one_word_description": "string",
-                        "content_summary": "string"
+                        "one_word_description_german": "string",
+                        "one_word_description_english": "string",
+                        "content_summary_german": "string",
+                        "content_summary_english": "string"
                     }
                 }
             },
             "user_prompt": {
-                "template": "Extract the text from this PDF document '{{pdf_path}}', count its characters, describe it with one word, and summarize its content as instructed."
+                "template": "Extract the text from this PDF document '{{pdf_path}}', count its characters, describe it with one word in both German and English, and summarize its content in both German and English as instructed."
             },
             "settings": {}
         }
@@ -776,6 +1002,14 @@ if __name__ == "__main__":
     if max_retries == 3 and "max_retries" in prompt_settings:
         max_retries = prompt_settings["max_retries"]
         print(f"  Using max_retries from prompt: {max_retries}")
+    
+    if timeout == 100 and "timeout" in prompt_settings:
+        timeout = prompt_settings["timeout"]
+        print(f"  Using timeout from prompt: {timeout}")
+    
+    if max_tokens == 50000 and "max_tokens" in prompt_settings:
+        max_tokens = prompt_settings["max_tokens"]
+        print(f"  Using max_tokens from prompt: {max_tokens}")
     
     if mode == 'skip' and "mode" in prompt_settings:
         mode = prompt_settings["mode"]
@@ -854,5 +1088,7 @@ if __name__ == "__main__":
                 mode, suffix, save_image, pil_images, max_retries, dpi, temperature,
                 prompt_file=prompt_file,
                 prompt_config=prompt_config,
-                endpoint_url=endpoint_url
+                endpoint_url=endpoint_url,
+                timeout=timeout,
+                max_tokens=max_tokens
             )
