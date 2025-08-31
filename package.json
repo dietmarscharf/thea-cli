@@ -18,7 +18,13 @@
     "build-spec": ". venv/bin/activate && pyinstaller thea.spec",
     "build-spec-windows": "venv\\Scripts\\activate && pyinstaller thea.spec",
     "clean-build": "rm -rf build dist *.spec __pycache__",
-    "clean-build-windows": "rmdir /s /q build dist & del *.spec & rmdir /s /q __pycache__"
+    "clean-build-windows": "rmdir /s /q build dist & del *.spec & rmdir /s /q __pycache__",
+    "thea:clean": ". venv/bin/activate && python3 thea.py --clean Belege/",
+    "thea:clean-windows": "venv\\Scripts\\activate && python thea.py --clean Belege\\",
+    "thea:clean-force": ". venv/bin/activate && python3 thea.py --clean --force Belege/",
+    "thea:clean-force-windows": "venv\\Scripts\\activate && python thea.py --clean --force Belege\\",
+    "thea:clean-dry": ". venv/bin/activate && python3 thea.py --clean --dry-run Belege/",
+    "thea:clean-dry-windows": "venv\\Scripts\\activate && python thea.py --clean --dry-run Belege\\"
   },
   "keywords": [
     "pdf",
