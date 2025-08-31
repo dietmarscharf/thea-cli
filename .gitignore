@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# PyInstaller
+build/
+dist/
+*.spec
+!thea.spec
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project specific
+Belege/
+*.thea
+*.png
+*.pdf
+*.PDF
+
+# OS
+.DS_Store
+Thumbs.db

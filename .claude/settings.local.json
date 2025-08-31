@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(. venv/bin/activate)",
+      "Bash(pip install:*)",
+      "Bash(npm run:*)",
+      "Bash(pkill:*)",
+      "Bash(python3:*)",
+      "Bash(grep:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
