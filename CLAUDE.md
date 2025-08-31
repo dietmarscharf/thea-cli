@@ -10,7 +10,7 @@ THEA is a PDF text extraction and analysis system that uses Ollama's vision mode
 
 ### Core Components
 
-The system (`thea.py`) consists of five main functions:
+The system (`thea.py`) consists of six main functions:
 
 1. **`load_prompt_file(prompt_path)`** - Loads JSON or plain text prompt configurations. Returns a dict with prompt config or None.
 
@@ -29,6 +29,11 @@ The system (`thea.py`) consists of five main functions:
    - Streams responses from Ollama API
    - Saves results as JSON v2.0 format
 
+6. **`clean_thea_files(directory, force, dry_run)`** - Cleans THEA-generated files:
+   - Identifies files using timestamp and naming patterns
+   - Safely removes only THEA-created `.thea` and `.png` files
+   - Supports dry-run mode and forced deletion
+
 ### Processing Pipeline
 
 1. **Configuration Loading**
@@ -43,8 +48,8 @@ The system (`thea.py`) consists of five main functions:
 
 3. **Model Communication**
    - Streams responses character-by-character to stdout
-   - Implements retry logic with temperature progression: `initial_temp + (retry_count * (1.0 - initial_temp) / max_retries)`
-   - Detects stuck patterns (single chunk, two-chunk alternating, three-chunk cycle)
+   - Implements retry logic with temperature progression formula: `initial_temp + (retry_count * (1.0 - initial_temp) / (max_retries - 1))`
+   - Detects stuck patterns (single chunk, two-chunk alternating, three-chunk cycle) after 50+ repetitions
 
 4. **Result Storage**
    - Saves as `.thea` files in JSON v2.0 format
@@ -52,6 +57,36 @@ The system (`thea.py`) consists of five main functions:
    - Backward compatible with legacy text format detection
 
 ## Commands
+
+### Running THEA
+```bash
+# Default processing (Belege/ folder, gemma3:27b, --max-retries 10, --save-image)
+npm run thea               # Linux/macOS
+npm run thea-windows       # Windows
+
+# Direct execution with options
+python3 thea.py [OPTIONS] <file_pattern> [file_pattern2] ...
+python3 thea.py --clean [--force] [--dry-run] [directory]
+
+# Common patterns
+python3 thea.py sample_document.pdf                    # Single file
+python3 thea.py --mode overwrite "*.pdf"              # Force reprocess
+python3 thea.py --prompt invoice.prompt "*.pdf"       # Custom prompt
+python3 thea.py -m gemma:14b -t 0.5 "*.pdf"          # Different model/temp
+```
+
+### Cleaning THEA Files
+```bash
+# Clean THEA files from Belege/ directory
+npm run thea:clean           # With confirmation
+npm run thea:clean-force     # Without confirmation
+npm run thea:clean-dry       # Preview only
+
+# Direct CLI usage
+python3 thea.py --clean [directory]
+python3 thea.py --clean --force Belege/
+python3 thea.py --clean --dry-run .
+```
 
 ### Development Setup
 ```bash
@@ -62,22 +97,10 @@ npm run setup-windows      # Windows
 # Activate virtual environment
 . venv/bin/activate        # Linux/macOS
 venv\Scripts\activate      # Windows
-```
 
-### Running THEA
-```bash
-# Default processing (Belege/ folder, gemma3:27b, --max-retries 10)
-npm run thea               # Linux/macOS
-npm run thea-windows       # Windows
-
-# Direct execution with options
-python3 thea.py [OPTIONS] <file_pattern> [file_pattern2] ...
-
-# Common patterns
-python3 thea.py sample_document.pdf                    # Single file
-python3 thea.py --mode overwrite "*.pdf"              # Force reprocess
-python3 thea.py --prompt invoice.prompt "*.pdf"       # Custom prompt
-python3 thea.py -m gemma:14b -t 0.5 "*.pdf"          # Different model/temp
+# Install/update dependencies
+npm run install            # Linux/macOS
+npm run install-windows    # Windows
 ```
 
 ### Building Executables
@@ -86,7 +109,23 @@ npm run build-windows      # Creates thea.exe
 npm run build-linux        # Creates thea-linux
 npm run build-macos        # Creates thea-macos
 npm run build-spec         # Build using thea.spec
+npm run clean-build        # Clean build artifacts
 ```
+
+## Command-Line Options
+
+- `--help, -h` - Show help message
+- `--clean` - Clean THEA-generated files
+  - `--force` - Skip confirmation prompt
+  - `--dry-run` - Preview without deleting
+- `--mode <skip|overwrite>` - Processing mode (default: skip)
+- `-m, --model <name>` - Override model (default: gemma3:27b)
+- `-t, --temperature <value>` - Initial temperature (0.0-2.0, default: 0.1)
+- `--prompt <file.prompt>` - Load custom prompt configuration
+- `--suffix <text>` - Add suffix to output filename
+- `--save-image` - Export processed images as PNG
+- `--dpi <number>` - PDF conversion DPI (50-600, default: 300)
+- `--max-retries <n>` - Max retry attempts (1-10, default: 3)
 
 ## Prompt File Format
 
@@ -149,6 +188,7 @@ npm run build-spec         # Build using thea.spec
 - Requires vision-capable models (gemma3:27b, gemma:14b, etc.)
 - Enforces JSON output with `format: "json"`
 - Streaming enabled for real-time output
+- Temperature progression: Linearly increases from initial to 1.0 across retries
 
 ### Pattern Detection
 Monitors for repetitive output patterns (50+ repetitions):
@@ -156,31 +196,40 @@ Monitors for repetitive output patterns (50+ repetitions):
 - Two-chunk: Alternating between two values  
 - Three-chunk: Cycling through three values
 
-### File Naming
+### File Naming Patterns
 - Output: `<pdf>.<timestamp>.<model>[.<suffix>].thea`
 - Images: `<pdf>.<timestamp>.<model>[.<suffix>].<dpi>p<page>.png`
-- Suffix auto-derived from prompt filename unless overridden
+- Timestamp format: `YYYYMMDD_HHMMSS`
+- Model name has colons replaced with dots (e.g., `gemma3:27b` → `gemma3.27b`)
 
 ### Skip Mode Logic
 - Only skips files matching both model AND suffix
 - Detects both JSON v2.0 and legacy text formats
 - Enables parallel processing with different configurations
 
+### Clean Function Patterns
+THEA-generated file identification:
+- `.thea` files: `^.*\.\d{8}_\d{6}\.[^.]+\.thea$` (without suffix)
+- `.thea` files: `^.*\.\d{8}_\d{6}\.[^.]+\.[^.]+\.thea$` (with suffix)
+- `.png` files: `^.*\.\d{8}_\d{6}\.[^.]+\.\d+p\d+\.png$` (without suffix)
+- `.png` files: `^.*\.\d{8}_\d{6}\.[^.]+\.[^.]+\.\d+p\d+\.png$` (with suffix)
+
 ## Prerequisites
 
 1. **Python 3.8+** with venv module
-2. **Poppler** (PDF processing):
+2. **Node.js** for npm scripts
+3. **Poppler** for PDF processing:
    - Ubuntu/Debian: `sudo apt-get install poppler-utils`
    - macOS: `brew install poppler`
-   - Windows: Download from GitHub, add bin/ to PATH
-3. **Ollama** with vision models:
+   - Windows: Download from https://github.com/oschwartz10612/poppler-windows/releases/, add bin/ to PATH
+4. **Ollama** with vision models:
    ```bash
    ollama serve
    ollama pull gemma3:27b
    ```
 
-## Dependencies
-- pdf2image==1.17.0
-- Pillow==10.4.0
-- requests==2.32.3
-- pyinstaller==6.3.0
+## Dependencies (requirements.txt)
+- pdf2image==1.17.0 - PDF to image conversion
+- Pillow==10.4.0 - Image processing
+- requests==2.32.3 - API communication
+- pyinstaller==6.3.0 - Executable building
