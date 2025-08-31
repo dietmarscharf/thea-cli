@@ -46,7 +46,8 @@ class PdfToPngPipeline(Pipeline):
             "pipeline": self.pipeline_type,
             "dpi": dpi,
             "pages_processed": 0,
-            "save_images": save_images
+            "save_images": save_images,
+            "saved_files": []  # Track saved image files
         }
         
         try:
@@ -54,16 +55,29 @@ class PdfToPngPipeline(Pipeline):
             base64_images: List[str] = []
             pil_images: List[Any] = []
             
-            for i, image in enumerate(images):
+            for i, image in enumerate(images, 1):
                 # Keep PIL image for potential saving
                 if save_images:
                     pil_images.append(image)
+                
+                # Track image information
+                image_info = {
+                    "page": i,
+                    "width": image.width,
+                    "height": image.height,
+                    "resolution": f"{image.width}x{image.height}",
+                    "dpi": dpi
+                }
                 
                 # Convert to base64
                 img_byte_arr = io.BytesIO()
                 image.save(img_byte_arr, format='PNG')
                 base64_image = base64.b64encode(img_byte_arr.getvalue()).decode('utf-8')
                 base64_images.append(base64_image)
+                
+                # Add base64 size to image info
+                image_info["base64_size"] = len(base64_image)
+                metadata["saved_files"].append(image_info)
             
             metadata["pages_processed"] = len(images)
             metadata["total_image_size"] = sum(len(img) for img in base64_images)

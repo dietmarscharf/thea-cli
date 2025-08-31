@@ -1,5 +1,6 @@
 import json
 import datetime
+import os
 from typing import Any, Dict, List, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from .base import Pipeline
@@ -53,13 +54,18 @@ class PdfToTextPipeline(Pipeline):
         
         return extractors
     
-    def process(self, pdf_path: str, parallel: bool = True, **kwargs) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    def process(self, pdf_path: str, parallel: bool = True, save_extractions: bool = False, 
+                timestamp: str = None, model_part: str = None, suffix: str = None, **kwargs) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         """
         Extract text from PDF using multiple methods.
         
         Args:
             pdf_path: Path to the PDF file
             parallel: Whether to run extractors in parallel
+            save_extractions: Whether to save extraction results to files
+            timestamp: Timestamp for file naming
+            model_part: Model name part for file naming
+            suffix: Optional suffix for file naming
             
         Returns:
             Tuple of (extraction_results, metadata)
@@ -77,7 +83,9 @@ class PdfToTextPipeline(Pipeline):
             "pdf_path": pdf_path,
             "extractors_available": list(self.extractors.keys()),
             "extractors_used": [],
-            "parallel_extraction": parallel
+            "parallel_extraction": parallel,
+            "save_extractions": save_extractions,
+            "saved_files": []  # Track saved extraction files
         }
         
         extractions = []
@@ -98,6 +106,11 @@ class PdfToTextPipeline(Pipeline):
                             extractions.append(result)
                             metadata["extractors_used"].append(extractor_name)
                             print(f"    ✓ {extractor_name}: {len(result.get('text', ''))} chars extracted")
+                            
+                            # Save extraction to file if requested
+                            if save_extractions and timestamp and model_part:
+                                self._save_extraction_file(result, pdf_path, timestamp, model_part, 
+                                                         suffix, metadata)
                         else:
                             print(f"    ✗ {extractor_name}: {result.get('metadata', {}).get('error', 'Unknown error')}")
                     except Exception as e:
@@ -111,6 +124,11 @@ class PdfToTextPipeline(Pipeline):
                         extractions.append(result)
                         metadata["extractors_used"].append(name)
                         print(f"    ✓ {name}: {len(result.get('text', ''))} chars extracted")
+                        
+                        # Save extraction to file if requested
+                        if save_extractions and timestamp and model_part:
+                            self._save_extraction_file(result, pdf_path, timestamp, model_part, 
+                                                     suffix, metadata)
                     else:
                         print(f"    ✗ {name}: {result.get('metadata', {}).get('error', 'Unknown error')}")
                 except Exception as e:
@@ -180,3 +198,54 @@ class PdfToTextPipeline(Pipeline):
         formatted_data["extractions"].sort(key=lambda x: x["confidence"], reverse=True)
         
         return formatted_data
+    
+    def _save_extraction_file(self, extraction_result: Dict[str, Any], pdf_path: str, 
+                              timestamp: str, model_part: str, suffix: Optional[str], 
+                              metadata: Dict[str, Any]) -> None:
+        """Save extraction result to a text file."""
+        import os
+        
+        extractor_name = extraction_result.get("method", "unknown")
+        text_content = extraction_result.get("text", "")
+        
+        # Build filename
+        if suffix:
+            text_file = f"{pdf_path}.{timestamp}.{model_part}.{suffix}.{extractor_name}.txt"
+            meta_file = f"{pdf_path}.{timestamp}.{model_part}.{suffix}.{extractor_name}.json"
+        else:
+            text_file = f"{pdf_path}.{timestamp}.{model_part}.{extractor_name}.txt"
+            meta_file = f"{pdf_path}.{timestamp}.{model_part}.{extractor_name}.json"
+        
+        try:
+            # Save text content
+            with open(text_file, 'w', encoding='utf-8') as f:
+                f.write(text_content)
+            
+            # Save metadata
+            extraction_metadata = {
+                "extractor": extractor_name,
+                "confidence": extraction_result.get("confidence", 0),
+                "character_count": len(text_content),
+                "extraction_metadata": extraction_result.get("metadata", {}),
+                "file_size": os.path.getsize(text_file)
+            }
+            
+            with open(meta_file, 'w', encoding='utf-8') as f:
+                json.dump(extraction_metadata, f, indent=2)
+            
+            print(f"      Saved extraction: {text_file}")
+            
+            # Track saved file
+            file_info = {
+                "extractor": extractor_name,
+                "type": "text/plain",
+                "text_file": text_file,
+                "meta_file": meta_file,
+                "confidence": extraction_result.get("confidence", 0),
+                "character_count": len(text_content),
+                "file_size": os.path.getsize(text_file)
+            }
+            metadata["saved_files"].append(file_info)
+            
+        except Exception as e:
+            print(f"      Error saving extraction file: {e}")

@@ -101,8 +101,16 @@ def clean_thea_files(directory=".", force=False, dry_run=False):
         r'^.*\.\d{8}_\d{6}\..*\.\d+p\d+\.png$'  # Any PNG with timestamp and DPI pattern
     ]
     
+    # Patterns for THEA-generated text extraction files
+    # Format: <original>.<timestamp>.<model>.<suffix>.<extractor>.txt or .json
+    # Extractors: pypdf2, pdfplumber, pymupdf
+    extraction_patterns = [
+        r'^.*\.\d{8}_\d{6}\..*\.(pypdf2|pdfplumber|pymupdf)\.(txt|json)$'  # Text extraction files
+    ]
+    
     thea_files = []
     png_files = []
+    extraction_files = []
     
     # Find matching files
     try:
@@ -119,6 +127,11 @@ def clean_thea_files(directory=".", force=False, dry_run=False):
                     if re.match(pattern, file):
                         png_files.append(file_path)
                         break
+                # Check extraction files
+                for pattern in extraction_patterns:
+                    if re.match(pattern, file):
+                        extraction_files.append(file_path)
+                        break
     except FileNotFoundError:
         print(f"Error: Directory '{directory}' not found.")
         return 0, 0
@@ -129,17 +142,19 @@ def clean_thea_files(directory=".", force=False, dry_run=False):
     # Sort files for consistent display
     thea_files.sort()
     png_files.sort()
+    extraction_files.sort()
     
     total_thea = len(thea_files)
     total_png = len(png_files)
+    total_extraction = len(extraction_files)
     
-    if total_thea == 0 and total_png == 0:
+    if total_thea == 0 and total_png == 0 and total_extraction == 0:
         print(f"No THEA-generated files found in '{directory}'")
-        return 0, 0
+        return 0, 0, 0
     
     # Display files to be deleted
     print(f"\n=== THEA Files to Clean in '{directory}' ===")
-    print(f"Found {total_thea} .thea file(s) and {total_png} .png file(s)")
+    print(f"Found {total_thea} .thea file(s), {total_png} .png file(s), and {total_extraction} extraction file(s)")
     
     if dry_run:
         print("\n--- DRY RUN MODE - No files will be deleted ---")
@@ -158,21 +173,29 @@ def clean_thea_files(directory=".", force=False, dry_run=False):
         if total_png > 10:
             print(f"  ... and {total_png - 10} more")
     
+    if extraction_files:
+        print(f"\nExtraction files ({total_extraction}):")
+        for f in extraction_files[:10]:  # Show first 10
+            print(f"  - {os.path.basename(f)}")
+        if total_extraction > 10:
+            print(f"  ... and {total_extraction - 10} more")
+    
     if dry_run:
-        print(f"\nDry run complete. Would delete {total_thea} .thea and {total_png} .png files.")
-        return 0, 0
+        print(f"\nDry run complete. Would delete {total_thea} .thea, {total_png} .png, and {total_extraction} extraction files.")
+        return 0, 0, 0
     
     # Confirmation prompt
     if not force:
-        print(f"\nAbout to delete {total_thea} .thea file(s) and {total_png} .png file(s)")
+        print(f"\nAbout to delete {total_thea} .thea file(s), {total_png} .png file(s), and {total_extraction} extraction file(s)")
         response = input("Are you sure? (y/N): ").strip().lower()
         if response != 'y':
             print("Cancelled.")
-            return 0, 0
+            return 0, 0, 0
     
     # Delete files
     deleted_thea = 0
     deleted_png = 0
+    deleted_extraction = 0
     
     print("\nDeleting files...")
     
@@ -194,10 +217,19 @@ def clean_thea_files(directory=".", force=False, dry_run=False):
         except Exception as e:
             print(f"  Error deleting {f}: {e}")
     
-    print(f"\n=== Clean Complete ===")
-    print(f"Deleted {deleted_thea} .thea file(s) and {deleted_png} .png file(s)")
+    for f in extraction_files:
+        try:
+            os.remove(f)
+            deleted_extraction += 1
+            if deleted_extraction <= 5 or deleted_extraction % 10 == 0:  # Progress indicator
+                print(f"  Deleted: {os.path.basename(f)}")
+        except Exception as e:
+            print(f"  Error deleting {f}: {e}")
     
-    return deleted_thea, deleted_png
+    print(f"\n=== Clean Complete ===")
+    print(f"Deleted {deleted_thea} .thea file(s), {deleted_png} .png file(s), and {deleted_extraction} extraction file(s)")
+    
+    return deleted_thea, deleted_png, deleted_extraction
 
 def clean_json_response(response_text):
     """Extract JSON and thinking from response, handling markdown blocks and thinking tags."""
@@ -443,18 +475,39 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
     # Initialize execution data based on pipeline type
     if pipeline_type == "pdf-convert-png":
         base64_images, _ = pipeline_data if isinstance(pipeline_data, tuple) else (pipeline_data, [])
-        images_processed = []
-        for i in range(len(base64_images)):
-            images_processed.append({
-                "page": i + 1,
-                "resolution": None,  # Will be set if we have PIL images
-                "dpi": dpi,
-                "saved_as": None
-            })
+        files_processed = []
+        
+        # Get saved file info from pipeline metadata if available
+        if pipeline_metadata and "saved_files" in pipeline_metadata:
+            for file_info in pipeline_metadata["saved_files"]:
+                files_processed.append({
+                    "page": file_info.get("page"),
+                    "type": "image/png",
+                    "resolution": file_info.get("resolution"),
+                    "width": file_info.get("width"),
+                    "height": file_info.get("height"),
+                    "dpi": file_info.get("dpi"),
+                    "base64_size": file_info.get("base64_size"),
+                    "saved_as": None  # Will be updated if saved
+                })
+        else:
+            # Fallback for compatibility
+            for i in range(len(base64_images)):
+                files_processed.append({
+                    "page": i + 1,
+                    "type": "image/png",
+                    "resolution": None,
+                    "dpi": dpi,
+                    "saved_as": None
+                })
     else:
-        # For text pipeline, track extraction info instead
-        images_processed = []  # Keep empty for compatibility
+        # For text pipeline, track extraction files
+        files_processed = []
         base64_images = []  # For compatibility with existing code
+        
+        # Get saved extraction file info from pipeline metadata
+        if pipeline_metadata and "saved_files" in pipeline_metadata:
+            files_processed = pipeline_metadata["saved_files"]
     
     # Save images if requested
     if save_image and pil_images:
@@ -466,16 +519,20 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
             try:
                 image.save(image_file, format='PNG')
                 print(f"Saved image: {image_file}")
-                # Update images_processed
-                images_processed[i-1]["saved_as"] = image_file
-                images_processed[i-1]["resolution"] = f"{image.width}x{image.height}"
+                # Update files_processed
+                if i-1 < len(files_processed):
+                    files_processed[i-1]["saved_as"] = image_file
+                    files_processed[i-1]["file_size"] = os.path.getsize(image_file)
+                    if not files_processed[i-1].get("resolution"):
+                        files_processed[i-1]["resolution"] = f"{image.width}x{image.height}"
             except Exception as e:
                 print(f"Error saving image {image_file}: {e}")
                 execution_data["errors"].append(f"Failed to save image {i}: {str(e)}")
     elif pil_images:
         # Still populate resolution even if not saving
         for i, image in enumerate(pil_images):
-            images_processed[i]["resolution"] = f"{image.width}x{image.height}"
+            if i < len(files_processed) and not files_processed[i].get("resolution"):
+                files_processed[i]["resolution"] = f"{image.width}x{image.height}"
     
     # Statistics tracking
     start_time = time.time()
@@ -705,7 +762,7 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
                         "pattern_type": pattern_type,
                         "chunks_received": chunk_count,
                         "request_time_seconds": request_time,
-                        "images_processed": images_processed
+                        "files_processed": files_processed
                     }
                     
                     execution_data["response"] = {
@@ -803,7 +860,7 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
                     "pattern_type": pattern_type,
                     "chunks_received": chunk_count,
                     "request_time_seconds": request_time,
-                    "images_processed": images_processed
+                    "files_processed": files_processed
                 }
                 
                 execution_data["response"] = {
@@ -874,7 +931,7 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
                         "pattern_type": pattern_type,
                         "chunks_received": chunk_count,
                         "request_time_seconds": request_time,
-                        "images_processed": images_processed
+                        "files_processed": files_processed
                     }
                     
                     execution_data["response"] = {
@@ -939,7 +996,7 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
                     "pattern_type": pattern_type,
                     "chunks_received": chunk_count,
                     "request_time_seconds": request_time,
-                    "images_processed": images_processed
+                    "files_processed": files_processed
                 }
                 
                 # Even if JSON parsing failed, try to extract thinking
@@ -1002,7 +1059,7 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
                     "pattern_type": pattern_type,
                     "chunks_received": 0,
                     "request_time_seconds": 0,
-                    "images_processed": images_processed
+                    "files_processed": files_processed
                 }
                 
                 execution_data["response"] = {
@@ -1038,6 +1095,7 @@ if __name__ == "__main__":
     suffix = ''  # Default no suffix
     prompt_file = None  # Default no prompt file
     save_image = False  # Default don't save images
+    save_extractions = False  # Default don't save text extractions
     dpi = 300  # Default DPI for PDF to image conversion
     max_attempts = 3  # Default max attempts for stuck model responses
     model_override = None  # Default: use built-in model list
@@ -1078,7 +1136,7 @@ if __name__ == "__main__":
                 sys.exit(1)
         
         # Execute clean and exit
-        deleted_thea, deleted_png = clean_thea_files(directory, force, dry_run)
+        deleted_thea, deleted_png, deleted_extraction = clean_thea_files(directory, force, dry_run)
         sys.exit(0)
     
     # Parse optional arguments
@@ -1099,6 +1157,9 @@ if __name__ == "__main__":
         elif args[0] == '--save-image':
             save_image = True
             args = args[1:]  # Remove save-image flag from args
+        elif args[0] == '--save-extractions':
+            save_extractions = True
+            args = args[1:]  # Remove save-extractions flag from args
         elif args[0] == '--dpi' and len(args) >= 2:
             try:
                 dpi = int(args[1])
@@ -1189,7 +1250,8 @@ if __name__ == "__main__":
         print("                    The filename (without .prompt) becomes the default suffix")
         print("  --suffix <text>   Add custom suffix to output filename before .thea extension")
         print("                    Overrides the automatic suffix from prompt filename")
-        print("  --save-image      Save extracted images as PNG files with same naming as .thea files")
+        print("  --save-image      Save extracted images as PNG files (for image pipeline)")
+        print("  --save-extractions Save text extraction results as .txt files (for text pipeline)")
         print("  --dpi <number>    Set DPI resolution for PDF to image conversion (50-600, default: 300)")
         print("  --max-attempts <n> Max attempts when model gets stuck (1-10, default: 3)")
         print("  -m, --model <name> Override default model (e.g., gemma:14b, llama2:13b)")
@@ -1351,6 +1413,11 @@ if __name__ == "__main__":
         if save_image:
             print(f"  Using save_image from prompt: {save_image}")
     
+    if not save_extractions and "save_extractions" in prompt_settings:
+        save_extractions = prompt_settings["save_extractions"]
+        if save_extractions:
+            print(f"  Using save_extractions from prompt: {save_extractions}")
+    
     if dpi == 300 and "dpi" in prompt_settings:
         dpi = prompt_settings["dpi"]
         print(f"  Using DPI from prompt: {dpi}")
@@ -1426,7 +1493,18 @@ if __name__ == "__main__":
                 continue
         else:
             # Text extraction pipeline
-            pipeline_data, pipeline_metadata = pipeline.process(pdf_path)
+            # Generate timestamp and model part for file naming
+            import datetime
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            model_part = models[0].replace(":", ".") if models else "unknown"
+            
+            pipeline_data, pipeline_metadata = pipeline.process(
+                pdf_path, 
+                save_extractions=save_extractions,
+                timestamp=timestamp,
+                model_part=model_part,
+                suffix=suffix
+            )
             
             if not pipeline_data or pipeline_metadata.get("extraction_count", 0) == 0:
                 print(f"Skipping {pdf_path} - no text extracted")
