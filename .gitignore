@@ -26,9 +26,10 @@ Belege/
 *.png
 *.pdf
 *.PDF
-# Ignore custom prompt files but keep default
+# Ignore custom prompt files but keep default and prompts directory
 *.prompt
 !.prompt
+!prompts/*.prompt
 
 # OS
 .DS_Store

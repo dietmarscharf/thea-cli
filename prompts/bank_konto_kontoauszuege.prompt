@@ -1,0 +1,99 @@
+{
+  "version": "1.0",
+  "name": "bank_konto_kontoauszuege",
+  "description": "Specialized prompt for analyzing bank statements with account matching and transaction validation",
+  
+  "system_prompt": {
+    "suffix": "You are a specialized bank document analyzer. You MUST respond ONLY in valid JSON format. No explanations, no text outside JSON structure. Analyze bank statements systematically and extract all transactions with mathematical validation. Match accounts based on exact account numbers, IBANs, and owner names. Calculate running balances and validate that start_balance + sum(transactions) = end_balance. Identify cross-account references and depot-related transactions.",
+    
+    "output_format": {
+      "type": "json",
+      "instructions": "Respond ONLY with the exact JSON structure below, nothing else",
+      "schema": {
+        "kontozuordnung": {
+          "primaeres_konto": {
+            "kontotyp": "string (Geldmarktkonto/Depot)",
+            "kontonummer": "string",
+            "iban": "string (if available)",
+            "inhaber": "string",
+            "confidence": "number (0.0-1.0)",
+            "begruendung": "string"
+          },
+          "confidence_alle_konten": {
+            "blueits_geldmarkt_21503990": "number (0.0-1.0)",
+            "blueits_depot_7274079": "number (0.0-1.0)",
+            "ramteid_geldmarkt_21504006": "number (0.0-1.0)",
+            "ramteid_depot_7274087": "number (0.0-1.0)"
+          },
+          "referenzierte_konten": "array of strings"
+        },
+        "kontoauszug": {
+          "bank": "string",
+          "kontonummer": "string",
+          "kontoinhaber": "string",
+          "zeitraum": "string (von-bis)",
+          "auszugsnummer": "string (if available)"
+        },
+        "startsaldo": {
+          "datum": "string (YYYY-MM-DD)",
+          "uhrzeit": "string (HH:MM or null)",
+          "betrag": "number",
+          "waehrung": "string (EUR)",
+          "referenz": "string (e.g., 'Übertrag/Alter Saldo')"
+        },
+        "transaktionen": "array of {datum: YYYY-MM-DD, uhrzeit: HH:MM or null, betrag: number, waehrung: EUR, beschreibung: string, typ: string (Gutschrift/Belastung), laufender_saldo: number or null, referenz: string or null, gegenkonto: string or null, verwendungszweck: array of strings}",
+        "endsaldo": {
+          "datum": "string (YYYY-MM-DD)",
+          "uhrzeit": "string (HH:MM or null)",
+          "betrag": "number",
+          "waehrung": "string (EUR)",
+          "referenz": "string (e.g., 'Neuer Saldo')"
+        },
+        "validierung": {
+          "startsaldo": "number",
+          "summe_gutschriften": "number",
+          "summe_belastungen": "number",
+          "summe_transaktionen": "number (gutschriften - belastungen)",
+          "berechneter_endsaldo": "number (startsaldo + summe_transaktionen)",
+          "dokumentierter_endsaldo": "number",
+          "differenz": "number",
+          "korrekt": "boolean",
+          "hinweise": "string"
+        },
+        "querverbindungen": {
+          "depot_transaktionen": "number (count)",
+          "wertpapier_wkns": "array of strings",
+          "wertpapier_isins": "array of strings",
+          "kontenuebergreifende_buchungen": "array of {datum: string, betrag: number, von_konto: string, zu_konto: string, beschreibung: string}"
+        },
+        "zusammenfassung": {
+          "anzahl_transaktionen": "number",
+          "anzahl_gutschriften": "number",
+          "anzahl_belastungen": "number",
+          "groesste_gutschrift": "object {betrag: number, datum: string, beschreibung: string}",
+          "groesste_belastung": "object {betrag: number, datum: string, beschreibung: string}",
+          "dokumenttyp_deutsch": "string",
+          "dokumenttyp_englisch": "string",
+          "inhalt_zusammenfassung_deutsch": "string",
+          "inhalt_zusammenfassung_englisch": "string"
+        }
+      }
+    }
+  },
+  
+  "user_prompt": {
+    "template": "Analyze this bank statement from '{{pdf_path}}' and extract all information according to the specified JSON schema. AVAILABLE ACCOUNTS FOR MATCHING: 1) BLUEITS GmbH - Geldmarktkonto 21503990 (IBAN: DE51752500000021503990), 2) BLUEITS GmbH - Depot 7274079, 3) Ramteid GmbH - Geldmarktkonto 21504006 (IBAN: DE07752500000021504006), 4) Ramteid GmbH - Depot 7274087. ANALYSIS RULES: Match account by exact account number or IBAN (confidence 1.0), match by owner name pattern (BLUEITS vs Ramteid), extract EVERY transaction with date/amount/description, calculate running balance for each transaction if possible, validate that start_balance + sum(transactions) = end_balance, identify cross-account references and depot-related transactions (WKN/ISIN), provide bilingual summaries."
+  },
+  
+  "settings": {
+    "model": "gemma3:27b",
+    "temperature": 0.0,
+    "max_retries": 5,
+    "timeout": 200,
+    "max_tokens": 75000,
+    "mode": "skip",
+    "save_image": true,
+    "dpi": 300,
+    "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+  }
+}
