@@ -26,6 +26,9 @@ Belege/
 *.png
 *.pdf
 *.PDF
+# Ignore custom prompt files but keep default
+*.prompt
+!.prompt
 
 # OS
 .DS_Store
