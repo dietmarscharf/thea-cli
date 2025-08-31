@@ -384,6 +384,10 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
     
     # Retry loop for handling stuck model responses
     for retry_count in range(max_retries):
+        # Initialize per-retry variables
+        chunk_count = 0
+        request_time = 0
+        
         # Calculate progressive temperature: starts at initial_temperature, increases to 1.0
         # Formula: temperature = initial_temp + (retry_count * (1.0 - initial_temp) / (max_retries - 1))
         # Handle edge case where max_retries = 1
@@ -427,13 +431,9 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
             full_response = ""
             
             # Pattern detection variables
-            repetitive_pattern_count = 0
             last_contents = []  # Store last few content values for pattern detection
             stuck_detected = False
             local_pattern_type = None
-            
-            chunk_count = 0
-            request_time = time.time() - request_start
             
             # Log incoming streaming chunks to stdout
             print(f"\n=== Incoming Streaming Response from Model: {model_name} for File: {pdf_path} ===")
@@ -545,10 +545,68 @@ def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_
                     except json.JSONDecodeError:
                         print("Error decoding chunk:", decoded_chunk)
             
+            # Calculate actual request time after streaming completes
+            request_time = time.time() - request_start
+            
             # If stuck was detected, retry
             if stuck_detected:
                 stuck_pattern_detected = True
                 pattern_type = local_pattern_type
+                
+                # Check if this is the last retry
+                if retry_count == max_retries - 1:
+                    # Last attempt failed - save what we have
+                    print(f"\nFinal attempt failed due to: {local_pattern_type}")
+                    
+                    # Calculate statistics
+                    end_time = time.time()
+                    processing_time = end_time - start_time
+                    iso_end_time = datetime.datetime.now().isoformat() + "Z"
+                    total_output_tokens = len(full_response) // 4
+                    
+                    # Update execution data
+                    execution_data["metadata"]["processing"]["end_time"] = iso_end_time
+                    execution_data["metadata"]["processing"]["processing_time_seconds"] = processing_time
+                    
+                    execution_data["execution"] = {
+                        "retry_count": retry_count,
+                        "final_temperature": current_temperature,
+                        "stuck_pattern_detected": True,
+                        "pattern_type": pattern_type,
+                        "chunks_received": chunk_count,
+                        "request_time_seconds": request_time,
+                        "images_processed": images_processed
+                    }
+                    
+                    execution_data["response"] = {
+                        "text": full_response if full_response else None,
+                        "thinking": None,
+                        "json": None
+                    }
+                    
+                    execution_data["statistics"] = {
+                        "tokens": {
+                            "input_estimated": total_input_tokens,
+                            "output_estimated": total_output_tokens,
+                            "total_estimated": total_input_tokens + total_output_tokens,
+                            "tokens_per_second": total_output_tokens / processing_time if processing_time > 0 else 0
+                        },
+                        "characters": {
+                            "response_total": len(full_response),
+                            "extracted_text": 0,
+                            "json_formatted": 0
+                        }
+                    }
+                    
+                    execution_data["errors"].append(f"Processing terminated due to: {pattern_type}")
+                    
+                    # Save the partial/failed response
+                    with open(output_file, 'w', encoding='utf-8') as f:
+                        json.dump(execution_data, f, indent=2, ensure_ascii=False)
+                    
+                    print(f"Saved partial response to: {output_file}")
+                    return  # Exit the function
+                
                 print(f"Terminating connection and retrying... (Attempt {retry_count + 1}/{max_retries})")
                 continue  # Go to next retry iteration
             
