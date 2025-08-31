@@ -1,25 +1,42 @@
 {
-  "version": "1.0",
+  "version": "2.0",
   "name": "pdf-extract-png",
-  "description": "Default configuration for PDF to PNG extraction pipeline",
+  "description": "Optimized vision-based extraction prompt for financial and business documents",
   
   "system_prompt": {
-    "suffix": "You are analyzing high-resolution images extracted from a PDF document. Extract all text content accurately, count the total characters, provide a one-word description in both German and English, and summarize the content in both languages."
+    "suffix": "You are a vision-based document processing system analyzing high-resolution PDF page images. Your task: 1) Extract ALL visible text from the images accurately. 2) Count the total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. IMPORTANT: Use <thinking> tags for your analysis process, then output the JSON result. After thinking, provide ONLY the JSON structure.",
+    
+    "output_format": {
+      "type": "json",
+      "schema": {
+        "extracted_text": "string (complete text from all pages)",
+        "character_count": "number (exact count of extracted text)",
+        "document_type": "string (e.g., Orderabrechnung, Rechnung, Kontoauszug, Vertrag, Brief)",
+        "three_word_description_german": "string (exactly 3 words)",
+        "three_word_description_english": "string (exactly 3 words)",
+        "content_summary_german": "string (1-2 sentences)",
+        "content_summary_english": "string (1-2 sentences)",
+        "pages_processed": "number (number of images analyzed)",
+        "extraction_confidence": "string (high/medium/low based on OCR quality)"
+      },
+      "instructions": "First use <thinking> tags to analyze the document. Then output ONLY the JSON structure. The JSON must start with { and end with }."
+    }
   },
   
   "user_prompt": {
-    "template": "Please analyze this PDF document '{{pdf_path}}' and extract its content."
+    "template": "Analyze the images from PDF '{{pdf_path}}'. Extract all text, count characters, classify the document, and provide summaries. Use <thinking> tags for analysis, then output JSON."
   },
   
   "settings": {
-    "model": "gemma3:12b",
-    "temperature": 0.1,
-    "max_attempts": 10,
+    "model": "gemma3:27b",
+    "temperature": 0.15,
+    "max_attempts": 5,
     "timeout": 200,
-    "max_tokens": 50000,
+    "max_tokens": 40000,
     "mode": "skip",
     "save_sidecars": true,
     "dpi": 300,
+    "format": "json",
     "pipeline": "pdf-extract-png",
     "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
   }
