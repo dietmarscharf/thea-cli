@@ -2,6 +2,7 @@ from typing import Dict, Any, Optional
 from .base import Pipeline
 from .pdf_extract_png import PdfExtractPngPipeline
 from .pdf_extract_txt import PdfExtractTxtPipeline
+from .pdf_extract_docling import PdfExtractDoclingPipeline
 
 class PipelineManager:
     """Manages pipeline selection and execution."""
@@ -9,7 +10,8 @@ class PipelineManager:
     # Available pipeline types
     PIPELINES = {
         "pdf-extract-png": PdfExtractPngPipeline,
-        "pdf-extract-txt": PdfExtractTxtPipeline
+        "pdf-extract-txt": PdfExtractTxtPipeline,
+        "pdf-extract-docling": PdfExtractDoclingPipeline
     }
     
     @classmethod
