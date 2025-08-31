@@ -1,39 +1,42 @@
 {
-  "version": "1.0",
+  "version": "2.0",
   "name": "pdf-extract-txt",
-  "description": "Default THEA extraction prompt for general document processing",
+  "description": "Optimized text extraction prompt for financial and business documents",
   
   "system_prompt": {
-    "suffix": "Combine all text versions to one accurate text accurately. Then, count the total number of characters in the extracted text directly (do not count step-by-step or iteratively; just compute and output the exact count). Provide a three-word description of the document type in both German and English. Also, briefly summarize what the document is about content-wise in 1-2 sentences in both German and English.",
+    "suffix": "You are a document processing system. You receive multiple text extractions from a PDF. Your task: 1) Merge the extractions into one accurate text by choosing the best parts from each extraction. 2) Count the total characters. 3) Classify the document. 4) Summarize the content. Output ONLY valid JSON. Do NOT use thinking tags, explanations, or any text outside the JSON structure.",
     
-       "output_format": {
+    "output_format": {
       "type": "json",
       "schema": {
-        "extracted_text": "string",
-        "character_count": "number",
-        "one_word_description_german": "string",
-        "one_word_description_english": "string",
-        "content_summary_german": "string",
-        "content_summary_english": "string"
+        "extracted_text": "string (the complete merged text)",
+        "character_count": "number (exact character count)",
+        "document_type": "string (e.g., Orderabrechnung, Rechnung, Kontoauszug, Vertrag, Brief)",
+        "three_word_description_german": "string (exactly 3 words)",
+        "three_word_description_english": "string (exactly 3 words)",
+        "content_summary_german": "string (1-2 sentences)",
+        "content_summary_english": "string (1-2 sentences)",
+        "extraction_quality": "string (high/medium/low based on extraction consistency)"
       },
-      "instructions": "Respond ONLY in this exact JSON format, nothing else!"
+      "instructions": "Output ONLY this JSON structure. Start with { and end with }. No other text allowed."
     }
   },
   
   "user_prompt": {
-    "template": "Extract the text from this PDF document '{{pdf_path}}', count its characters, describe it with three words in both German and English, and summarize its content in both German and English as instructed."
+    "template": "Process the PDF '{{pdf_path}}'. Merge the text extractions, count characters, classify the document, and provide summaries. Output only JSON."
   },
   
   "settings": {
-    "model": "qwen3:14b",
-    "temperature": 0.1,
+    "model": "qwen3:30b",
+    "temperature": 0.2,
     "max_attempts": 3,
     "timeout": 200,
-    "max_tokens": 50000,
+    "max_tokens": 30000,
     "mode": "overwrite",
     "save_sidecars": true,
-    "dpi": 150,
+    "format": "json",
     "pipeline": "pdf-extract-txt",
-    "extractors": ["pypdf2", "pdfplumber", "pymupdf"]
+    "extractors": ["pypdf2", "pdfplumber", "pymupdf"],
+    "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
   }
 }
