@@ -88,7 +88,7 @@
   "settings": {
     "model": "gemma3:27b",
     "temperature": 0.0,
-    "max_retries": 5,
+    "max_attempts": 5,
     "timeout": 200,
     "max_tokens": 75000,
     "mode": "skip",

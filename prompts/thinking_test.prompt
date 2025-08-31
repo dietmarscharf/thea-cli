@@ -1,0 +1,29 @@
+{
+  "version": "3.0",
+  "name": "thinking_test",
+  "description": "Test prompt to force thinking tags",
+  
+  "system_prompt": {
+    "suffix": "CRITICAL INSTRUCTION: You MUST start your response with <thinking> tags. Inside the <thinking> tags, analyze the document step by step. Only after closing the </thinking> tag should you provide any other output. This is mandatory - failure to use <thinking> tags will result in an invalid response.",
+    
+    "output_format": {
+      "type": "text",
+      "instructions": "First <thinking>, then JSON"
+    }
+  },
+  
+  "user_prompt": {
+    "template": "Analyze {{pdf_path}}. YOUR RESPONSE MUST START WITH <thinking> AND END WITH </thinking> before providing JSON. Example format:\n<thinking>\nStep 1: I see...\nStep 2: I notice...\n</thinking>\n\nThen provide JSON output."
+  },
+  
+  "settings": {
+    "model": "gemma3:27b",
+    "temperature": 0.3,
+    "max_attempts": 1,
+    "timeout": 200,
+    "max_tokens": 75000,
+    "mode": "overwrite",
+    "save_image": false,
+    "dpi": 150
+  }
+}

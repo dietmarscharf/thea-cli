@@ -1,0 +1,138 @@
+{
+  "version": "2.0",
+  "name": "bank_konto_kontoauszuege_v2",
+  "description": "Enhanced bank statement analysis with improved Verwendungszweck extraction and thinking capability",
+  
+  "system_prompt": {
+    "suffix": "You are a specialized bank document analyzer. IMPORTANT: Always wrap your thinking process in <thinking></thinking> tags. Inside these tags, analyze the document step-by-step, identify all transactions, and validate calculations. After the thinking tags, provide the final JSON output:",
+    
+    "output_format": {
+      "type": "json",
+      "instructions": "After your analysis, provide the JSON output:",
+      "schema": {
+        "kontozuordnung": {
+          "primaeres_konto": {
+            "kontotyp": "string (Geldmarktkonto/Depot)",
+            "kontonummer": "string",
+            "iban": "string (if available)",
+            "inhaber": "string",
+            "confidence": "number (0.0-1.0)",
+            "begruendung": "string"
+          },
+          "confidence_alle_konten": {
+            "blueits_geldmarkt_21503990": "number (0.0-1.0)",
+            "blueits_depot_7274079": "number (0.0-1.0)",
+            "ramteid_geldmarkt_21504006": "number (0.0-1.0)",
+            "ramteid_depot_7274087": "number (0.0-1.0)"
+          },
+          "referenzierte_konten": "array of strings"
+        },
+        "kontoauszug": {
+          "bank": "string",
+          "kontonummer": "string",
+          "kontoinhaber": "string",
+          "zeitraum": "string (von-bis)",
+          "auszugsnummer": "string (if available)",
+          "seite": "string (e.g., 'Seite 1 von 2')"
+        },
+        "startsaldo": {
+          "datum": "string (YYYY-MM-DD)",
+          "uhrzeit": "string (HH:MM or null)",
+          "betrag": "number",
+          "waehrung": "string (EUR)",
+          "referenz": "string (e.g., 'Kontostand am', 'Übertrag', 'Alter Saldo')"
+        },
+        "transaktionen": [
+          {
+            "datum": "string (YYYY-MM-DD)",
+            "wertstellung": "string (YYYY-MM-DD) if different from datum",
+            "uhrzeit": "string (HH:MM or null)",
+            "betrag": "number (negative for Belastung, positive for Gutschrift)",
+            "waehrung": "string (EUR)",
+            "beschreibung": "string (main transaction type)",
+            "typ": "string (Gutschrift/Belastung)",
+            "laufender_saldo": "number or null",
+            "referenz": "string or null",
+            "gegenkonto": "string or null",
+            "verwendungszweck": [
+              "First line of Verwendungszweck",
+              "Second line if exists",
+              "Third line if exists",
+              "... all lines must be captured"
+            ]
+          }
+        ],
+        "endsaldo": {
+          "datum": "string (YYYY-MM-DD)",
+          "uhrzeit": "string (HH:MM or null)",
+          "betrag": "number",
+          "waehrung": "string (EUR)",
+          "referenz": "string (e.g., 'Neuer Saldo', 'Kontostand')"
+        },
+        "validierung": {
+          "startsaldo": "number",
+          "summe_gutschriften": "number (sum of all positive transactions)",
+          "summe_belastungen": "number (sum of all negative transactions as positive)",
+          "summe_transaktionen": "number (gutschriften - belastungen)",
+          "berechneter_endsaldo": "number (startsaldo + summe_transaktionen)",
+          "dokumentierter_endsaldo": "number",
+          "differenz": "number (berechneter - dokumentierter)",
+          "korrekt": "boolean (true if differenz is 0 or very small)",
+          "hinweise": "string (explanation if not korrekt)"
+        },
+        "querverbindungen": {
+          "depot_transaktionen": "number (count)",
+          "wertpapier_wkns": "array of strings",
+          "wertpapier_isins": "array of strings",
+          "kontenuebergreifende_buchungen": [
+            {
+              "datum": "string",
+              "betrag": "number",
+              "von_konto": "string",
+              "zu_konto": "string",
+              "beschreibung": "string"
+            }
+          ]
+        },
+        "zusammenfassung": {
+          "anzahl_transaktionen": "number",
+          "anzahl_gutschriften": "number",
+          "anzahl_belastungen": "number",
+          "groesste_gutschrift": {
+            "betrag": "number",
+            "datum": "string",
+            "beschreibung": "string"
+          },
+          "groesste_belastung": {
+            "betrag": "number",
+            "datum": "string",
+            "beschreibung": "string"
+          },
+          "besonderheiten_deutsch": ["strings"],
+          "besonderheiten_englisch": ["strings"],
+          "dokumenttyp_deutsch": "string (e.g., 'Kontoauszug')",
+          "dokumenttyp_englisch": "string (e.g., 'Bank Statement')",
+          "inhalt_zusammenfassung_deutsch": "string",
+          "inhalt_zusammenfassung_englisch": "string"
+        }
+      }
+    }
+  },
+  
+  "user_prompt": {
+    "template": "Please analyze this bank statement '{{pdf_path}}'. First, use <thinking> tags to show your step-by-step analysis process. Then provide the final JSON output. Remember: Start with <thinking> tags for your analysis!"
+  },
+  
+  "settings": {
+    "model": "gemma3:12b",
+    "temperature": 0.0,
+    "max_attempts": 5,
+    "timeout": 200,
+    "max_tokens": 75000,
+    "mode": "skip",
+    "save_image": true,
+    "dpi": 300,
+    "endpoint_url": "https://b1s.hey.bahn.business/api/chat",
+    "pipeline": "pdf-convert-png"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "version": "1.0",
+  "name": "bank_qwen",
+  "description": "Bank statement analysis optimized for qwen models",
+  
+  "system_prompt": {
+    "suffix": "You are analyzing bank statements from extracted text data. You will receive multiple text extractions from different methods - compare them to get the complete picture. Output ONLY valid JSON, nothing else. The JSON must start with { and end with }.",
+    
+    "output_format": {
+      "type": "json",
+      "instructions": "Output pure JSON",
+      "schema": {
+        "kontoauszug": {
+          "bank": "string",
+          "kontonummer": "string",
+          "zeitraum": "string"
+        },
+        "startsaldo": {
+          "datum": "string",
+          "betrag": "number"
+        },
+        "transaktionen": [
+          {
+            "datum": "string",
+            "betrag": "number",
+            "beschreibung": "string",
+            "verwendungszweck": ["array of strings"]
+          }
+        ],
+        "endsaldo": {
+          "datum": "string",
+          "betrag": "number"
+        },
+        "zusammenfassung": "string"
+      }
+    }
+  },
+  
+  "user_prompt": {
+    "template": "Analyze bank statement {{pdf_path}} and output JSON."
+  },
+  
+  "settings": {
+    "model": "qwen3:14b",
+    "temperature": 0.1,
+    "max_attempts": 3,
+    "timeout": 200,
+    "max_tokens": 50000,
+    "mode": "overwrite",
+    "save_image": false,
+    "dpi": 150,
+    "pipeline": "pdf-extract-txt",
+    "extractors": ["pypdf2", "pdfplumber", "pymupdf"]
+  }
+}

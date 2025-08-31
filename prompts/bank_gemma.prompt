@@ -1,0 +1,55 @@
+{
+  "version": "1.0",
+  "name": "bank_gemma",
+  "description": "Bank statement analysis optimized for gemma models with image processing",
+  
+  "system_prompt": {
+    "suffix": "You are a specialized bank document analyzer processing high-resolution images. IMPORTANT: Always wrap your thinking process in <thinking></thinking> tags. Inside these tags, analyze the document step-by-step, identify all transactions, and validate calculations. After the thinking tags, provide the final JSON output.",
+    
+    "output_format": {
+      "type": "json",
+      "instructions": "After your analysis in thinking tags, provide the JSON output:",
+      "schema": {
+        "kontoauszug": {
+          "bank": "string",
+          "kontonummer": "string",
+          "zeitraum": "string"
+        },
+        "startsaldo": {
+          "datum": "string",
+          "betrag": "number"
+        },
+        "transaktionen": [
+          {
+            "datum": "string",
+            "betrag": "number",
+            "beschreibung": "string",
+            "verwendungszweck": ["array of strings"]
+          }
+        ],
+        "endsaldo": {
+          "datum": "string",
+          "betrag": "number"
+        },
+        "zusammenfassung": "string"
+      }
+    }
+  },
+  
+  "user_prompt": {
+    "template": "Please analyze this bank statement '{{pdf_path}}'. First, use <thinking> tags to show your step-by-step analysis process. Then provide the final JSON output."
+  },
+  
+  "settings": {
+    "model": "gemma3:12b",
+    "temperature": 0.1,
+    "max_attempts": 5,
+    "timeout": 200,
+    "max_tokens": 50000,
+    "mode": "overwrite",
+    "save_image": true,
+    "dpi": 300,
+    "pipeline": "pdf-convert-png",
+    "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+  }
+}
