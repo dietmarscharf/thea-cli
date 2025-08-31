@@ -57,7 +57,7 @@ def pdf_to_base64_images(pdf_path, dpi=300) -> tuple[list[Any], list[Any]]:
         return [], []
 
 
-def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_prompt, mode='skip', suffix='', save_image=False, pil_images=None, max_retries=3, dpi=300, initial_temperature=0.3):
+def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_prompt, mode='skip', suffix='', save_image=False, pil_images=None, max_retries=3, dpi=300, initial_temperature=0.1):
     # Generate model part (e.g., gemma3.12b)
     model_part: Any = model_name.replace(":", ".")
     
@@ -308,7 +308,7 @@ if __name__ == "__main__":
     dpi = 300  # Default DPI for PDF to image conversion
     max_retries = 3  # Default max retries for stuck model responses
     model_override = None  # Default: use built-in model list
-    temperature = 0.3  # Default temperature (low for consistency)
+    temperature = 0.1  # Default temperature (very low for precision)
     args = sys.argv[1:]
     
     # Check for help flag first
@@ -389,7 +389,7 @@ if __name__ == "__main__":
         print("  --dpi <number>    Set DPI resolution for PDF to image conversion (50-600, default: 300)")
         print("  --max-retries <n> Max retry attempts when model gets stuck (1-10, default: 3)")
         print("  -m, --model <name> Override default model (e.g., gemma:14b, llama2:13b)")
-        print("  -t, --temperature <value> Set initial temperature (0.0-2.0, default: 0.3)")
+        print("  -t, --temperature <value> Set initial temperature (0.0-2.0, default: 0.1)")
         print("                    Temperature increases progressively with retries to reach ~1.0")
         print("\nOutput File Format:")
         print("  Default:          <pdf>.<timestamp>.<model>.thea")
