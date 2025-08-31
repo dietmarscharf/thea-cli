@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "name": "default",
+  "description": "Default THEA extraction prompt for general PDF processing",
+  
+  "system_prompt": {
+    "suffix": "Extract all text from the provided PDF image(s) accurately. Then, count the total number of characters in the extracted text directly (do not count step-by-step or iteratively; just compute and output the exact count). Provide a one-word description of the document type. Also, briefly summarize what the document is about content-wise in 1-2 sentences.",
+    
+    "output_format": {
+      "type": "json",
+      "schema": {
+        "extracted_text": "string",
+        "character_count": "number",
+        "one_word_description": "string",
+        "content_summary": "string"
+      },
+      "instructions": "Respond ONLY in this exact JSON format, nothing else"
+    }
+  },
+  
+  "user_prompt": {
+    "template": "Extract the text from this PDF document '{{pdf_path}}', count its characters, describe it with one word, and summarize its content as instructed."
+  },
+  
+  "settings": {
+    "model": "gemma3:27b",
+    "temperature": 0.1,
+    "max_retries": 3,
+    "mode": "skip",
+    "save_image": false,
+    "dpi": 300,
+    "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+  }
+}
