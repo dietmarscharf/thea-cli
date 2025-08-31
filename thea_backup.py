@@ -11,15 +11,12 @@ import time
 import platform
 import socket
 import re
-
-# Import pipeline system
-from pipelines.manager import PipelineManager
-from pipelines.pdf_to_png import PdfToPngPipeline
-
 try:
+    from pdf2image import convert_from_path
     from PIL import Image
 except ImportError:
-    print("PIL not available")
+    print("pdf2image not available")
+    convert_from_path = None
     Image = None
 
 def load_prompt_file(prompt_path):
@@ -305,15 +302,36 @@ def clean_json_response(response_text):
     return cleaned_json, thinking_text
 
 
-# Legacy function for backward compatibility - now handled by pipeline
 def pdf_to_base64_images(pdf_path, dpi=300) -> tuple[list[Any], list[Any]]:
-    """Legacy wrapper for image pipeline."""
-    pipeline = PdfToPngPipeline()
-    result, metadata = pipeline.process(pdf_path, dpi=dpi, save_images=True)
-    return result
+    # Convert PDF to list of PIL images (one per page)
+    # Returns tuple of (base64_images, pil_images)
+    if convert_from_path is None:
+        print("Error: pdf2image with poppler is required but not available")
+        print("Please install poppler binaries for Windows:")
+        print("1. Download from: https://github.com/oschwartz10612/poppler-windows/releases/")
+        print("2. Extract and add to PATH")
+        print("3. Or use conda: conda install -c conda-forge poppler")
+        return [], []
+    
+    try:
+        images = convert_from_path(pdf_path, dpi=dpi)
+        base64_images: list[Any] = []
+        pil_images: list[Any] = []
+        for image in images:
+            # Keep PIL image for potential saving
+            pil_images.append(image)
+            # Convert to base64
+            img_byte_arr = io.BytesIO()
+            image.save(img_byte_arr, format='PNG')
+            base64_image = base64.b64encode(img_byte_arr.getvalue()).decode('utf-8')
+            base64_images.append(base64_image)
+        return base64_images, pil_images
+    except Exception as e:
+        print(f"Error processing PDF {pdf_path}: {e}")
+        return [], []
 
 
-def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_prompt, mode='skip', suffix='', save_image=False, pil_images=None, max_attempts=3, dpi=300, initial_temperature=0.1, prompt_file=None, prompt_config=None, endpoint_url="https://b1s.hey.bahn.business/api/chat", timeout=100, max_tokens=50000, format_mode=None, pipeline_type="pdf-convert-png", pipeline_metadata=None):
+def process_with_model(model_name, base64_images, pdf_path, system_prompt, user_prompt, mode='skip', suffix='', save_image=False, pil_images=None, max_attempts=3, dpi=300, initial_temperature=0.1, prompt_file=None, prompt_config=None, endpoint_url="https://b1s.hey.bahn.business/api/chat", timeout=100, max_tokens=50000, format_mode=None):
     # Track all execution details for the new JSON format
     execution_data = {
         "version": "2.0",
@@ -353,16 +371,8 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
             print(f"Skipping {pdf_path} with model {model_name}{suffix_msg} - already processed ({len(existing_files)} existing file(s){format_info})")
             return
     
-    # Messages: Combine system and user, with pipeline data
-    if pipeline_type == "pdf-convert-png":
-        # Image pipeline - use base64 images
-        base64_images, _ = pipeline_data if isinstance(pipeline_data, tuple) else (pipeline_data, [])
-        user_message = {"role": "user", "content": user_prompt, "images": base64_images}
-    else:
-        # Text pipeline - include extraction data in content
-        extraction_json = json.dumps(pipeline_data, indent=2, ensure_ascii=False)
-        combined_content = f"{user_prompt}\n\n[PDF TEXT EXTRACTIONS]\n{extraction_json}"
-        user_message = {"role": "user", "content": combined_content}
+    # Messages: Combine system and user, with images in the user message
+    user_message = {"role": "user", "content": user_prompt, "images": base64_images}
     
     messages = [
         {"role": "system", "content": system_prompt},
@@ -384,19 +394,11 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
         output_file: Any = pdf_path + "." + timestamp + "." + model_part + ".thea"
     
     # Populate metadata
-    # Determine page count based on pipeline
-    if pipeline_type == "pdf-convert-png":
-        base64_images, _ = pipeline_data if isinstance(pipeline_data, tuple) else (pipeline_data, [])
-        page_count = len(base64_images)
-    else:
-        # For text pipeline, get page count from metadata if available
-        page_count = pipeline_metadata.get("pages_processed", 0) if pipeline_metadata else 0
-    
     execution_data["metadata"]["file"] = {
         "pdf_path": pdf_path,
         "pdf_absolute_path": os.path.abspath(pdf_path),
         "pdf_size_bytes": os.path.getsize(pdf_path) if os.path.exists(pdf_path) else 0,
-        "pdf_pages": page_count,
+        "pdf_pages": len(base64_images),
         "output_file": output_file
     }
     
@@ -406,9 +408,7 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
         "end_time": None,  # Will be set later
         "processing_time_seconds": None,  # Will be set later
         "hostname": socket.gethostname(),
-        "platform": platform.system().lower(),
-        "pipeline": pipeline_type,
-        "pipeline_metadata": pipeline_metadata
+        "platform": platform.system().lower()
     }
     
     execution_data["metadata"]["model"] = {
@@ -440,21 +440,15 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
         "prompt_config": prompt_config if prompt_config and not prompt_config.get("legacy") else None
     }
     
-    # Initialize execution data based on pipeline type
-    if pipeline_type == "pdf-convert-png":
-        base64_images, _ = pipeline_data if isinstance(pipeline_data, tuple) else (pipeline_data, [])
-        images_processed = []
-        for i in range(len(base64_images)):
-            images_processed.append({
-                "page": i + 1,
-                "resolution": None,  # Will be set if we have PIL images
-                "dpi": dpi,
-                "saved_as": None
-            })
-    else:
-        # For text pipeline, track extraction info instead
-        images_processed = []  # Keep empty for compatibility
-        base64_images = []  # For compatibility with existing code
+    # Initialize execution images data
+    images_processed = []
+    for i in range(len(base64_images)):
+        images_processed.append({
+            "page": i + 1,
+            "resolution": None,  # Will be set if we have PIL images
+            "dpi": dpi,
+            "saved_as": None
+        })
     
     # Save images if requested
     if save_image and pil_images:
@@ -483,17 +477,11 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
     total_output_tokens = 0
     
     # Estimate input tokens (rough approximation: 1 token ≈ 4 chars)
-    if pipeline_type == "pdf-convert-png":
-        # Count prompt tokens for image pipeline
-        input_text = system_prompt + user_prompt
-        total_input_tokens = len(input_text) // 4
-        # Add image tokens (estimate: 1 image ≈ 1000 tokens per page)
-        total_input_tokens += len(base64_images) * 1000
-    else:
-        # For text pipeline, include the extraction JSON in token count
-        extraction_json = json.dumps(pipeline_data, ensure_ascii=False) if isinstance(pipeline_data, dict) else str(pipeline_data)
-        input_text = system_prompt + user_prompt + extraction_json
-        total_input_tokens = len(input_text) // 4
+    # Count prompt tokens
+    input_text = system_prompt + user_prompt
+    total_input_tokens = len(input_text) // 4
+    # Add image tokens (estimate: 1 image ≈ 1000 tokens per page)
+    total_input_tokens += len(base64_images) * 1000
     
     # Variables to track across retries
     final_retry_count = 0
@@ -1045,7 +1033,6 @@ if __name__ == "__main__":
     timeout = 100  # Default timeout in seconds for overall response
     max_tokens = 50000  # Default max tokens to generate
     format_mode = None  # Default: no format restriction (allows thinking)
-    pipeline_override = None  # Default: use prompt settings or auto-detect
     args = sys.argv[1:]
     
     # Check for help flag first
@@ -1159,13 +1146,6 @@ if __name__ == "__main__":
             else:
                 print(f"Error: Format must be 'json' or 'none'. Got: {args[1]}")
                 sys.exit(1)
-        elif args[0] == '--pipeline' and len(args) >= 2:
-            pipeline_override = args[1]
-            if pipeline_override not in ['pdf-convert-png', 'pdf-extract-txt']:
-                print(f"Error: Unknown pipeline type '{pipeline_override}'")
-                print("Available pipelines: pdf-convert-png, pdf-extract-txt")
-                sys.exit(1)
-            args = args[2:]  # Remove pipeline arguments from args
         else:
             print(f"Error: Unknown option '{args[0]}'")
             sys.exit(1)
@@ -1200,10 +1180,6 @@ if __name__ == "__main__":
         print("  --format <mode>   Output format mode: 'json' or 'none' (default: none)")
         print("                    'json' forces pure JSON output (no thinking)")
         print("                    'none' allows model thinking and reasoning")
-        print("  --pipeline <type> Processing pipeline: 'pdf-convert-png' or 'pdf-extract-txt'")
-        print("                    'pdf-convert-png': Convert PDF to images (for vision models)")
-        print("                    'pdf-extract-txt': Extract text using multiple methods (for text models)")
-        print("                    Default: determined by prompt file or model type")
         print("\nOutput File Format:")
         print("  Default:          <pdf>.<timestamp>.<model>.thea")
         print("  With suffix:      <pdf>.<timestamp>.<model>.<suffix>.thea")
@@ -1399,42 +1375,15 @@ if __name__ == "__main__":
     if model_override:
         models: list[str] = [model_override]
     else:
-        models: list[str] = ["gemma3:12b"]  # Default model (smaller for faster switching)
-    
-    # Initialize pipeline based on prompt configuration or override
-    if pipeline_override:
-        # Use command-line override
-        pipeline = PipelineManager.get_pipeline(pipeline_override, prompt_config.get("settings", {}).get("pipeline_config", {}))
-        pipeline_type = pipeline_override
-        print(f"Using pipeline override: {pipeline_type}")
-    else:
-        # Use prompt configuration
-        pipeline = PipelineManager.get_pipeline_from_prompt(prompt_config)
-        pipeline_type = pipeline.pipeline_type
+        models: list[str] = ["gemma3:27b"]  # Default model
     
     for pdf_path in pdf_paths:
         print(f"\nProcessing file: {pdf_path}")
+        base64_images, pil_images = pdf_to_base64_images(pdf_path, dpi=dpi)
         
-        # Process PDF through the selected pipeline
-        if pipeline_type == "pdf-convert-png":
-            # Image pipeline
-            pipeline_data, pipeline_metadata = pipeline.process(pdf_path, dpi=dpi, save_images=save_image)
-            base64_images, pil_images = pipeline_data
-            
-            if not base64_images:
-                print(f"Skipping {pdf_path} - no images available")
-                continue
-        else:
-            # Text extraction pipeline
-            pipeline_data, pipeline_metadata = pipeline.process(pdf_path)
-            
-            if not pipeline_data or pipeline_metadata.get("extraction_count", 0) == 0:
-                print(f"Skipping {pdf_path} - no text extracted")
-                continue
-            
-            # Format for model
-            pipeline_data = pipeline.format_for_model(pipeline_data, pipeline_metadata)
-            pil_images = None  # No images for text pipeline
+        if not base64_images:
+            print(f"Skipping {pdf_path} - no images available")
+            continue
         
         for model in models:
             # Build user prompt from template
@@ -1442,14 +1391,12 @@ if __name__ == "__main__":
             
             # Pass additional parameters for the new JSON format
             process_with_model(
-                model, pipeline_data, pdf_path, system_prompt, user_prompt, 
+                model, base64_images, pdf_path, system_prompt, user_prompt, 
                 mode, suffix, save_image, pil_images, max_attempts, dpi, temperature,
                 prompt_file=prompt_file,
                 prompt_config=prompt_config,
                 endpoint_url=endpoint_url,
                 timeout=timeout,
                 max_tokens=max_tokens,
-                format_mode=format_mode,
-                pipeline_type=pipeline_type,
-                pipeline_metadata=pipeline_metadata
+                format_mode=format_mode
             )
