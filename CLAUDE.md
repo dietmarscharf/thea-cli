@@ -8,19 +8,122 @@ THEA is a PDF text extraction and analysis system that uses Ollama's vision mode
 
 ## Architecture
 
-The system consists of a single Python script (`thea.py`) with three main functions:
-1. `pdf_to_base64_images()` - Converts PDF files to base64-encoded PNG images using pdf2image/poppler
-2. `process_with_model()` - Core processing logic that handles model communication, retry logic, and result saving
-3. `load_prompt_file()` - Loads custom prompts from `.prompt` files
+### Core Components
 
-### Processing Flow
-1. PDF → PNG conversion at configurable DPI (default: 300)
-2. Streaming API communication with Ollama endpoint
-3. Progressive temperature increase (0.1 → 1.0) during retries to handle stuck patterns
-4. Pattern detection for 1-3 chunk repetitive sequences
-5. Results saved as JSON v2.0 format `.thea` files with comprehensive metadata
+The system (`thea.py`) consists of five main functions:
 
-### Output Format (.thea files v2.0)
+1. **`load_prompt_file(prompt_path)`** - Loads JSON or plain text prompt configurations. Returns a dict with prompt config or None.
+
+2. **`build_system_prompt(prompt_config)`** - Constructs the complete system prompt by combining:
+   - Hardcoded prefix: "You are a vision-based text extractor and analyzer. "
+   - Configurable suffix from prompt config
+   - Output format instructions from schema
+
+3. **`build_user_prompt(prompt_config, pdf_path)`** - Creates user prompts from templates with `{{variable}}` substitution.
+
+4. **`pdf_to_base64_images(pdf_path, dpi)`** - Converts PDFs to base64-encoded PNG images using pdf2image/poppler. Returns tuple of (base64_images, pil_images).
+
+5. **`process_with_model(...)`** - Main processing orchestrator that:
+   - Manages retry logic with progressive temperature increases
+   - Detects and handles stuck pattern repetitions
+   - Streams responses from Ollama API
+   - Saves results as JSON v2.0 format
+
+### Processing Pipeline
+
+1. **Configuration Loading**
+   - Priority: Command-line args > `.prompt` file > hardcoded defaults
+   - Auto-loads `.prompt` from root if present
+   - Supports both JSON and legacy plain text formats
+
+2. **PDF Processing**
+   - Converts each page to PNG at specified DPI
+   - Encodes images as base64 for API transmission
+   - Optionally saves images with pattern: `<pdf>.<timestamp>.<model>.<dpi>p<page>.png`
+
+3. **Model Communication**
+   - Streams responses character-by-character to stdout
+   - Implements retry logic with temperature progression: `initial_temp + (retry_count * (1.0 - initial_temp) / max_retries)`
+   - Detects stuck patterns (single chunk, two-chunk alternating, three-chunk cycle)
+
+4. **Result Storage**
+   - Saves as `.thea` files in JSON v2.0 format
+   - Contains complete metadata, settings, prompts, response, and statistics
+   - Backward compatible with legacy text format detection
+
+## Commands
+
+### Development Setup
+```bash
+# Initial setup
+npm run setup              # Linux/macOS
+npm run setup-windows      # Windows
+
+# Activate virtual environment
+. venv/bin/activate        # Linux/macOS
+venv\Scripts\activate      # Windows
+```
+
+### Running THEA
+```bash
+# Default processing (Belege/ folder, gemma3:27b, --max-retries 10)
+npm run thea               # Linux/macOS
+npm run thea-windows       # Windows
+
+# Direct execution with options
+python3 thea.py [OPTIONS] <file_pattern> [file_pattern2] ...
+
+# Common patterns
+python3 thea.py sample_document.pdf                    # Single file
+python3 thea.py --mode overwrite "*.pdf"              # Force reprocess
+python3 thea.py --prompt invoice.prompt "*.pdf"       # Custom prompt
+python3 thea.py -m gemma:14b -t 0.5 "*.pdf"          # Different model/temp
+```
+
+### Building Executables
+```bash
+npm run build-windows      # Creates thea.exe
+npm run build-linux        # Creates thea-linux
+npm run build-macos        # Creates thea-macos
+npm run build-spec         # Build using thea.spec
+```
+
+## Prompt File Format
+
+### Structure (`.prompt` or `<name>.prompt`)
+```json
+{
+  "version": "1.0",
+  "system_prompt": {
+    "suffix": "Extraction instructions...",
+    "output_format": {
+      "type": "json",
+      "schema": { "field": "type" },
+      "instructions": "Format guidance"
+    }
+  },
+  "user_prompt": {
+    "template": "Process {{pdf_path}}"
+  },
+  "settings": {
+    "model": "gemma3:27b",
+    "temperature": 0.1,
+    "max_retries": 3,
+    "mode": "skip",
+    "save_image": false,
+    "dpi": 300,
+    "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+  }
+}
+```
+
+### Parameter Priority
+1. Command-line arguments (highest)
+2. Prompt file settings
+3. Hardcoded defaults (lowest)
+
+## Output Format (.thea v2.0)
+
 ```json
 {
   "version": "2.0",
@@ -31,7 +134,7 @@ The system consists of a single Python script (`thea.py`) with three main functi
   },
   "settings": { "mode", "suffix", "prompt_file", "save_image", "dpi", "max_retries", "initial_temperature", "temperature_progression" },
   "execution": { "retry_count", "final_temperature", "stuck_pattern_detected", "pattern_type", "chunks_received", "images_processed" },
-  "prompt": { "system", "custom_prompt_file", "custom_prompt_content" },
+  "prompt": { "system", "user", "prompt_file", "prompt_config" },
   "response": { "text", "thinking", "json" },
   "statistics": { "tokens", "characters" },
   "errors": [],
@@ -39,106 +142,45 @@ The system consists of a single Python script (`thea.py`) with three main functi
 }
 ```
 
-## Common Development Commands
-
-### Setup & Dependencies
-```bash
-# First-time setup (creates venv and installs dependencies)
-npm run setup              # Linux/macOS
-npm run setup-windows      # Windows
-
-# Install/update dependencies only
-npm run install            # Linux/macOS  
-npm run install-windows    # Windows
-
-# Activate virtual environment for manual work
-. venv/bin/activate        # Linux/macOS
-venv\Scripts\activate      # Windows
-```
-
-### Running THEA
-```bash
-# Process PDFs in Belege/ folder with default settings
-npm run thea               # Linux/macOS (uses gemma3:27b, saves images)
-npm run thea-windows       # Windows
-
-# Direct usage with all options
-. venv/bin/activate && python3 thea.py [OPTIONS] <file_pattern> [file_pattern2] ...
-
-# Examples
-python3 thea.py sample_document.pdf                    # Basic processing
-python3 thea.py -m gemma:14b "*.pdf"                  # Different model
-python3 thea.py --mode overwrite "*.pdf"              # Force reprocess
-python3 thea.py --save-image --dpi 600 "*.pdf"        # High-res image export
-python3 thea.py --prompt custom.prompt "*.pdf"        # Custom prompt
-python3 thea.py --max-retries 10 -t 0.5 "*.pdf"       # Adjust retry/temperature
-```
-
-### Building Executables
-```bash
-# Build platform-specific executable
-npm run build-windows      # Creates thea.exe
-npm run build-linux        # Creates thea-linux
-npm run build-macos        # Creates thea-macos
-
-# Build using spec file (more control)
-npm run build-spec         # Linux/macOS
-npm run build-spec-windows # Windows
-
-# Clean build artifacts
-npm run clean-build        # Linux/macOS
-npm run clean-build-windows # Windows
-```
-
-## Command-Line Options
-
-- `--help, -h` - Show help message
-- `--mode <skip|overwrite>` - Processing mode (default: skip)
-- `-m, --model <name>` - Override model (default: gemma3:27b)
-- `-t, --temperature <value>` - Initial temperature (0.0-2.0, default: 0.1)
-- `--prompt <file.prompt>` - Load custom prompt (filename becomes suffix)
-- `--suffix <text>` - Add suffix to output filename
-- `--save-image` - Export processed images as PNG
-- `--dpi <number>` - PDF conversion DPI (50-600, default: 300)
-- `--max-retries <n>` - Max retry attempts (1-10, default: 3)
-
 ## Key Technical Details
 
-### Ollama Integration
+### Ollama Configuration
 - Default endpoint: `https://b1s.hey.bahn.business/api/chat`
-- Streaming JSON responses with `format: "json"` enforced
-- Models must support vision capabilities (e.g., gemma3:27b, gemma:14b)
-- Temperature progression formula: `initial_temp + (retry_count * (1.0 - initial_temp) / max_retries)`
+- Requires vision-capable models (gemma3:27b, gemma:14b, etc.)
+- Enforces JSON output with `format: "json"`
+- Streaming enabled for real-time output
 
 ### Pattern Detection
-Detects three types of stuck patterns after 50+ repetitions:
-1. Single chunk repetition (e.g., `\t\t\t...`)
-2. Two-chunk alternation (e.g., `ABABAB...`)
-3. Three-chunk cycle (e.g., `ABCABCABC...`)
+Monitors for repetitive output patterns (50+ repetitions):
+- Single chunk: Same content repeated
+- Two-chunk: Alternating between two values  
+- Three-chunk: Cycling through three values
 
-### File Naming Convention
-- Default: `<pdf>.<timestamp>.<model>.thea`
-- With suffix: `<pdf>.<timestamp>.<model>.<suffix>.thea`
-- Saved images: `<pdf>.<timestamp>.<model>[.<suffix>].<dpi>p<page>.png`
+### File Naming
+- Output: `<pdf>.<timestamp>.<model>[.<suffix>].thea`
+- Images: `<pdf>.<timestamp>.<model>[.<suffix>].<dpi>p<page>.png`
+- Suffix auto-derived from prompt filename unless overridden
 
-### Skip Mode Behavior
-- Skip mode is suffix-specific: only skips files with matching model AND suffix
-- Detects both old plain-text and new JSON format `.thea` files
-- Allows parallel processing with different configurations
+### Skip Mode Logic
+- Only skips files matching both model AND suffix
+- Detects both JSON v2.0 and legacy text formats
+- Enables parallel processing with different configurations
 
 ## Prerequisites
 
-1. **Python 3.8+** with venv support
-2. **Poppler** for PDF processing:
+1. **Python 3.8+** with venv module
+2. **Poppler** (PDF processing):
    - Ubuntu/Debian: `sudo apt-get install poppler-utils`
    - macOS: `brew install poppler`
    - Windows: Download from GitHub, add bin/ to PATH
-3. **Ollama** running with vision models:
-   - Start: `ollama serve`
-   - Pull model: `ollama pull gemma3:27b`
+3. **Ollama** with vision models:
+   ```bash
+   ollama serve
+   ollama pull gemma3:27b
+   ```
 
-## Dependencies (requirements.txt)
-- pdf2image==1.17.0 - PDF to image conversion
-- Pillow==10.4.0 - Image processing
-- requests==2.32.3 - API communication
-- pyinstaller==6.3.0 - Executable building
+## Dependencies
+- pdf2image==1.17.0
+- Pillow==10.4.0
+- requests==2.32.3
+- pyinstaller==6.3.0
