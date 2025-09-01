@@ -32,8 +32,11 @@ Belege/
 *.docling.json
 *.docling.md
 *.pypdf2.txt
+*.pypdf2.json
 *.pdfplumber.txt
+*.pdfplumber.json
 *.pymupdf.txt
+*.pymupdf.json
 # Ignore custom prompt files but keep default and prompts directory
 *.prompt
 !.prompt
