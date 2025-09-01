@@ -52,7 +52,9 @@ The text pipeline uses multiple extractors (`extractors/` directory):
 
 The main `process_with_model()` function in `thea.py` (line 348) orchestrates:
 
-1. **Skip Mode Logic** - Checks for existing `.thea_extract` files BEFORE pipeline processing (lines 1487-1498)
+1. **Skip Mode Logic** - Checks for existing files based on mode (lines 1536-1593)
+   - Normal mode: Checks for `.thea_extract` files
+   - Sidecars-only mode: Checks for pipeline-specific sidecar files
 2. **Pipeline Processing** - Runs selected pipeline to extract content
 3. **Ollama API Streaming** - Sends to model with chunk-by-chunk processing
 4. **Pattern Detection** - Monitors for stuck responses (1-100 char repetitions)
@@ -104,9 +106,16 @@ npm run thea:pdf-extract-txt     # Text extraction with Qwen
 npm run thea:pdf-extract-docling # Docling extraction with gemma3:27b
 
 # Sidecar-only mode (extraction without AI analysis)
-python3 thea.py --sidecars-only --pipeline pdf-extract-png "*.pdf"     # Extract PNG images only
-python3 thea.py --sidecars-only --pipeline pdf-extract-txt "*.pdf"     # Extract text only
-python3 thea.py --sidecars-only --pipeline pdf-extract-docling "*.pdf" # Docling extraction only
+npm run thea:sidecars:png        # Extract PNG images only (skip existing)
+npm run thea:sidecars:txt        # Extract text only (skip existing)
+npm run thea:sidecars:docling    # Docling extraction only (skip existing)
+npm run thea:sidecars            # Auto-detect pipeline (skip existing)
+
+# Force regeneration of sidecars
+npm run thea:sidecars:png-force     # Force PNG extraction
+npm run thea:sidecars:txt-force     # Force text extraction
+npm run thea:sidecars:docling-force # Force Docling extraction
+npm run thea:sidecars-force         # Force auto-detect pipeline
 
 # Bank statement processing
 npm run thea:kontoauszug:gemma   # Gemma for bank statements
@@ -161,6 +170,18 @@ npm run thea:clean:png-force-windows
 # etc.
 
 # Cleans: *.thea_extract, *.thea (legacy), *.png, extraction files (*.txt, *.json, *.md)
+```
+
+### File Transfer and Sync
+
+```bash
+# Transfer extraction results to another project
+npm run thea:sync-sidecars         # Linux/macOS rsync
+npm run thea:sync-sidecars-windows # Windows robocopy
+npm run thea:sync-sidecars-dry     # Dry run to preview
+
+# Syncs: *.thea_extract, *.docling.*, *.pypdf2.txt, *.pdfplumber.txt, *.pymupdf.txt, *.png
+# Target: ../Sparkasse/docs/
 ```
 
 ### Building Executables
@@ -245,6 +266,7 @@ The `--sidecars-only` flag enables extraction-only mode without sending data to 
 - Skips all model processing
 - Much faster than full processing (no API calls)
 - Files use same naming convention as full processing
+- Skip mode checks for existing sidecar files (not `.thea_extract`)
 
 ### Docling Pipeline (pdf-extract-docling)
 
