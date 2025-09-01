@@ -103,6 +103,11 @@ npm run thea:pdf-extract-png     # Image extraction with Gemma
 npm run thea:pdf-extract-txt     # Text extraction with Qwen
 npm run thea:pdf-extract-docling # Docling extraction with gemma3:27b
 
+# Sidecar-only mode (extraction without AI analysis)
+python3 thea.py --sidecars-only --pipeline pdf-extract-png "*.pdf"     # Extract PNG images only
+python3 thea.py --sidecars-only --pipeline pdf-extract-txt "*.pdf"     # Extract text only
+python3 thea.py --sidecars-only --pipeline pdf-extract-docling "*.pdf" # Docling extraction only
+
 # Bank statement processing
 npm run thea:kontoauszug:gemma   # Gemma for bank statements
 npm run thea:kontoauszug:qwen    # Qwen for bank statements
@@ -116,6 +121,7 @@ python3 thea.py --prompt prompts/bank_gemma.prompt --save-sidecars "document.pdf
 # Key parameters
 --pipeline <type>      # pdf-extract-png, pdf-extract-txt, or pdf-extract-docling
 --save-sidecars        # Save PNG images or text extractions
+--sidecars-only        # Generate sidecars without model processing
 --max-attempts <n>     # Retry attempts for stuck patterns (1-10)
 --temperature <value>  # Initial temperature (0.0-2.0, default: 0.1)
 --mode <skip|overwrite> # Skip existing or overwrite
@@ -205,6 +211,40 @@ Example with 3 retries: 0.10 → 0.40 → 0.70
 - Timeout configurable (default: 100-200 seconds)
 
 ## Pipeline-Specific Details
+
+### Sidecar-Only Mode
+
+The `--sidecars-only` flag enables extraction-only mode without sending data to Ollama models:
+
+**Use cases:**
+- Pre-process PDFs for later analysis
+- Quick text/image extraction without AI processing
+- Batch extraction for archival purposes
+- Testing extraction quality before AI analysis
+- Offline extraction when Ollama is unavailable
+
+**Behavior by pipeline:**
+
+**pdf-extract-png:**
+- Extracts PDF pages as PNG images
+- Saves: `*.{timestamp}.{model}.{suffix}.{dpi}p{page}.png`
+- Example: `python3 thea.py --sidecars-only --pipeline pdf-extract-png --dpi 150 "*.pdf"`
+
+**pdf-extract-txt:**
+- Runs PyPDF2, pdfplumber, pymupdf extractors
+- Saves: `*.pypdf2.txt`, `*.pdfplumber.txt`, `*.pymupdf.txt`
+- Example: `python3 thea.py --sidecars-only --pipeline pdf-extract-txt "documents/*.pdf"`
+
+**pdf-extract-docling:**
+- Uses Docling deep learning extraction
+- Saves: `*.docling.txt`, `*.docling.json`, `*.docling.md`
+- Example: `python3 thea.py --sidecars-only --pipeline pdf-extract-docling "complex/*.pdf"`
+
+**Notes:**
+- Automatically enables `--save-sidecars`
+- Skips all model processing
+- Much faster than full processing (no API calls)
+- Files use same naming convention as full processing
 
 ### Docling Pipeline (pdf-extract-docling)
 
