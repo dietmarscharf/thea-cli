@@ -23,9 +23,17 @@ dist/
 # Project specific
 Belege/
 *.thea
+*.thea_extract
 *.png
 *.pdf
 *.PDF
+# Extraction pipeline outputs
+*.docling.txt
+*.docling.json
+*.docling.md
+*.pypdf2.txt
+*.pdfplumber.txt
+*.pymupdf.txt
 # Ignore custom prompt files but keep default and prompts directory
 *.prompt
 !.prompt
