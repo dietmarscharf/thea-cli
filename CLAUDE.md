@@ -52,9 +52,12 @@ The text pipeline uses multiple extractors (`extractors/` directory):
 
 The main `process_with_model()` function in `thea.py` (line 348) orchestrates:
 
-1. **Skip Mode Logic** - Checks for existing files based on mode (lines 1536-1593)
-   - Normal mode: Checks for `.thea_extract` files
-   - Sidecars-only mode: Checks for pipeline-specific sidecar files
+1. **Skip Mode Logic** - Checks for existing files based on mode (lines 1536-1568)
+   - Normal mode: Checks for `.thea_extract` files matching `*.{model}.{suffix}.thea_extract`
+   - Sidecars-only mode: Checks for ANY existing pipeline-specific sidecar files:
+     - Docling: `*.docling.*` (catches all variations regardless of model/suffix)
+     - Text: `*.pypdf2.txt`, `*.pdfplumber.txt`, `*.pymupdf.txt`
+     - PNG: `*.png`
 2. **Pipeline Processing** - Runs selected pipeline to extract content
 3. **Ollama API Streaming** - Sends to model with chunk-by-chunk processing
 4. **Pattern Detection** - Monitors for stuck responses (1-100 char repetitions)
@@ -266,7 +269,8 @@ The `--sidecars-only` flag enables extraction-only mode without sending data to 
 - Skips all model processing
 - Much faster than full processing (no API calls)
 - Files use same naming convention as full processing
-- Skip mode checks for existing sidecar files (not `.thea_extract`)
+- Skip mode in sidecars-only checks for ANY existing sidecar files regardless of model or suffix used
+- This prevents duplicate processing even when switching between models or using different suffixes
 
 ### Docling Pipeline (pdf-extract-docling)
 

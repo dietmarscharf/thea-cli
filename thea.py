@@ -1544,36 +1544,22 @@ if __name__ == "__main__":
                 
                 if pipeline_type == "pdf-extract-docling":
                     # Check for any existing Docling sidecar files
-                    if suffix:
-                        existing_pattern = f"{pdf_path}.*.{model_part}.{suffix}.docling.*"
-                    else:
-                        existing_pattern = f"{pdf_path}.*.{model_part}.docling.*"
+                    existing_pattern = f"{pdf_path}.*.docling.*"
                     existing_files = glob.glob(existing_pattern)
                     
                 elif pipeline_type == "pdf-extract-txt":
                     # Check for any existing text extraction sidecar files
-                    if suffix:
-                        # Check for any of the text extractor outputs
-                        patterns = [
-                            f"{pdf_path}.*.{model_part}.{suffix}.pypdf2.txt",
-                            f"{pdf_path}.*.{model_part}.{suffix}.pdfplumber.txt",
-                            f"{pdf_path}.*.{model_part}.{suffix}.pymupdf.txt"
-                        ]
-                    else:
-                        patterns = [
-                            f"{pdf_path}.*.{model_part}.pypdf2.txt",
-                            f"{pdf_path}.*.{model_part}.pdfplumber.txt",
-                            f"{pdf_path}.*.{model_part}.pymupdf.txt"
-                        ]
+                    patterns = [
+                        f"{pdf_path}.*.pypdf2.txt",
+                        f"{pdf_path}.*.pdfplumber.txt",
+                        f"{pdf_path}.*.pymupdf.txt"
+                    ]
                     for pattern in patterns:
                         existing_files.extend(glob.glob(pattern))
                     
                 elif pipeline_type == "pdf-extract-png":
                     # Check for any existing PNG sidecar files
-                    if suffix:
-                        existing_pattern = f"{pdf_path}.*.{model_part}.{suffix}.*.png"
-                    else:
-                        existing_pattern = f"{pdf_path}.*.{model_part}.*.png"
+                    existing_pattern = f"{pdf_path}.*.png"
                     existing_files = glob.glob(existing_pattern)
                 
                 if existing_files:
