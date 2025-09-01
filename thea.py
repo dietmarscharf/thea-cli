@@ -1536,15 +1536,61 @@ if __name__ == "__main__":
         if mode == 'skip' and models:
             # Use the first model for the skip check
             model_part = models[0].replace(":", ".")
-            if suffix:
-                existing_pattern = f"{pdf_path}.*.{model_part}.{suffix}.thea_extract"
+            
+            # Different skip logic for sidecars-only mode vs normal mode
+            if sidecars_only:
+                # Check for existing sidecar files based on pipeline type
+                existing_files = []
+                
+                if pipeline_type == "pdf-extract-docling":
+                    # Check for any existing Docling sidecar files
+                    if suffix:
+                        existing_pattern = f"{pdf_path}.*.{model_part}.{suffix}.docling.*"
+                    else:
+                        existing_pattern = f"{pdf_path}.*.{model_part}.docling.*"
+                    existing_files = glob.glob(existing_pattern)
+                    
+                elif pipeline_type == "pdf-extract-txt":
+                    # Check for any existing text extraction sidecar files
+                    if suffix:
+                        # Check for any of the text extractor outputs
+                        patterns = [
+                            f"{pdf_path}.*.{model_part}.{suffix}.pypdf2.txt",
+                            f"{pdf_path}.*.{model_part}.{suffix}.pdfplumber.txt",
+                            f"{pdf_path}.*.{model_part}.{suffix}.pymupdf.txt"
+                        ]
+                    else:
+                        patterns = [
+                            f"{pdf_path}.*.{model_part}.pypdf2.txt",
+                            f"{pdf_path}.*.{model_part}.pdfplumber.txt",
+                            f"{pdf_path}.*.{model_part}.pymupdf.txt"
+                        ]
+                    for pattern in patterns:
+                        existing_files.extend(glob.glob(pattern))
+                    
+                elif pipeline_type == "pdf-extract-png":
+                    # Check for any existing PNG sidecar files
+                    if suffix:
+                        existing_pattern = f"{pdf_path}.*.{model_part}.{suffix}.*.png"
+                    else:
+                        existing_pattern = f"{pdf_path}.*.{model_part}.*.png"
+                    existing_files = glob.glob(existing_pattern)
+                
+                if existing_files:
+                    suffix_msg = f" with suffix '{suffix}'" if suffix else ""
+                    print(f"Skipping {pdf_path} with model {models[0]}{suffix_msg} - sidecars already exist ({len(existing_files)} file(s))")
+                    continue
             else:
-                existing_pattern = f"{pdf_path}.*.{model_part}.thea_extract"
-            existing_files = glob.glob(existing_pattern)
-            if existing_files:
-                suffix_msg = f" with suffix '{suffix}'" if suffix else ""
-                print(f"Skipping {pdf_path} with model {models[0]}{suffix_msg} - already processed ({len(existing_files)} existing file(s))")
-                continue
+                # Normal mode: check for .thea_extract files
+                if suffix:
+                    existing_pattern = f"{pdf_path}.*.{model_part}.{suffix}.thea_extract"
+                else:
+                    existing_pattern = f"{pdf_path}.*.{model_part}.thea_extract"
+                existing_files = glob.glob(existing_pattern)
+                if existing_files:
+                    suffix_msg = f" with suffix '{suffix}'" if suffix else ""
+                    print(f"Skipping {pdf_path} with model {models[0]}{suffix_msg} - already processed ({len(existing_files)} existing file(s))")
+                    continue
         
         # Process PDF through the selected pipeline
         if pipeline_type == "pdf-extract-png":
