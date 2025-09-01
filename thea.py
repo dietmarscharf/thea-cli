@@ -1119,6 +1119,7 @@ if __name__ == "__main__":
     suffix = ''  # Default no suffix
     prompt_file = None  # Default no prompt file
     save_sidecars = False  # Default don't save sidecar files (images or text extractions)
+    sidecars_only = False  # Default: run model processing after extraction
     dpi = 300  # Default DPI for PDF to image conversion
     max_attempts = 3  # Default max attempts for stuck model responses
     model_override = None  # Default: use built-in model list
@@ -1187,6 +1188,10 @@ if __name__ == "__main__":
         elif args[0] == '--save-sidecars':
             save_sidecars = True
             args = args[1:]  # Remove save-sidecars flag from args
+        elif args[0] == '--sidecars-only':
+            sidecars_only = True
+            save_sidecars = True  # Automatically enable sidecar saving
+            args = args[1:]  # Remove sidecars-only flag from args
         elif args[0] == '--dpi' and len(args) >= 2:
             try:
                 dpi = int(args[1])
@@ -1249,10 +1254,14 @@ if __name__ == "__main__":
                 sys.exit(1)
         elif args[0] == '--pipeline' and len(args) >= 2:
             pipeline_override = args[1]
-            if pipeline_override not in ['pdf-convert-png', 'pdf-extract-txt']:
+            if pipeline_override not in ['pdf-convert-png', 'pdf-extract-txt', 'pdf-extract-png', 'pdf-extract-docling']:
                 print(f"Error: Unknown pipeline type '{pipeline_override}'")
-                print("Available pipelines: pdf-convert-png, pdf-extract-txt")
-                sys.exit(1)
+                print("Available pipelines: pdf-extract-png, pdf-extract-txt, pdf-extract-docling")
+                # Support legacy name
+                if pipeline_override == 'pdf-convert-png':
+                    pipeline_override = 'pdf-extract-png'
+                else:
+                    sys.exit(1)
             args = args[2:]  # Remove pipeline arguments from args
         else:
             print(f"Error: Unknown option '{args[0]}'")
@@ -1279,6 +1288,7 @@ if __name__ == "__main__":
         print("  --suffix <text>   Add custom suffix to output filename before .thea extension")
         print("                    Overrides the automatic suffix from prompt filename")
         print("  --save-sidecars   Save sidecar files (PNG images for image pipeline, text files for text pipeline)")
+        print("  --sidecars-only   Generate sidecar files only without model processing (implies --save-sidecars)")
         print("  --dpi <number>    Set DPI resolution for PDF to image conversion (50-600, default: 300)")
         print("  --max-attempts <n> Max attempts when model gets stuck (1-10, default: 3)")
         print("  -m, --model <name> Override default model (e.g., gemma:14b, llama2:13b)")
@@ -1317,6 +1327,10 @@ if __name__ == "__main__":
         print("  python thea.py --save-sidecars --dpi 150 '*.pdf'")
         print("\n  # High quality image extraction")
         print("  python thea.py --save-sidecars --dpi 600 --suffix hq 'important.pdf'")
+        print("\n  # Extract text only without model processing")
+        print("  python thea.py --sidecars-only --pipeline pdf-extract-txt '*.pdf'")
+        print("\n  # Extract with Docling only without model processing")
+        print("  python thea.py --sidecars-only --pipeline pdf-extract-docling 'Belege/*.pdf'")
         print("\n  # Increase attempts for unstable model")
         print("  python thea.py --max-attempts 5 '*.pdf'")
         print("\n  # Use a different model")
@@ -1465,7 +1479,9 @@ if __name__ == "__main__":
     print(f"Mode: {mode}")
     if suffix:
         print(f"Suffix: {suffix}")
-    if save_sidecars:
+    if sidecars_only:
+        print(f"Sidecars-only mode: enabled (skipping model processing)")
+    elif save_sidecars:
         print(f"Save sidecars: enabled")
     print(f"DPI: {dpi}")
     print(f"Max attempts: {max_attempts}")
@@ -1539,6 +1555,25 @@ if __name__ == "__main__":
             if not base64_images:
                 print(f"Skipping {pdf_path} - no images available")
                 continue
+            
+            # For sidecars-only mode with PNG pipeline, save images now
+            if sidecars_only and pil_images:
+                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                model_part = models[0].replace(":", ".") if models else "unknown"
+                
+                for i, image in enumerate(pil_images, 1):
+                    if suffix:
+                        image_file = f"{pdf_path}.{timestamp}.{model_part}.{suffix}.{dpi}p{i}.png"
+                    else:
+                        image_file = f"{pdf_path}.{timestamp}.{model_part}.{dpi}p{i}.png"
+                    try:
+                        image.save(image_file, format='PNG')
+                        print(f"      Saved image: {image_file}")
+                    except Exception as e:
+                        print(f"      Error saving image {image_file}: {e}")
+                
+                print(f"  ✓ {len(pil_images)} PNG images saved for {pdf_path} (skipping model processing)")
+                continue
         else:
             # Text extraction pipeline
             # Generate timestamp and model part for file naming
@@ -1569,6 +1604,11 @@ if __name__ == "__main__":
             # Format for model
             pipeline_data = pipeline.format_for_model(pipeline_data, pipeline_metadata)
             pil_images = None  # No images for text pipeline
+        
+        # Check if we should skip model processing
+        if sidecars_only:
+            print(f"  ✓ Sidecars saved for {pdf_path} (skipping model processing)")
+            continue
         
         for model in models:
             # Build user prompt from template
