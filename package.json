@@ -68,7 +68,11 @@
     "thea:clean:png-force": ". venv/bin/activate && python3 thea.py --clean --force --pipeline png Belege/",
     "thea:clean:png-force-windows": "venv\\Scripts\\activate && python thea.py --clean --force --pipeline png Belege\\",
     "thea:clean:png-dry": ". venv/bin/activate && python3 thea.py --clean --dry-run --pipeline png Belege/",
-    "thea:clean:png-dry-windows": "venv\\Scripts\\activate && python thea.py --clean --dry-run --pipeline png Belege\\"
+    "thea:clean:png-dry-windows": "venv\\Scripts\\activate && python thea.py --clean --dry-run --pipeline png Belege\\",
+    "thea:sync-sidecars": "rsync -av --include='*.thea_extract' --include='*.docling.*' --include='*.pypdf2.txt' --include='*.pdfplumber.txt' --include='*.pymupdf.txt' --include='*.png' --include='*/' --exclude='*' Belege/ ../Sparkasse/docs/",
+    "thea:sync-sidecars-windows": "robocopy Belege ..\\Sparkasse\\docs *.thea_extract *.docling.txt *.docling.json *.docling.md *.pypdf2.txt *.pdfplumber.txt *.pymupdf.txt *.png /S /NJH /NJS /NC /NS /NP",
+    "thea:sync-sidecars-dry": "rsync -avn --include='*.thea_extract' --include='*.docling.*' --include='*.pypdf2.txt' --include='*.pdfplumber.txt' --include='*.pymupdf.txt' --include='*.png' --include='*/' --exclude='*' Belege/ ../Sparkasse/docs/",
+    "thea:sync-sidecars-dry-windows": "robocopy Belege ..\\Sparkasse\\docs *.thea_extract *.docling.txt *.docling.json *.docling.md *.pypdf2.txt *.pdfplumber.txt *.pymupdf.txt *.png /S /L"
   },
   "keywords": [
     "pdf",
