@@ -50,9 +50,9 @@ The text pipeline uses multiple extractors (`extractors/` directory):
 
 ### Core Processing Flow
 
-The main `process_with_model()` function in `thea.py` (line 348) orchestrates:
+The main `process_with_model()` function in `thea.py:348` orchestrates:
 
-1. **Skip Mode Logic** - Checks for existing files based on mode (lines 1536-1568)
+1. **Skip Mode Logic** - Checks for existing files based on mode (`thea.py:1536-1568`)
    - Normal mode: Checks for `.thea_extract` files matching `*.{model}.{suffix}.thea_extract`
    - Sidecars-only mode: Checks for ANY existing pipeline-specific sidecar files:
      - Docling: `*.docling.*` (catches all variations regardless of model/suffix)
@@ -139,6 +139,22 @@ python3 thea.py --prompt prompts/bank_gemma.prompt --save-sidecars "document.pdf
 --mode <skip|overwrite> # Skip existing or overwrite
 --dpi <number>         # Image resolution (50-600, default: 300)
 --format <json|none>   # JSON enforcement or allow thinking tags
+```
+
+### Testing
+
+```bash
+# Test thinking tag extraction
+python3 test_thinking.py
+
+# Test with sample document
+python3 thea.py --mode overwrite --save-sidecars sample_document.pdf
+
+# Test specific pipeline
+python3 thea.py --pipeline pdf-extract-txt --save-sidecars sample_document.pdf
+
+# Process financial documents
+python3 thea.py --prompt prompts/pdf-extract-txt.prompt "Belege/*.pdf"
 ```
 
 ### Clean Generated Files
@@ -355,22 +371,6 @@ When repetitive patterns are detected:
 - Image pipeline requires: pdf2image, poppler binaries
 - Text pipeline requires: At least one of PyPDF2, pdfplumber, pymupdf
 - Graceful degradation when extractors unavailable
-
-## Testing
-
-```bash
-# Test thinking tag extraction
-python3 test_thinking.py
-
-# Test with sample document
-python3 thea.py --mode overwrite --save-sidecars sample_document.pdf
-
-# Test specific pipeline
-python3 thea.py --pipeline pdf-extract-txt --save-sidecars sample_document.pdf
-
-# Process financial documents
-python3 thea.py --prompt prompts/pdf-extract-txt.prompt "Belege/*.pdf"
-```
 
 ## Prompt File Development
 
