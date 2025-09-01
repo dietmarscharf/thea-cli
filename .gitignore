@@ -22,6 +22,7 @@ dist/
 
 # Project specific
 Belege/
+docs/
 *.thea
 *.thea_extract
 *.png
