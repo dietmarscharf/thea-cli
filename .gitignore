@@ -22,7 +22,7 @@ dist/
 
 # Project specific
 Belege/
-docs/
+# docs/  # Commented out to allow docs folder in repository
 *.thea
 *.thea_extract
 *.png

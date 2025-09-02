@@ -1,0 +1,336 @@
+=== COMPLETE FILE INVENTORY ===
+Generated: Tue Sep  2 15:06:03 CEST 2025
+================================================================================
+
+COMPANY: BLUEITS
+ACCOUNT: Depotkonto 7274079
+DIRECTORY: BLUEITS-Depotkonto-7274079
+TOTAL FILES: 314
+----------------------------------------
+
+  Year 2020: 9 files
+    - 20201222_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_21_12_2020.pdf
+    - 20201222_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_21_12_2020_1.pdf
+    - 20201222_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_21_12_2020_2.pdf
+    - 20201223_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_22_12_2020.pdf
+    - 20201223_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_22_12_2020_1.pdf
+    ... and 4 more files
+
+  Year 2021: 73 files
+    - 20210107_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_06_01_2021.pdf
+    - 20210107_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_06_01_2021_1.pdf
+    - 20210107_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_06_01_2021_2.pdf
+    - 20210107_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_06_01_2021_3.pdf
+    - 20210107_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_06_01_2021_4.pdf
+    ... and 68 more files
+
+  Year 2022: 52 files
+    - 20220125_Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_11_01_2022.pdf
+    - 20220201_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_31_01_2022.pdf
+    - 20220203_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_02_02_2022.pdf
+    - 20220203_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_02_02_2022_1.pdf
+    - 20220203_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_02_02_2022_2.pdf
+    ... and 47 more files
+
+  Year 2023: 98 files
+    - Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_02_10_2023.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_03_04_2023.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_03_07_2023.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_10_01_2023.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_15_05_2023.PDF
+    ... and 93 more files
+
+  Year 2024: 54 files
+    - Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_01_07_2024.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_01_10_2024.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_02_04_2024.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_10_01_2024.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_24_04_2024.PDF
+    ... and 49 more files
+
+  Year 2025: 28 files
+    - Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_01_04_2025.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_01_07_2025.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_10_01_2025.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_28_04_2025.PDF
+    - Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_01_07_2025.PDF
+    ... and 23 more files
+
+================================================================================
+
+COMPANY: BLUEITS
+ACCOUNT: Geldmarktkonto 21503990
+DIRECTORY: BLUEITS-Geldmarktkonto-21503990
+TOTAL FILES: 55
+----------------------------------------
+
+  Year 2020: 1 files
+    - Konto_21503990-Auszug_2020_0001.pdf
+
+  Year 2021: 12 files
+    - Konto_21503990-Auszug_2021_0001.pdf
+    - Konto_21503990-Auszug_2021_0002.pdf
+    - Konto_21503990-Auszug_2021_0003.pdf
+    - Konto_21503990-Auszug_2021_0004.pdf
+    - Konto_21503990-Auszug_2021_0005.pdf
+    ... and 7 more files
+
+  Year 2022: 11 files
+    - Konto_0021503990-Auszug_2022_0003.pdf
+    - Konto_0021503990-Auszug_2022_0004.pdf
+    - Konto_0021503990-Auszug_2022_0005.pdf
+    - Konto_0021503990-Auszug_2022_0006.pdf
+    - Konto_0021503990-Auszug_2022_0007.pdf
+    ... and 6 more files
+
+  Year 2023: 11 files
+    - Konto_0021503990-Auszug_2023_0001.pdf
+    - Konto_0021503990-Auszug_2023_0002.pdf
+    - Konto_0021503990-Auszug_2023_0003.pdf
+    - Konto_0021503990-Auszug_2023_0004.pdf
+    - Konto_0021503990-Auszug_2023_0005.pdf
+    ... and 6 more files
+
+  Year 2024: 12 files
+    - Konto_0021503990-Auszug_2024_0001.pdf
+    - Konto_0021503990-Auszug_2024_0002.pdf
+    - Konto_0021503990-Auszug_2024_0003.pdf
+    - Konto_0021503990-Auszug_2024_0004.pdf
+    - Konto_0021503990-Auszug_2024_0005.pdf
+    ... and 7 more files
+
+  Year 2025: 8 files
+    - Konto_0021503990-Auszug_2025_0001.pdf
+    - Konto_0021503990-Auszug_2025_0002.pdf
+    - Konto_0021503990-Auszug_2025_0003.pdf
+    - Konto_0021503990-Auszug_2025_0004.pdf
+    - Konto_0021503990-Auszug_2025_0005.pdf
+    ... and 3 more files
+
+================================================================================
+
+COMPANY: BLUEITS
+ACCOUNT: Girokonto 200750750
+DIRECTORY: BLUEITS-Girokonto-200750750
+TOTAL FILES: 59
+----------------------------------------
+
+  Year 2020: 3 files
+    - Konto_200750750-Auszug_2020_0014.pdf
+    - Konto_200750750-Auszug_2020_0015.pdf
+    - Konto_200750750-Auszug_2020_0016.pdf
+
+  Year 2021: 12 files
+    - Konto_200750750-Auszug_2021_0001.pdf
+    - Konto_200750750-Auszug_2021_0002.pdf
+    - Konto_200750750-Auszug_2021_0003.pdf
+    - Konto_200750750-Auszug_2021_0004.pdf
+    - Konto_200750750-Auszug_2021_0005.pdf
+    ... and 7 more files
+
+  Year 2022: 12 files
+    - Konto_0200750750-Auszug_2022_0004.pdf
+    - Konto_0200750750-Auszug_2022_0005.pdf
+    - Konto_0200750750-Auszug_2022_0006.pdf
+    - Konto_0200750750-Auszug_2022_0007.pdf
+    - Konto_0200750750-Auszug_2022_0008.pdf
+    ... and 7 more files
+
+  Year 2023: 12 files
+    - Konto_0200750750-Auszug_2023_0001.pdf
+    - Konto_0200750750-Auszug_2023_0002.pdf
+    - Konto_0200750750-Auszug_2023_0003.pdf
+    - Konto_0200750750-Auszug_2023_0004.pdf
+    - Konto_0200750750-Auszug_2023_0005.pdf
+    ... and 7 more files
+
+  Year 2024: 12 files
+    - Konto_0200750750-Auszug_2024_0001.pdf
+    - Konto_0200750750-Auszug_2024_0002.pdf
+    - Konto_0200750750-Auszug_2024_0003.pdf
+    - Konto_0200750750-Auszug_2024_0004.pdf
+    - Konto_0200750750-Auszug_2024_0005.pdf
+    ... and 7 more files
+
+  Year 2025: 8 files
+    - Konto_0200750750-Auszug_2025_0001.pdf
+    - Konto_0200750750-Auszug_2025_0002.pdf
+    - Konto_0200750750-Auszug_2025_0003.pdf
+    - Konto_0200750750-Auszug_2025_0004.pdf
+    - Konto_0200750750-Auszug_2025_0005.pdf
+    ... and 3 more files
+
+================================================================================
+
+COMPANY: Ramteid
+ACCOUNT: Depotkonto 7274087
+DIRECTORY: Ramteid-Depotkonto-7274087
+TOTAL FILES: 88
+----------------------------------------
+
+  Year 2020: 6 files
+    - 20201222_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_21_12_2020.pdf
+    - 20201222_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_21_12_2020_1.pdf
+    - 20201222_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_21_12_2020_2.pdf
+    - 20201223_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_22_12_2020.pdf
+    - 20201223_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_22_12_2020_1.pdf
+    ... and 1 more files
+
+  Year 2021: 36 files
+    - 20210107_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_06_01_2021.pdf
+    - 20210108_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_07_01_2021.pdf
+    - 20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021.pdf
+    - 20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021_1.pdf
+    - 20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021_2.pdf
+    ... and 31 more files
+
+  Year 2022: 5 files
+    - 20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf
+    - Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2022.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_10_2022.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2022.PDF
+
+  Year 2023: 18 files
+    - Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_10_2023.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_04_2023.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_07_2023.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2023.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_15_05_2023.PDF
+    ... and 13 more files
+
+  Year 2024: 19 files
+    - Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2024.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2024.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_04_2024.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2024.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_24_04_2024.PDF
+    ... and 14 more files
+
+  Year 2025: 4 files
+    - Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2025.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2025.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF
+    - Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2025.PDF
+
+================================================================================
+
+COMPANY: Ramteid
+ACCOUNT: Geldmarktkonto 21504006
+DIRECTORY: Ramteid-Geldmarktkonto-21504006
+TOTAL FILES: 43
+----------------------------------------
+
+  Year 2020: 1 files
+    - Konto_21504006-Auszug_2020_0001.pdf
+
+  Year 2021: 12 files
+    - Konto_21504006-Auszug_2021_0001.pdf
+    - Konto_21504006-Auszug_2021_0002.pdf
+    - Konto_21504006-Auszug_2021_0003.pdf
+    - Konto_21504006-Auszug_2021_0004.pdf
+    - Konto_21504006-Auszug_2021_0005.pdf
+    ... and 7 more files
+
+  Year 2022: 11 files
+    - Konto_0021504006-Auszug_2022_0003.pdf
+    - Konto_0021504006-Auszug_2022_0004.pdf
+    - Konto_0021504006-Auszug_2022_0005.pdf
+    - Konto_0021504006-Auszug_2022_0006.pdf
+    - Konto_0021504006-Auszug_2022_0007.pdf
+    ... and 6 more files
+
+  Year 2023: 9 files
+    - Konto_0021504006-Auszug_2023_0001.pdf
+    - Konto_0021504006-Auszug_2023_0002.pdf
+    - Konto_0021504006-Auszug_2023_0003.pdf
+    - Konto_0021504006-Auszug_2023_0004.pdf
+    - Konto_0021504006-Auszug_2023_0005.pdf
+    ... and 4 more files
+
+  Year 2024: 7 files
+    - Konto_0021504006-Auszug_2024_0001.pdf
+    - Konto_0021504006-Auszug_2024_0002.pdf
+    - Konto_0021504006-Auszug_2024_0003.pdf
+    - Konto_0021504006-Auszug_2024_0004.pdf
+    - Konto_0021504006-Auszug_2024_0005.pdf
+    ... and 2 more files
+
+  Year 2025: 3 files
+    - Konto_0021504006-Auszug_2025_0001.pdf
+    - Konto_0021504006-Auszug_2025_0002.pdf
+    - Konto_0021504006-Auszug_2025_0003.pdf
+
+================================================================================
+
+COMPANY: Ramteid
+ACCOUNT: Girokonto 21377502
+DIRECTORY: Ramteid-Girokonto-21377502
+TOTAL FILES: 59
+----------------------------------------
+
+  Year 2020: 3 files
+    - Konto_21377502-Auszug_2020_0014.pdf
+    - Konto_21377502-Auszug_2020_0015.pdf
+    - Konto_21377502-Auszug_2020_0016.pdf
+
+  Year 2021: 12 files
+    - Konto_21377502-Auszug_2021_0001.pdf
+    - Konto_21377502-Auszug_2021_0002.pdf
+    - Konto_21377502-Auszug_2021_0003.pdf
+    - Konto_21377502-Auszug_2021_0004.pdf
+    - Konto_21377502-Auszug_2021_0005.pdf
+    ... and 7 more files
+
+  Year 2022: 12 files
+    - Konto_0021377502-Auszug_2022_0004.pdf
+    - Konto_0021377502-Auszug_2022_0005.pdf
+    - Konto_0021377502-Auszug_2022_0006.pdf
+    - Konto_0021377502-Auszug_2022_0007.pdf
+    - Konto_0021377502-Auszug_2022_0008.pdf
+    ... and 7 more files
+
+  Year 2023: 12 files
+    - Konto_0021377502-Auszug_2023_0001.pdf
+    - Konto_0021377502-Auszug_2023_0002.pdf
+    - Konto_0021377502-Auszug_2023_0003.pdf
+    - Konto_0021377502-Auszug_2023_0004.pdf
+    - Konto_0021377502-Auszug_2023_0005.pdf
+    ... and 7 more files
+
+  Year 2024: 12 files
+    - Konto_0021377502-Auszug_2024_0001.pdf
+    - Konto_0021377502-Auszug_2024_0002.pdf
+    - Konto_0021377502-Auszug_2024_0003.pdf
+    - Konto_0021377502-Auszug_2024_0004.pdf
+    - Konto_0021377502-Auszug_2024_0005.pdf
+    ... and 7 more files
+
+  Year 2025: 8 files
+    - Konto_0021377502-Auszug_2025_0001.pdf
+    - Konto_0021377502-Auszug_2025_0002.pdf
+    - Konto_0021377502-Auszug_2025_0003.pdf
+    - Konto_0021377502-Auszug_2025_0004.pdf
+    - Konto_0021377502-Auszug_2025_0005.pdf
+    ... and 3 more files
+
+================================================================================
+
+=== SUMMARY STATISTICS ===
+Total directories: 6
+Total files: 618
+
+Files per account:
+  BLUEITS-Depotkonto-7274079: 314 files
+  BLUEITS-Geldmarktkonto-21503990: 55 files
+  BLUEITS-Girokonto-200750750: 59 files
+  Ramteid-Depotkonto-7274087: 88 files
+  Ramteid-Geldmarktkonto-21504006: 43 files
+  Ramteid-Girokonto-21377502: 59 files
+
+IMPORTANT NOTES:
+1. Files with same names in different directories have DIFFERENT content
+2. These are separate documents for different company accounts
+3. All files should remain in their respective directories
+4. The 'duplicate' warnings during extraction were due to name conflicts
+   between companies, not actual duplicate content

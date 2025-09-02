@@ -1,0 +1,149 @@
+DUPLICATE FILES CHECKSUM REPORT
+================================================================================
+
+File: Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_15_07_2024.PDF
+  BLUEITS MD5: 66c0e5db924bd436a24fb2a1d1ddf1b7
+  Ramteid MD5: 8085c1301f6dc2f38531af2e66062a72
+  Status: ✗ DIFFERENT
+
+File: Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_15_12_2023.PDF
+  BLUEITS MD5: f8908129c9bb900bf86ec06a022076c3
+  Ramteid MD5: 104e8421648f5574594c13f0d2bdb109
+  Status: ✗ DIFFERENT
+
+File: Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_11_09_2023_1.PDF
+  BLUEITS MD5: 7b3f257009637a8039892b7acec10296
+  Ramteid MD5: b30a80a9f7d21d1c2d401796ec5d873f
+  Status: ✗ DIFFERENT
+
+File: Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_11_09_2023.PDF
+  BLUEITS MD5: bb4f5d340ca1d316449b200d84d8085e
+  Ramteid MD5: faa08b28035b1fcdae0953c6bdf29d7b
+  Status: ✗ DIFFERENT
+
+File: Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_10_10_2023.PDF
+  BLUEITS MD5: 65ecdb142c6625204cdda0f76dc7dbda
+  Ramteid MD5: 2e5e8980ebe85503adf49f3739d8c529
+  Status: ✗ DIFFERENT
+
+File: Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_17_07_2023.PDF
+  BLUEITS MD5: d29684b0be0139d3d18ddc840c4dcd1b
+  Ramteid MD5: ac794ced83bebe5ec64ce32f4b2b8d60
+  Status: ✗ DIFFERENT
+
+File: Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_19_07_2023.PDF
+  BLUEITS MD5: 715d492e3252671b21c3c244e2be98ae
+  Ramteid MD5: 6cacac8b85a9a0fe90364a366b0ea200
+  Status: ✗ DIFFERENT
+
+File: Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_04_05_2023.PDF
+  BLUEITS MD5: 5030978f3cda5cbf070c775de6a26813
+  Ramteid MD5: e79ee19895e29fb289e31cfcfb14c375
+  Status: ✗ DIFFERENT
+
+File: 20211103_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_02_11_2021_1.pdf
+  BLUEITS MD5: 0db7fd15b8329f4ff6a533ab74ed3281
+  Ramteid MD5: 998fa350f0cdb795b5d239b992c3699e
+  Status: ✗ DIFFERENT
+
+File: 20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021.pdf
+  BLUEITS MD5: 9c3036621883472eeb36c228f98e4d72
+  Ramteid MD5: 015ff137371d2a99092357f65c1b050d
+  Status: ✗ DIFFERENT
+
+File: 20211103_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_02_11_2021.pdf
+  BLUEITS MD5: 889ec846d1245d61cd5875d15266576a
+  Ramteid MD5: 83f50368604468adf1a36df12dc529e7
+  Status: ✗ DIFFERENT
+
+File: 20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021_1.pdf
+  BLUEITS MD5: 5b9288e0ad1d71f6c4d5d08b9a1cba8b
+  Ramteid MD5: 6cdb58658f26d3ed92657bfe8c7579b1
+  Status: ✗ DIFFERENT
+
+File: 20210305_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_04_03_2021.pdf
+  BLUEITS MD5: d49c3187b367df5a65e5f92359d49772
+  Ramteid MD5: 17291bbb5e418ac586220173dffd2040
+  Status: ✗ DIFFERENT
+
+File: 20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021.pdf
+  BLUEITS MD5: 6bd2ba1a5dc6e2a01f3d7dcf77633000
+  Ramteid MD5: 0b162e658ec69a6a2b32a2d12f42227c
+  Status: ✗ DIFFERENT
+
+File: 20210108_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_07_01_2021.pdf
+  BLUEITS MD5: f6118a8e8591c09745707bee5473f164
+  Ramteid MD5: e3282845bd6c9f054c27e538c09b66d1
+  Status: ✗ DIFFERENT
+
+File: 20210116_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_14_01_2021.pdf
+  BLUEITS MD5: 1bd2b68e42fadf5061b2a83582872b6d
+  Ramteid MD5: b9d1387041924575a6446b90565c99fa
+  Status: ✗ DIFFERENT
+
+File: 20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021.pdf
+  BLUEITS MD5: 5ecfec0d336a5d89053e3c0eeede4ca0
+  Ramteid MD5: 7972dde87711cfc0b60840cab012ed4a
+  Status: ✗ DIFFERENT
+
+File: 20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021_4.pdf
+  BLUEITS MD5: 371b3400c698454d7569cdb0d5e373f8
+  Ramteid MD5: 4f2fa449404fc6391c95ec405d3f5cf2
+  Status: ✗ DIFFERENT
+
+File: 20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021_2.pdf
+  BLUEITS MD5: ee8345312ae23e2f2ed040970d2adab5
+  Ramteid MD5: 0bb6d3bc3446c62a6bdf68b44f578049
+  Status: ✗ DIFFERENT
+
+File: 20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021_3.pdf
+  BLUEITS MD5: 1ab42caa7e72293bdc985d7529930a88
+  Ramteid MD5: c15926f46b3c15e7fc1fdcab15689545
+  Status: ✗ DIFFERENT
+
+File: 20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021_1.pdf
+  BLUEITS MD5: 6df97a3d96dbf249f342d2e03ff8073b
+  Ramteid MD5: 0a4eb499b846911ba9bf411fc657963c
+  Status: ✗ DIFFERENT
+
+File: 20210107_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_06_01_2021.pdf
+  BLUEITS MD5: aef58115adf9bcdba400d1363ba1c40b
+  Ramteid MD5: dbae7f62c8cceceba754e36ab399f23c
+  Status: ✗ DIFFERENT
+
+File: 20201222_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_21_12_2020_1.pdf
+  BLUEITS MD5: de04db95ac72197661877fa861c7ca87
+  Ramteid MD5: 71f6444b9fe0366f0af0679f0bded1e8
+  Status: ✗ DIFFERENT
+
+File: 20201222_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_21_12_2020.pdf
+  BLUEITS MD5: 7bf7fd88e5c2ed7a30342273078f7174
+  Ramteid MD5: 954cbcb2329e7c2cea5074f1cb723eda
+  Status: ✗ DIFFERENT
+
+File: 20201229_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_28_12_2020.pdf
+  BLUEITS MD5: 164041c62549ce9d5b1785a7b93e1057
+  Ramteid MD5: c6544c476d006266d1e75e300ad8bf0b
+  Status: ✗ DIFFERENT
+
+File: 20201223_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_22_12_2020.pdf
+  BLUEITS MD5: d767b5374f48884cee36890b88cbad94
+  Ramteid MD5: b32852426e1fa465194ba4030f62347c
+  Status: ✗ DIFFERENT
+
+File: 20201222_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_21_12_2020_2.pdf
+  BLUEITS MD5: 800ea804c17e5035764521defd3e8d61
+  Ramteid MD5: 7a902ff597f13d7bdcb1b2a1f98c88ac
+  Status: ✗ DIFFERENT
+
+File: 20201223_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_22_12_2020_1.pdf
+  BLUEITS MD5: 366736a140d3bccdceae562c264a7ddf
+  Ramteid MD5: 6f67e7e48cf59a2f6c50d5710c1f2ede
+  Status: ✗ DIFFERENT
+
+
+SUMMARY:
+  Files with same content: 0
+  Files with different content: 28
+  Files not found in both locations: 0
+  Total duplicate files checked: 28
