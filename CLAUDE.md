@@ -47,6 +47,7 @@ The text pipeline uses multiple extractors (`extractors/` directory):
 - **PyPDF2Extractor**: Basic text extraction, confidence ~0.8
 - **PdfPlumberExtractor**: Advanced extraction with table support, confidence ~0.9
 - **PyMuPDFExtractor**: Fast extraction with formatting, confidence ~1.0
+- **DoclingExtractor**: ML-based extraction for complex layouts
 
 ### Core Processing Flow
 
@@ -139,6 +140,9 @@ python3 thea.py --prompt prompts/bank_gemma.prompt --save-sidecars "document.pdf
 --mode <skip|overwrite> # Skip existing or overwrite
 --dpi <number>         # Image resolution (50-600, default: 300)
 --format <json|none>   # JSON enforcement or allow thinking tags
+--clean                # Clean THEA-generated files
+--force                # Skip confirmation prompts
+--dry-run              # Preview actions without executing
 ```
 
 ### Testing
@@ -241,7 +245,7 @@ Example with 3 retries: 0.10 → 0.40 → 0.70
 ### Pipeline Selection Logic
 1. Check prompt file `settings.pipeline`
 2. Check `--pipeline` command-line override
-3. Auto-detect based on model name
+3. Auto-detect based on model name (qwen→txt, gemma→png)
 4. Default to `pdf-extract-png`
 
 ### Ollama API Configuration
@@ -444,3 +448,123 @@ find Belege -name "*.thea_extract" | wc -l  # Count completed
 - Increase initial temperature slightly (0.1 → 0.15)
 - Reduce max_attempts if model consistently gets stuck
 - Check for actual repetitive content in source PDF
+
+### Poppler not found errors
+- Ensure poppler-utils is installed (Linux/macOS)
+- On Windows, verify poppler bin directory is in PATH
+- Test with: `pdftoppm -h` in terminal
+
+## Directory Structure
+
+```
+THEA/
+├── thea.py                 # Main entry point, CLI argument handling
+├── pipelines/              # Pipeline implementations
+│   ├── __init__.py
+│   ├── base.py            # BasePipeline abstract class
+│   ├── manager.py         # Pipeline selection and management
+│   ├── pdf_extract_png.py # Image extraction pipeline
+│   ├── pdf_extract_txt.py # Text extraction pipeline
+│   └── pdf_extract_docling.py # Docling ML pipeline
+├── extractors/            # Text extraction implementations
+│   ├── __init__.py
+│   ├── pypdf2_extractor.py
+│   ├── pdfplumber_extractor.py
+│   ├── pymupdf_extractor.py
+│   └── docling_extractor.py
+├── prompts/               # Prompt configuration files
+│   ├── pdf-extract-png.prompt
+│   ├── pdf-extract-txt.prompt
+│   ├── pdf-extract-docling.prompt
+│   ├── bank_gemma.prompt
+│   ├── bank_qwen.prompt
+│   ├── bank_konto_kontoauszuege.prompt
+│   └── thinking_test.prompt
+├── docs/                  # Project documentation and output
+├── test_thinking.py       # Test suite for thinking tag extraction
+├── requirements.txt       # Python dependencies
+└── package.json          # NPM scripts and project metadata
+```
+
+## Available Prompt Files
+
+- **pdf-extract-png.prompt**: Vision-based extraction with Gemma models
+- **pdf-extract-txt.prompt**: Text extraction for Qwen models  
+- **pdf-extract-docling.prompt**: Docling ML extraction
+- **bank_gemma.prompt**: Bank statement processing (Gemma)
+- **bank_qwen.prompt**: Bank statement processing (Qwen)
+- **bank_konto_kontoauszuege.prompt**: German bank account statements
+- **thinking_test.prompt**: Testing thinking tag behavior
+
+## Key Functions and Entry Points
+
+### Main Entry Point
+- `thea.py:main()` - CLI entry point, argument parsing
+- `thea.py:process_with_model()` (line 348) - Core processing orchestrator
+
+### Pipeline Functions
+- `pipelines/manager.py:PipelineManager.get_pipeline()` - Pipeline selection
+- `pipelines/base.py:Pipeline.process()` - Abstract pipeline interface
+- `pipelines/base.py:Pipeline.format_for_model()` - Model formatting
+
+### Prompt Loading
+- `thea.py:load_prompt_file()` (line 25) - Load JSON/text prompts
+- `thea.py:build_system_prompt()` (line 50) - Build system prompt
+- `thea.py:build_user_prompt()` (line 78) - Build user prompt with substitutions
+
+### Utility Functions
+- `thea.py:clean_thea_files()` (line 89) - Clean generated files
+- `thea.py:extract_thinking_content()` - Extract thinking tags
+- `thea.py:clean_json_response()` - Clean and validate JSON
+
+## Environment Variables
+
+- `OLLAMA_API_URL`: Override default Ollama endpoint (default: https://b1s.hey.bahn.business/api/chat)
+- `THEA_DEFAULT_MODEL`: Default model if not specified (default: gemma3:27b)
+- `THEA_DEFAULT_PIPELINE`: Default pipeline if not auto-detected (default: pdf-extract-png)
+
+## Linting and Testing
+
+### Running Tests
+```bash
+# Test thinking tag extraction logic
+python3 test_thinking.py
+
+# Test with sample PDF document (included in repo)
+python3 thea.py --mode overwrite --save-sidecars sample_document.pdf
+```
+
+### Code Quality Checks
+No formal linting configured. When adding linting:
+- Consider adding ruff or pylint for Python code
+- Add configuration to pyproject.toml or setup.cfg
+- Create npm script aliases for consistency
+
+## Troubleshooting Guide
+
+### Common Issues
+
+1. **"Poppler not found" errors**
+   - Linux/macOS: `sudo apt-get install poppler-utils` or `brew install poppler`
+   - Windows: Download from GitHub, add bin folder to PATH
+   - Verify: `pdftoppm -h`
+
+2. **Model stuck in repetitive patterns**
+   - Automatic retry with temperature scaling (0.1→1.0)
+   - Check pattern detection thresholds in thea.py
+   - Consider adjusting initial temperature in prompt file
+
+3. **Wrong pipeline auto-selected**
+   - Override with `--pipeline` parameter
+   - Set in prompt file's `settings.pipeline`
+   - Model name patterns: qwen→txt, gemma→png
+
+4. **Docling installation issues**
+   - Large download (~2GB with torch)
+   - Install separately: `pip install docling`
+   - Falls back to text extraction if unavailable
+
+5. **Thinking tags in JSON output**
+   - Qwen models: Must NOT use thinking tags with JSON
+   - Gemma models: Use thinking tags THEN output JSON
+   - Check prompt file's `system_prompt.suffix`
