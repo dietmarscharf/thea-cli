@@ -1,0 +1,22 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9500000000000001,
+  "character_count": 7846,
+  "extraction_metadata": {
+    "extraction_time": 3.9800865650177,
+    "pages": 3,
+    "tables": [
+      "Table 1",
+      "Table 2"
+    ],
+    "sections": [
+      "Kontoauszug 3/2021 Geldmarktkonto 21503990",
+      "Kontoauszug 3/2021 Geldmarktkonto 21503990,   BLUEITS GmbH",
+      "Hinweise zum Kontoauszug:"
+    ],
+    "has_tables": true,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 7900
+}

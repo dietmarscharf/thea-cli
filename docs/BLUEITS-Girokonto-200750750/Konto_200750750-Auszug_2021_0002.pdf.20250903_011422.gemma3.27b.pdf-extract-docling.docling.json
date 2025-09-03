@@ -1,0 +1,28 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9500000000000001,
+  "character_count": 20913,
+  "extraction_metadata": {
+    "extraction_time": 5.421548366546631,
+    "pages": 7,
+    "tables": [
+      "Table 1",
+      "Table 2",
+      "Table 3",
+      "Table 4"
+    ],
+    "sections": [
+      "Kontoauszug 2/2021 Girokonto 200750750, DE47 7525 0000 0200 7507 50",
+      "S Sparkasse Amberg-Sulzbach",
+      "Kontoauszug 2/2021 Girokonto 200750750, DE47 7525 0000 0200 7507 50,  BLUEITS GmbH",
+      "S Sparkasse Amberg-Sulzbach",
+      "Kontoauszug 2/2021 Girokonto 200750750, DE47 7525 0000 0200 7507 50,  BLUEITS GmbH",
+      "Kontoauszug 2/2021 Girokonto 200750750, DE47 7525 0000 0200 7507 50,  BLUEITS GmbH",
+      "Hinweise zum Kontoauszug:"
+    ],
+    "has_tables": true,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 20998
+}

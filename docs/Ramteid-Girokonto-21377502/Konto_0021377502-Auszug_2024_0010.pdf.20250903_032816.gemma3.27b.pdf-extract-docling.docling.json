@@ -1,0 +1,25 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9500000000000001,
+  "character_count": 18879,
+  "extraction_metadata": {
+    "extraction_time": 4.961451530456543,
+    "pages": 7,
+    "tables": [
+      "Table 1",
+      "Table 2"
+    ],
+    "sections": [
+      "Kontoauszug 10/2024",
+      "Girokonto 21377502, DE51 7525 0000 0021 3775 02",
+      "S Sparkasse Amberg-Sulzbach",
+      "Kundenmitteilungen:",
+      "(4) Erstattung:",
+      "Hinweise zum Kontoauszug:"
+    ],
+    "has_tables": true,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 19048
+}

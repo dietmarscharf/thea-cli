@@ -1,0 +1,19 @@
+{
+  "extractor": "docling",
+  "confidence": 0.85,
+  "character_count": 1355,
+  "extraction_metadata": {
+    "extraction_time": 3.0732438564300537,
+    "pages": 1,
+    "tables": [],
+    "sections": [
+      "Wertpapier Abrechnung Kauf",
+      "Kurswert",
+      "Depotnummer"
+    ],
+    "has_tables": false,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 1373
+}

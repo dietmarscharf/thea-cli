@@ -1,0 +1,18 @@
+{
+  "extractor": "docling",
+  "confidence": 0.85,
+  "character_count": 1347,
+  "extraction_metadata": {
+    "extraction_time": 2.9445345401763916,
+    "pages": 2,
+    "tables": [],
+    "sections": [
+      "Aufstellung \u00fcber Kundenfinanzinstrumente per 30.06.2021",
+      "Aufstellung \u00fcber Kundenfinanzinstrumente per 30.06.2021"
+    ],
+    "has_tables": false,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 1363
+}

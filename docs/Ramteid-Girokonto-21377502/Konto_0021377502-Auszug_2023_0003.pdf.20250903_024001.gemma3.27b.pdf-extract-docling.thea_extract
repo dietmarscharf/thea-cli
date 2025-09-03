@@ -1,0 +1,161 @@
+{
+  "version": "2.0",
+  "metadata": {
+    "file": {
+      "pdf_path": "docs/Ramteid-Girokonto-21377502/Konto_0021377502-Auszug_2023_0003.pdf",
+      "pdf_absolute_path": "/mnt/c/Projects/THEA/docs/Ramteid-Girokonto-21377502/Konto_0021377502-Auszug_2023_0003.pdf",
+      "pdf_size_bytes": 82138,
+      "pdf_pages": 0,
+      "output_file": "docs/Ramteid-Girokonto-21377502/Konto_0021377502-Auszug_2023_0003.pdf.20250903_024001.gemma3.27b.pdf-extract-docling.thea_extract"
+    },
+    "processing": {
+      "timestamp": "20250903_024001",
+      "start_time": "2025-09-03T02:40:01.333025Z",
+      "end_time": "2025-09-03T02:41:14.832173Z",
+      "processing_time_seconds": 73.49793148040771,
+      "hostname": "BLUEITS-DS-Privat",
+      "platform": "linux",
+      "pipeline": "pdf-extract-docling",
+      "pipeline_metadata": {
+        "pipeline": "pdf-extract-docling",
+        "timestamp": "2025-09-03T02:39:58.223678Z",
+        "pdf_path": "docs/Ramteid-Girokonto-21377502/Konto_0021377502-Auszug_2023_0003.pdf",
+        "extractor": "docling",
+        "fallback_model": "gemma3:27b",
+        "save_sidecars": true,
+        "saved_files": [
+          {
+            "extractor": "docling",
+            "type": "text/plain",
+            "text_file": "docs/Ramteid-Girokonto-21377502/Konto_0021377502-Auszug_2023_0003.pdf.20250903_023958.gemma3.27b.pdf-extract-docling.docling.txt",
+            "json_file": "docs/Ramteid-Girokonto-21377502/Konto_0021377502-Auszug_2023_0003.pdf.20250903_023958.gemma3.27b.pdf-extract-docling.docling.json",
+            "confidence": 0.9500000000000001,
+            "character_count": 10799,
+            "file_size": 10860,
+            "md_file": "docs/Ramteid-Girokonto-21377502/Konto_0021377502-Auszug_2023_0003.pdf.20250903_023958.gemma3.27b.pdf-extract-docling.docling.md"
+          }
+        ],
+        "extraction_success": true,
+        "text_length": 10799,
+        "confidence": 0.9500000000000001,
+        "has_tables": true,
+        "has_formulas": false,
+        "document_type": "invoice",
+        "pages": 3
+      }
+    },
+    "model": {
+      "name": "gemma3:27b",
+      "endpoint": "https://b1s.hey.bahn.business/api/chat",
+      "stream": true,
+      "format": "json"
+    }
+  },
+  "settings": {
+    "mode": "skip",
+    "suffix": "pdf-extract-docling",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "save_sidecars": true,
+    "dpi": 300,
+    "max_attempts": 3,
+    "initial_temperature": 0.2,
+    "temperature_progression": [
+      0.2
+    ],
+    "timeout": 300,
+    "max_tokens": 50000
+  },
+  "execution": {
+    "retry_count": 0,
+    "final_temperature": 0.2,
+    "stuck_pattern_detected": false,
+    "pattern_type": null,
+    "chunks_received": 2313,
+    "request_time_seconds": 73.49774408340454,
+    "files_processed": [
+      {
+        "extractor": "docling",
+        "type": "text/plain",
+        "text_file": "docs/Ramteid-Girokonto-21377502/Konto_0021377502-Auszug_2023_0003.pdf.20250903_023958.gemma3.27b.pdf-extract-docling.docling.txt",
+        "json_file": "docs/Ramteid-Girokonto-21377502/Konto_0021377502-Auszug_2023_0003.pdf.20250903_023958.gemma3.27b.pdf-extract-docling.docling.json",
+        "confidence": 0.9500000000000001,
+        "character_count": 10799,
+        "file_size": 10860,
+        "md_file": "docs/Ramteid-Girokonto-21377502/Konto_0021377502-Auszug_2023_0003.pdf.20250903_023958.gemma3.27b.pdf-extract-docling.docling.md"
+      }
+    ]
+  },
+  "prompt": {
+    "system": "You are a vision-based text extractor and analyzer. Always use <thinking></thinking> tags to show your analysis process. You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text. Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }.: {\"extracted_text\": \"<string (complete verified text from document)>\", \"character_count\": \"<number (exact count of extracted text)>\", \"document_type\": \"<string (e.g., Invoice, Contract, Report, Statement, Technical)>\", \"three_word_description_german\": \"<string (exactly 3 words)>\", \"three_word_description_english\": \"<string (exactly 3 words)>\", \"content_summary_german\": \"<string (2-3 sentences)>\", \"content_summary_english\": \"<string (2-3 sentences)>\", \"extraction_quality\": \"<string (excellent/good/fair/poor)>\", \"has_tables\": \"<boolean>\", \"has_formulas\": \"<boolean>\", \"document_sections\": \"<array of strings (main section headings if present)>\"}",
+    "user": "Analyze the Docling extraction from PDF 'docs/Ramteid-Girokonto-21377502/Konto_0021377502-Auszug_2023_0003.pdf'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON.",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "prompt_config": {
+      "version": "2.0",
+      "name": "pdf-extract-docling",
+      "description": "Advanced document extraction using Docling with gemma3:27b fallback for complex documents",
+      "system_prompt": {
+        "suffix": "You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text.",
+        "output_format": {
+          "type": "json",
+          "schema": {
+            "extracted_text": "string (complete verified text from document)",
+            "character_count": "number (exact count of extracted text)",
+            "document_type": "string (e.g., Invoice, Contract, Report, Statement, Technical)",
+            "three_word_description_german": "string (exactly 3 words)",
+            "three_word_description_english": "string (exactly 3 words)",
+            "content_summary_german": "string (2-3 sentences)",
+            "content_summary_english": "string (2-3 sentences)",
+            "extraction_quality": "string (excellent/good/fair/poor)",
+            "has_tables": "boolean",
+            "has_formulas": "boolean",
+            "document_sections": "array of strings (main section headings if present)"
+          },
+          "instructions": "Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }."
+        }
+      },
+      "user_prompt": {
+        "template": "Analyze the Docling extraction from PDF '{{pdf_path}}'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON."
+      },
+      "settings": {
+        "model": "gemma3:27b",
+        "temperature": 0.2,
+        "max_attempts": 3,
+        "timeout": 300,
+        "max_tokens": 50000,
+        "mode": "skip",
+        "save_sidecars": true,
+        "format": "json",
+        "pipeline": "pdf-extract-docling",
+        "pipeline_config": {
+          "use_fallback_model": true,
+          "fallback_model": "gemma3:27b"
+        },
+        "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+      }
+    }
+  },
+  "response": {
+    "text": "{\"extracted_text\": \"Sparkasse Amberg-Sulzbach\\n\\n<!-- image -->\\n\\nFirma Ramteid GmbH Auf den Hochäckern 5 92224 Amberg\\n\\n## Kontoauszug 3/2023\\n\\n## Girokonto 21377502, DE51 7525 0000 0021 3775 02\\n\\n1. April 2023 Seite 1 von 3\\n\\n| Datum                                                                                                                                                                                                              | Erläuterung                                                                                                                                                                                                        | Betrag EUR   |\\n|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|\\n|                                                                                                                                                                                                                    | Kontostand am 31.03.2023 um20:03 Uhr                                                                                                                                                          | 22.499,19    |\\n| 01.02.2023                                                                                                                                                                                                     | Entgelte vom 01.02.2023 bis 28.02.2023                                                                                                                                                           | 21,92-       |\\n| 28.02.2023                                                                                                                                                                                                     | Umsatzbereitstellung        1 x    5,00                5,00-                                                                                                                                              |              |\\n| 28.02.2023                                                                                                                                                                                                     | Kontogrundpreis             1 x   10,95               10,95-                                                                                                                                             |              |\\n| 28.02.2023                                                                                                                                                                                                     | Lastschriftseinzug          4 x    0,75                3,00-                                                                                                                                              |              |\\n| 28.02.2023                                                                                                                                                                                                     | Überweisung-beleglos        6 x    0,12                0,72-                                                                                                                                              |              |\\n| 28.02.2023                                                                                                                                                                                                     | Gutschriftseingang          3 x    0,75                2,25-                                                                                                                                              |              |\\n| 28.02.2023                                                                                                                                                                                                     | Abrechnung 28.02.2023 vor Steuer                                    21,92-                                                                                                                                         |              |\\n| 28.02.2023                                                                                                                                                                                                     | Umsatzsteuer  19%  auf          21,92-                 USt:          4,16-                                                                                                                                      |              |\\n| 28.02.2023                                                                                                                                                                                                     | Abrechnung 28.02.2023                                               26,08-                                                                                                                                         |              |\\n| 29.03.2023                                                                                                                                                                                                     | Lastschriftseinzug Knappschaft-Bahn-See Deutsche Rentenversicherung Knappsc haft-Bahn-See 9879123581 OB-93829864 EUR 163,28. BEITRAG 0323 - 0323 9879123581 OB-93829864 30.03.2023 | -163,28      |\\n| 30.03.2023                                                                                                                                                                                                     | Überweisung-beleglos IHK Regensburg RNr. 960727832/0 RDat. 21.03.2023 K Nr. 10000800134 DATUM 30.03.2023, 11.53 UHR 4308316484-0000001                                                        | -125,80      |\\n\\n<!-- image -->\\n\\nKontoauszug 3/2023\\n\\nGirokonto 21377502, DE51 7525 0000 0021 3775 02,  Ramteid GmbH\\n\\nSeite 2 von 3\\n\\n| Datum Erläuterung                                                                                                                                                                             | Betrag EUR   |\\n|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|\\n| 29.03.2023                                                                                                                                                                                                     | Lastschriftseinzug Knappschaft-Bahn-See Deutsche Rentenversicherung Knappsc haft-Bahn-See 9879123581 OB-93829864 EUR 163,28. BEITRAG 0323 - 0323 9879123581 OB-93829864 30.03.2023 | -163,28      |\\n| 30.03.2023                                                                                                                                                                                                     | Überweisung-beleglos IHK Regensburg RNr. 960727832/0 RDat. 21.03.2023 K Nr. 10000800134 DATUM 30.03.2023, 11.53 UHR 4308316484-0000001                                                        | -125,80      |\\n| 31.03.2023                                                                                                                                                                                                     | Kontostand am 31.03.2023 um20:03 Uhr                                                                                                                                                          | 22.499,19    |\\n\\nAnzahl Anlagen\\n\\n1\\n\\n<!-- image -->\\n\\nKontoauszug 3/2023\\n\\nGirokonto 21377502, DE51 7525 0000 0021 3775 02,  Ramteid GmbH\\n\\nSeite 3 von 3\\n\\nEntgeltabschluss:\\n\\nAnlage     1\\n\\nEntgelte vom 01.02.2023 bis 28.02.2023                              21,92-\\n\\nUmsatzbereitstellung        1 x    5,00                5,00-\\n\\nKontogrundpreis             1 x   10,95               10,95-\\n\\nLastschriftseinzug\\n\\nGeschäftsvorfälle          4 x    0,75                3,00-\\n\\nÜberweisung-beleglos\\n\\nGeschäftsvorfälle          6 x    0,12                0,72-\\n\\nGutschriftseingang\\n\\nGeschäftsvorfälle          3 x    0,75                2,25-\\n\\n--------------\\n\\nAbrechnung 28.02.2023 vor Steuer                                    21,92-\\n\\nUmsatzsteuer  19%  auf          21,92-                 USt:          4,16-\\n\\n--------------\\n\\nAbrechnung 28.02.2023                                               26,08-\\n\\nRechnungsnummer: 20230228-BY083-00010207162\\n\\nBitte beachten Sie die Hinweise zum Kontoauszug.\\n\\n## Hinweise zum Kontoauszug:\\n\\nSehr geehrte Kundin, sehr geehrter Kunde, bitte prüfen Sie die Buchungen und Berechnungen in diesem Kontoauszug. Eventuelle Rückfragen besprechen Sie bitte mit Ihrem Kundenberater.\\n\\n- l Der angegebene Kontostand berücksichtigt nicht die Wertstellung der einzelnen Buchungen. Dies bedeutet, dass der genannte Betrag nicht dem für die Zinsrechnung maßgeblichen Kontostand entsprechen muss und bei Verfügungen möglicherweise Zinsen für die Inanspruchnahme einer eingeräumten oder geduldeten Kontoüberziehung anfallen können.\\n- l Einwendungen gegen den Kontoauszug richten Sie bitte unverzüglich an unsere Revisionsabteilung. Unsere Anschrift(en) entnehmen Sie bitte unserem Preis- und Leistungsverzeichnis.\\n- l Rechnungsabschlüsse gelten als genehmigt, sofern Sie innerhalb von sechs Wochen nach Zugang keine Einwendungen erheben. Einwendungen gegen Rechnungsabschlüsse müssen der Sparkasse zugehen. Zur Fristwahrung genügt die rechtzeitige Absendung (Nr. 7 Abs. 3 unserer Allgemeinen Geschäftsbedingungen).\\n- l Schecks und andere Einzugspapiere sind erst dann eingelöst, wenn sie nicht bis zum Ablauf des übernächsten Bankarbeitstages storniert oder korrigiert werden. Diese Papiere sind auch eingelöst, wenn die Sparkasse ihren Einlösungswillen schon vorher Dritten gegenüber erkennbar bekundet hat (z. B. durch Bezahltmeldung). Für Lastschriften gelten die Einlösungsregeln in den hierfür vereinbarten besonderen Bedingungen.\\n- l Gutschriften aus eingereichten Schecks, Lastschriften und anderen Einzugspapieren erfolgen unter dem Vorbehalt der Einlösung.\\n- l Sparkontoauszüge heften Sie bitte in Ihr Loseblatt-Sparkassenbuch ein.\\n- l Guthaben sind als Einlagen nach Maßgabe des Einlagensicherungsgesetzes entschädigungsfähig. Nähere Informationen können dem \\\"Informationsblatt zur Einlagensicherung\\\" entnommen werden.\\n- l Die vollständigen Entgeltbedingungen finden Sie unter www.sparkasse.de/entgeltbedingungen.\\n\\n\",\n    \"text_length\": 10694,\n    \"word_count\": 1564\n}",
+    "thinking": null,
+    "json": {
+      "extracted_text": "Sparkasse Amberg-Sulzbach\n\n<!-- image -->\n\nFirma Ramteid GmbH Auf den Hochäckern 5 92224 Amberg\n\n## Kontoauszug 3/2023\n\n## Girokonto 21377502, DE51 7525 0000 0021 3775 02\n\n1. April 2023 Seite 1 von 3\n\n| Datum                                                                                                                                                                                                              | Erläuterung                                                                                                                                                                                                        | Betrag EUR   |\n|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|\n|                                                                                                                                                                                                                    | Kontostand am 31.03.2023 um20:03 Uhr                                                                                                                                                          | 22.499,19    |\n| 01.02.2023                                                                                                                                                                                                     | Entgelte vom 01.02.2023 bis 28.02.2023                                                                                                                                                           | 21,92-       |\n| 28.02.2023                                                                                                                                                                                                     | Umsatzbereitstellung        1 x    5,00                5,00-                                                                                                                                              |              |\n| 28.02.2023                                                                                                                                                                                                     | Kontogrundpreis             1 x   10,95               10,95-                                                                                                                                             |              |\n| 28.02.2023                                                                                                                                                                                                     | Lastschriftseinzug          4 x    0,75                3,00-                                                                                                                                              |              |\n| 28.02.2023                                                                                                                                                                                                     | Überweisung-beleglos        6 x    0,12                0,72-                                                                                                                                              |              |\n| 28.02.2023                                                                                                                                                                                                     | Gutschriftseingang          3 x    0,75                2,25-                                                                                                                                              |              |\n| 28.02.2023                                                                                                                                                                                                     | Abrechnung 28.02.2023 vor Steuer                                    21,92-                                                                                                                                         |              |\n| 28.02.2023                                                                                                                                                                                                     | Umsatzsteuer  19%  auf          21,92-                 USt:          4,16-                                                                                                                                      |              |\n| 28.02.2023                                                                                                                                                                                                     | Abrechnung 28.02.2023                                               26,08-                                                                                                                                         |              |\n| 29.03.2023                                                                                                                                                                                                     | Lastschriftseinzug Knappschaft-Bahn-See Deutsche Rentenversicherung Knappsc haft-Bahn-See 9879123581 OB-93829864 EUR 163,28. BEITRAG 0323 - 0323 9879123581 OB-93829864 30.03.2023 | -163,28      |\n| 30.03.2023                                                                                                                                                                                                     | Überweisung-beleglos IHK Regensburg RNr. 960727832/0 RDat. 21.03.2023 K Nr. 10000800134 DATUM 30.03.2023, 11.53 UHR 4308316484-0000001                                                        | -125,80      |\n\n<!-- image -->\n\nKontoauszug 3/2023\n\nGirokonto 21377502, DE51 7525 0000 0021 3775 02,  Ramteid GmbH\n\nSeite 2 von 3\n\n| Datum Erläuterung                                                                                                                                                                             | Betrag EUR   |\n|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|\n| 29.03.2023                                                                                                                                                                                                     | Lastschriftseinzug Knappschaft-Bahn-See Deutsche Rentenversicherung Knappsc haft-Bahn-See 9879123581 OB-93829864 EUR 163,28. BEITRAG 0323 - 0323 9879123581 OB-93829864 30.03.2023 | -163,28      |\n| 30.03.2023                                                                                                                                                                                                     | Überweisung-beleglos IHK Regensburg RNr. 960727832/0 RDat. 21.03.2023 K Nr. 10000800134 DATUM 30.03.2023, 11.53 UHR 4308316484-0000001                                                        | -125,80      |\n| 31.03.2023                                                                                                                                                                                                     | Kontostand am 31.03.2023 um20:03 Uhr                                                                                                                                                          | 22.499,19    |\n\nAnzahl Anlagen\n\n1\n\n<!-- image -->\n\nKontoauszug 3/2023\n\nGirokonto 21377502, DE51 7525 0000 0021 3775 02,  Ramteid GmbH\n\nSeite 3 von 3\n\nEntgeltabschluss:\n\nAnlage     1\n\nEntgelte vom 01.02.2023 bis 28.02.2023                              21,92-\n\nUmsatzbereitstellung        1 x    5,00                5,00-\n\nKontogrundpreis             1 x   10,95               10,95-\n\nLastschriftseinzug\n\nGeschäftsvorfälle          4 x    0,75                3,00-\n\nÜberweisung-beleglos\n\nGeschäftsvorfälle          6 x    0,12                0,72-\n\nGutschriftseingang\n\nGeschäftsvorfälle          3 x    0,75                2,25-\n\n--------------\n\nAbrechnung 28.02.2023 vor Steuer                                    21,92-\n\nUmsatzsteuer  19%  auf          21,92-                 USt:          4,16-\n\n--------------\n\nAbrechnung 28.02.2023                                               26,08-\n\nRechnungsnummer: 20230228-BY083-00010207162\n\nBitte beachten Sie die Hinweise zum Kontoauszug.\n\n## Hinweise zum Kontoauszug:\n\nSehr geehrte Kundin, sehr geehrter Kunde, bitte prüfen Sie die Buchungen und Berechnungen in diesem Kontoauszug. Eventuelle Rückfragen besprechen Sie bitte mit Ihrem Kundenberater.\n\n- l Der angegebene Kontostand berücksichtigt nicht die Wertstellung der einzelnen Buchungen. Dies bedeutet, dass der genannte Betrag nicht dem für die Zinsrechnung maßgeblichen Kontostand entsprechen muss und bei Verfügungen möglicherweise Zinsen für die Inanspruchnahme einer eingeräumten oder geduldeten Kontoüberziehung anfallen können.\n- l Einwendungen gegen den Kontoauszug richten Sie bitte unverzüglich an unsere Revisionsabteilung. Unsere Anschrift(en) entnehmen Sie bitte unserem Preis- und Leistungsverzeichnis.\n- l Rechnungsabschlüsse gelten als genehmigt, sofern Sie innerhalb von sechs Wochen nach Zugang keine Einwendungen erheben. Einwendungen gegen Rechnungsabschlüsse müssen der Sparkasse zugehen. Zur Fristwahrung genügt die rechtzeitige Absendung (Nr. 7 Abs. 3 unserer Allgemeinen Geschäftsbedingungen).\n- l Schecks und andere Einzugspapiere sind erst dann eingelöst, wenn sie nicht bis zum Ablauf des übernächsten Bankarbeitstages storniert oder korrigiert werden. Diese Papiere sind auch eingelöst, wenn die Sparkasse ihren Einlösungswillen schon vorher Dritten gegenüber erkennbar bekundet hat (z. B. durch Bezahltmeldung). Für Lastschriften gelten die Einlösungsregeln in den hierfür vereinbarten besonderen Bedingungen.\n- l Gutschriften aus eingereichten Schecks, Lastschriften und anderen Einzugspapieren erfolgen unter dem Vorbehalt der Einlösung.\n- l Sparkontoauszüge heften Sie bitte in Ihr Loseblatt-Sparkassenbuch ein.\n- l Guthaben sind als Einlagen nach Maßgabe des Einlagensicherungsgesetzes entschädigungsfähig. Nähere Informationen können dem \"Informationsblatt zur Einlagensicherung\" entnommen werden.\n- l Die vollständigen Entgeltbedingungen finden Sie unter www.sparkasse.de/entgeltbedingungen.\n\n",
+      "text_length": 10694,
+      "word_count": 1564
+    }
+  },
+  "statistics": {
+    "tokens": {
+      "input_estimated": 3461,
+      "output_estimated": 2771,
+      "total_estimated": 6232,
+      "tokens_per_second": 37.7017413168786
+    },
+    "characters": {
+      "response_total": 11085,
+      "extracted_text": 10908,
+      "json_formatted": 11319
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

@@ -1,0 +1,185 @@
+{
+  "version": "2.0",
+  "metadata": {
+    "file": {
+      "pdf_path": "docs/Ramteid-Geldmarktkonto-21504006/Konto_0021504006-Auszug_2024_0005.pdf",
+      "pdf_absolute_path": "/mnt/c/Projects/THEA/docs/Ramteid-Geldmarktkonto-21504006/Konto_0021504006-Auszug_2024_0005.pdf",
+      "pdf_size_bytes": 34221,
+      "pdf_pages": 0,
+      "output_file": "docs/Ramteid-Geldmarktkonto-21504006/Konto_0021504006-Auszug_2024_0005.pdf.20250903_021018.gemma3.27b.pdf-extract-docling.thea_extract"
+    },
+    "processing": {
+      "timestamp": "20250903_021018",
+      "start_time": "2025-09-03T02:10:18.846373Z",
+      "end_time": "2025-09-03T02:11:25.402364Z",
+      "processing_time_seconds": 66.55492830276489,
+      "hostname": "BLUEITS-DS-Privat",
+      "platform": "linux",
+      "pipeline": "pdf-extract-docling",
+      "pipeline_metadata": {
+        "pipeline": "pdf-extract-docling",
+        "timestamp": "2025-09-03T02:10:15.489458Z",
+        "pdf_path": "docs/Ramteid-Geldmarktkonto-21504006/Konto_0021504006-Auszug_2024_0005.pdf",
+        "extractor": "docling",
+        "fallback_model": "gemma3:27b",
+        "save_sidecars": true,
+        "saved_files": [
+          {
+            "extractor": "docling",
+            "type": "text/plain",
+            "text_file": "docs/Ramteid-Geldmarktkonto-21504006/Konto_0021504006-Auszug_2024_0005.pdf.20250903_021015.gemma3.27b.pdf-extract-docling.docling.txt",
+            "json_file": "docs/Ramteid-Geldmarktkonto-21504006/Konto_0021504006-Auszug_2024_0005.pdf.20250903_021015.gemma3.27b.pdf-extract-docling.docling.json",
+            "confidence": 0.9500000000000001,
+            "character_count": 7686,
+            "file_size": 7741,
+            "md_file": "docs/Ramteid-Geldmarktkonto-21504006/Konto_0021504006-Auszug_2024_0005.pdf.20250903_021015.gemma3.27b.pdf-extract-docling.docling.md"
+          }
+        ],
+        "extraction_success": true,
+        "text_length": 7686,
+        "confidence": 0.9500000000000001,
+        "has_tables": true,
+        "has_formulas": false,
+        "document_type": "invoice",
+        "pages": 2
+      }
+    },
+    "model": {
+      "name": "gemma3:27b",
+      "endpoint": "https://b1s.hey.bahn.business/api/chat",
+      "stream": true,
+      "format": "json"
+    }
+  },
+  "settings": {
+    "mode": "skip",
+    "suffix": "pdf-extract-docling",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "save_sidecars": true,
+    "dpi": 300,
+    "max_attempts": 3,
+    "initial_temperature": 0.2,
+    "temperature_progression": [
+      0.2
+    ],
+    "timeout": 300,
+    "max_tokens": 50000
+  },
+  "execution": {
+    "retry_count": 0,
+    "final_temperature": 0.2,
+    "stuck_pattern_detected": false,
+    "pattern_type": null,
+    "chunks_received": 2079,
+    "request_time_seconds": 66.55476236343384,
+    "files_processed": [
+      {
+        "extractor": "docling",
+        "type": "text/plain",
+        "text_file": "docs/Ramteid-Geldmarktkonto-21504006/Konto_0021504006-Auszug_2024_0005.pdf.20250903_021015.gemma3.27b.pdf-extract-docling.docling.txt",
+        "json_file": "docs/Ramteid-Geldmarktkonto-21504006/Konto_0021504006-Auszug_2024_0005.pdf.20250903_021015.gemma3.27b.pdf-extract-docling.docling.json",
+        "confidence": 0.9500000000000001,
+        "character_count": 7686,
+        "file_size": 7741,
+        "md_file": "docs/Ramteid-Geldmarktkonto-21504006/Konto_0021504006-Auszug_2024_0005.pdf.20250903_021015.gemma3.27b.pdf-extract-docling.docling.md"
+      }
+    ]
+  },
+  "prompt": {
+    "system": "You are a vision-based text extractor and analyzer. Always use <thinking></thinking> tags to show your analysis process. You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text. Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }.: {\"extracted_text\": \"<string (complete verified text from document)>\", \"character_count\": \"<number (exact count of extracted text)>\", \"document_type\": \"<string (e.g., Invoice, Contract, Report, Statement, Technical)>\", \"three_word_description_german\": \"<string (exactly 3 words)>\", \"three_word_description_english\": \"<string (exactly 3 words)>\", \"content_summary_german\": \"<string (2-3 sentences)>\", \"content_summary_english\": \"<string (2-3 sentences)>\", \"extraction_quality\": \"<string (excellent/good/fair/poor)>\", \"has_tables\": \"<boolean>\", \"has_formulas\": \"<boolean>\", \"document_sections\": \"<array of strings (main section headings if present)>\"}",
+    "user": "Analyze the Docling extraction from PDF 'docs/Ramteid-Geldmarktkonto-21504006/Konto_0021504006-Auszug_2024_0005.pdf'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON.",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "prompt_config": {
+      "version": "2.0",
+      "name": "pdf-extract-docling",
+      "description": "Advanced document extraction using Docling with gemma3:27b fallback for complex documents",
+      "system_prompt": {
+        "suffix": "You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text.",
+        "output_format": {
+          "type": "json",
+          "schema": {
+            "extracted_text": "string (complete verified text from document)",
+            "character_count": "number (exact count of extracted text)",
+            "document_type": "string (e.g., Invoice, Contract, Report, Statement, Technical)",
+            "three_word_description_german": "string (exactly 3 words)",
+            "three_word_description_english": "string (exactly 3 words)",
+            "content_summary_german": "string (2-3 sentences)",
+            "content_summary_english": "string (2-3 sentences)",
+            "extraction_quality": "string (excellent/good/fair/poor)",
+            "has_tables": "boolean",
+            "has_formulas": "boolean",
+            "document_sections": "array of strings (main section headings if present)"
+          },
+          "instructions": "Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }."
+        }
+      },
+      "user_prompt": {
+        "template": "Analyze the Docling extraction from PDF '{{pdf_path}}'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON."
+      },
+      "settings": {
+        "model": "gemma3:27b",
+        "temperature": 0.2,
+        "max_attempts": 3,
+        "timeout": 300,
+        "max_tokens": 50000,
+        "mode": "skip",
+        "save_sidecars": true,
+        "format": "json",
+        "pipeline": "pdf-extract-docling",
+        "pipeline_config": {
+          "use_fallback_model": true,
+          "fallback_model": "gemma3:27b"
+        },
+        "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+      }
+    }
+  },
+  "response": {
+    "text": "{\"extracted_text\": \"Sparkasse Amberg-Sulzbach\\n\\n<!-- image -->\\n\\nFirma Ramteid GmbH Auf den Hochäckern 5 92224 Amberg\\n\\n## Kontoauszug 5/2024\\n\\n## Geldmarktkonto 21504006\\n\\n1. Oktober 2024 Seite 1 von 2\\n\\n| Datum Erläuterung                                                                                                                                                                                                      | Betrag EUR   |\\n|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|\\n| Kontostand am 30.08.2024, Auszug Nr. 4 Gutschriftseingang                                                                                                                                                              | 83,76        |\\n| 03.09.2024 RAMTEID GMBH                                                                                                                                                                                                | 9.900,00     |\\n| 04.09.2024 Wertpapierabrechnung / Wert: 05.09.2024 Depot 0007274087 Wertp.Abrechn. 03.09.2024 000002769154100 WKNA1CX3T                                                                                                | -9.812,00    |\\n| Gesch.Art KV Stück 50,0000 TESLA INC. DL -,001 ISIN US88160R1014 18.09.2024                                                                                                                                            | -103.324,86  |\\n| Wertpapierabrechnung / Wert: 19.09.2024 Depot 0007274087 Wertp.Abrechn. 17.09.2024 000003038755400 WKNA1CX3T Gesch.Art KV Stück 500,0000 TESLA INC. DL -,001 ISIN US88160R1014 Wertpapierabrechnung / Wert: 19.09.2024 |              |\\n| 18.09.2024                                                                                                                                                                                                             | 121.132,12   |\\n| Depot 0007274087 Wertp.Abrechn. 17.09.2024 000003210990300 WKNA1CX3T Gesch.Art VV Stück 580,0000 TESLA INC. DL -,001 ISIN US88160R1014 Überweisung/Übertrag                                                            |              |\\n| 20.09.2024                                                                                                                                                                                                             | -17.777,00   |\\n| RAMTEID GMBH Übertrag von Geldmarktkonto auf Gir okonto DATUM 20.09.2024, 07.55 UHR Wertpapierabrechnung / Wert: 30.09.2024                                                                                            |              |\\n| 27.09.2024                                                                                                                                                                                                             | 46.960,00    |\\n| Depot 0007274087 Wertp.Abrechn. 26.09.2024 000003311303300 WKNA1CX3T Gesch.Art VV Stück 200,0000 TESLA INC. DL -,001 ISIN US88160R1014 Wertpapierabrechnung / Wert: 30.09.2024                                         |              |\\n| 27.09.2024                                                                                                                                                                                                             | 70.354,88    |\\n| Depot 0007274087 Wertp.Abrechn. 26.09.2024 000003311303301 WKNA1CX3T Gesch.Art VV Stück 300,0000 TESLA INC. DL -,001 ISIN US88160R1014 Wertpapierabrechnung                                                            |              |\\n| 30.09.2024                                                                                                                                                                                                             | -117.586,79  |\\n| Depot 0007274087 Wertp.Abrechn. 26.09.2024 000003311303301 WKNA1CX3T Gesch.Art VV Stück 300,0000 TESLA INC. DL -,001 ISIN US88160R1014 Uhr                                                                             |              |\\n| Kontostand am 30.09.2024 um20:04                                                                                                                                                                                       | 118.954,25   |\\n\\n<!-- image -->\\n\\n## Kontoauszug 5/2024 Geldmarktkonto 21504006,   Ramteid GmbH\\n\\n## Hinweise zum Kontoauszug:\\n\\nSehr geehrte Kundin, sehr geehrter Kunde, bitte prüfen Sie die Buchungen und Berechnungen in diesem Kontoauszug. Eventuelle Rückfragen besprechen Sie bitte mit Ihrem Kundenberater.\\n\\n- l Der angegebene Kontostand berücksichtigt nicht die Wertstellung der einzelnen Buchungen. Dies bedeutet, dass der genannte Betrag nicht dem für die Zinsrechnung maßgeblichen Kontostand entsprechen muss und bei Verfügungen möglicherweise Zinsen für die Inanspruchnahme einer eingeräumten oder geduldeten Kontoüberziehung anfallen können.\\n- l Einwendungen gegen den Kontoauszug richten Sie bitte unverzüglich an unsere Revisionsabteilung. Unsere Anschrift(en) entnehmen Sie bitte unserem Preis- und Leistungsverzeichnis.\\n- l Rechnungsabschlüsse gelten als genehmigt, sofern Sie innerhalb von sechs Wochen nach Zugang keine Einwendungen erheben. Einwendungen gegen Rechnungsabschlüsse müssen der Sparkasse zugehen. Zur Fristwahrung genügt die rechtzeitige Absendung (Nr. 7 Abs. 3 unserer Allgemeinen Geschäftsbedingungen).\\n- l Schecks und andere Einzugspapiere sind erst dann eingelöst, wenn sie nicht bis zum Ablauf des übernächsten Bankarbeitstages storniert oder korrigiert werden. Diese Papiere sind auch eingelöst, wenn die Sparkasse ihren Einlösungswillen schon vorher Dritten gegenüber erkennbar bekundet hat (z. B. durch Bezahltmeldung). Für Lastschriften gelten die Einlösungsregeln in den hierfür vereinbarten besonderen Bedingungen.\\n- l Gutschriften aus eingereichten Schecks, Lastschriften und anderen Einzugspapieren erfolgen unter dem Vorbehalt der Einlösung.\\n- l Sparkontoauszüge heften Sie bitte in Ihr Loseblatt-Sparkassenbuch ein.\\n- l Guthaben sind als Einlagen nach Maßgabe des Einlagensicherungsgesetzes entschädigungsfähig. Nähere Informationen können dem \\\"Informationsbogen für den Einleger\\\" entnommen werden.\\n- l Dieser Kontoauszug gilt im Zusammenhang mit den zugrunde liegenden Verträgen laut angegebener Kontonummer als Rechnung im Sinne des UStG.\\n- l Dieser Brief wurde maschinell erstellt und ist ohne Unterschrift gültig.\\n\\nUnsere für den Geschäftsverkehr mit Ihnen geltenden Allgemeinen Geschäftsbedingungen und besonderen Bedingungen stellen wir Ihnen auf Wunsch gern zur Verfügung.\\n\\nMit freundlichen Grüßen Ihre Sparkasse\\n\\nSeite 2 von 2\",\n    \"text_length\": 7686,\n    \"metadata\": {\n      \"extraction_time\": 3.349199056625366,\n      \"pages\": 2,\n      \"tables\": [\n        \"Table 1\"\n      ],\n      \"sections\": [\n        \"Kontoauszug 5/2024\",\n        \"Geldmarktkonto 21504006\",\n        \"Kontoauszug 5/2024 Geldmarktkonto 21504006,   Ramteid GmbH\",\n        \"Hinweise zum Kontoauszug:\"\n      ],\n      \"has_tables\": true,\n      \"has_formulas\": false,\n      \"document_type\": \"invoice\"\n    },\n    \"sections\": [\n      \"Kontoauszug 5/2024\",\n      \"Geldmarktkonto 21504006\",\n      \"Kontoauszug 5/2024 Geldmarktkonto 21504006,   Ramteid GmbH\",\n      \"Hinweise zum Kontoauszug:\"\n    ],\n    \"tables\": [\n      \"Table 1\"\n    ]\n  }",
+    "thinking": null,
+    "json": {
+      "extracted_text": "Sparkasse Amberg-Sulzbach\n\n<!-- image -->\n\nFirma Ramteid GmbH Auf den Hochäckern 5 92224 Amberg\n\n## Kontoauszug 5/2024\n\n## Geldmarktkonto 21504006\n\n1. Oktober 2024 Seite 1 von 2\n\n| Datum Erläuterung                                                                                                                                                                                                      | Betrag EUR   |\n|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|\n| Kontostand am 30.08.2024, Auszug Nr. 4 Gutschriftseingang                                                                                                                                                              | 83,76        |\n| 03.09.2024 RAMTEID GMBH                                                                                                                                                                                                | 9.900,00     |\n| 04.09.2024 Wertpapierabrechnung / Wert: 05.09.2024 Depot 0007274087 Wertp.Abrechn. 03.09.2024 000002769154100 WKNA1CX3T                                                                                                | -9.812,00    |\n| Gesch.Art KV Stück 50,0000 TESLA INC. DL -,001 ISIN US88160R1014 18.09.2024                                                                                                                                            | -103.324,86  |\n| Wertpapierabrechnung / Wert: 19.09.2024 Depot 0007274087 Wertp.Abrechn. 17.09.2024 000003038755400 WKNA1CX3T Gesch.Art KV Stück 500,0000 TESLA INC. DL -,001 ISIN US88160R1014 Wertpapierabrechnung / Wert: 19.09.2024 |              |\n| 18.09.2024                                                                                                                                                                                                             | 121.132,12   |\n| Depot 0007274087 Wertp.Abrechn. 17.09.2024 000003210990300 WKNA1CX3T Gesch.Art VV Stück 580,0000 TESLA INC. DL -,001 ISIN US88160R1014 Überweisung/Übertrag                                                            |              |\n| 20.09.2024                                                                                                                                                                                                             | -17.777,00   |\n| RAMTEID GMBH Übertrag von Geldmarktkonto auf Gir okonto DATUM 20.09.2024, 07.55 UHR Wertpapierabrechnung / Wert: 30.09.2024                                                                                            |              |\n| 27.09.2024                                                                                                                                                                                                             | 46.960,00    |\n| Depot 0007274087 Wertp.Abrechn. 26.09.2024 000003311303300 WKNA1CX3T Gesch.Art VV Stück 200,0000 TESLA INC. DL -,001 ISIN US88160R1014 Wertpapierabrechnung / Wert: 30.09.2024                                         |              |\n| 27.09.2024                                                                                                                                                                                                             | 70.354,88    |\n| Depot 0007274087 Wertp.Abrechn. 26.09.2024 000003311303301 WKNA1CX3T Gesch.Art VV Stück 300,0000 TESLA INC. DL -,001 ISIN US88160R1014 Wertpapierabrechnung                                                            |              |\n| 30.09.2024                                                                                                                                                                                                             | -117.586,79  |\n| Depot 0007274087 Wertp.Abrechn. 26.09.2024 000003311303301 WKNA1CX3T Gesch.Art VV Stück 300,0000 TESLA INC. DL -,001 ISIN US88160R1014 Uhr                                                                             |              |\n| Kontostand am 30.09.2024 um20:04                                                                                                                                                                                       | 118.954,25   |\n\n<!-- image -->\n\n## Kontoauszug 5/2024 Geldmarktkonto 21504006,   Ramteid GmbH\n\n## Hinweise zum Kontoauszug:\n\nSehr geehrte Kundin, sehr geehrter Kunde, bitte prüfen Sie die Buchungen und Berechnungen in diesem Kontoauszug. Eventuelle Rückfragen besprechen Sie bitte mit Ihrem Kundenberater.\n\n- l Der angegebene Kontostand berücksichtigt nicht die Wertstellung der einzelnen Buchungen. Dies bedeutet, dass der genannte Betrag nicht dem für die Zinsrechnung maßgeblichen Kontostand entsprechen muss und bei Verfügungen möglicherweise Zinsen für die Inanspruchnahme einer eingeräumten oder geduldeten Kontoüberziehung anfallen können.\n- l Einwendungen gegen den Kontoauszug richten Sie bitte unverzüglich an unsere Revisionsabteilung. Unsere Anschrift(en) entnehmen Sie bitte unserem Preis- und Leistungsverzeichnis.\n- l Rechnungsabschlüsse gelten als genehmigt, sofern Sie innerhalb von sechs Wochen nach Zugang keine Einwendungen erheben. Einwendungen gegen Rechnungsabschlüsse müssen der Sparkasse zugehen. Zur Fristwahrung genügt die rechtzeitige Absendung (Nr. 7 Abs. 3 unserer Allgemeinen Geschäftsbedingungen).\n- l Schecks und andere Einzugspapiere sind erst dann eingelöst, wenn sie nicht bis zum Ablauf des übernächsten Bankarbeitstages storniert oder korrigiert werden. Diese Papiere sind auch eingelöst, wenn die Sparkasse ihren Einlösungswillen schon vorher Dritten gegenüber erkennbar bekundet hat (z. B. durch Bezahltmeldung). Für Lastschriften gelten die Einlösungsregeln in den hierfür vereinbarten besonderen Bedingungen.\n- l Gutschriften aus eingereichten Schecks, Lastschriften und anderen Einzugspapieren erfolgen unter dem Vorbehalt der Einlösung.\n- l Sparkontoauszüge heften Sie bitte in Ihr Loseblatt-Sparkassenbuch ein.\n- l Guthaben sind als Einlagen nach Maßgabe des Einlagensicherungsgesetzes entschädigungsfähig. Nähere Informationen können dem \"Informationsbogen für den Einleger\" entnommen werden.\n- l Dieser Kontoauszug gilt im Zusammenhang mit den zugrunde liegenden Verträgen laut angegebener Kontonummer als Rechnung im Sinne des UStG.\n- l Dieser Brief wurde maschinell erstellt und ist ohne Unterschrift gültig.\n\nUnsere für den Geschäftsverkehr mit Ihnen geltenden Allgemeinen Geschäftsbedingungen und besonderen Bedingungen stellen wir Ihnen auf Wunsch gern zur Verfügung.\n\nMit freundlichen Grüßen Ihre Sparkasse\n\nSeite 2 von 2",
+      "text_length": 7686,
+      "metadata": {
+        "extraction_time": 3.349199056625366,
+        "pages": 2,
+        "tables": [
+          "Table 1"
+        ],
+        "sections": [
+          "Kontoauszug 5/2024",
+          "Geldmarktkonto 21504006",
+          "Kontoauszug 5/2024 Geldmarktkonto 21504006,   Ramteid GmbH",
+          "Hinweise zum Kontoauszug:"
+        ],
+        "has_tables": true,
+        "has_formulas": false,
+        "document_type": "invoice"
+      },
+      "sections": [
+        "Kontoauszug 5/2024",
+        "Geldmarktkonto 21504006",
+        "Kontoauszug 5/2024 Geldmarktkonto 21504006,   Ramteid GmbH",
+        "Hinweise zum Kontoauszug:"
+      ],
+      "tables": [
+        "Table 1"
+      ]
+    }
+  },
+  "statistics": {
+    "tokens": {
+      "input_estimated": 2653,
+      "output_estimated": 1875,
+      "total_estimated": 4528,
+      "tokens_per_second": 28.172218764483393
+    },
+    "characters": {
+      "response_total": 7502,
+      "extracted_text": 6750,
+      "json_formatted": 7716
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

@@ -1,0 +1,17 @@
+{
+  "extractor": "docling",
+  "confidence": 0.85,
+  "character_count": 884,
+  "extraction_metadata": {
+    "extraction_time": 2.7477753162384033,
+    "pages": 1,
+    "tables": [],
+    "sections": [
+      "Wertpapier Streichungsbest\u00e4tigung Kauf"
+    ],
+    "has_tables": false,
+    "has_formulas": false,
+    "document_type": "document"
+  },
+  "file_size": 898
+}

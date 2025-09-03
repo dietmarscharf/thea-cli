@@ -1,0 +1,32 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9500000000000001,
+  "character_count": 40030,
+  "extraction_metadata": {
+    "extraction_time": 7.750802278518677,
+    "pages": 8,
+    "tables": [
+      "Table 1",
+      "Table 2",
+      "Table 3",
+      "Table 4",
+      "Table 5",
+      "Table 6"
+    ],
+    "sections": [
+      "Kontoauszug 10/2024",
+      "Girokonto 200750750, DE47 7525 0000 0200 7507 50",
+      "S Sparkasse Amberg-Sulzbach",
+      "Girokonto 200750750, DE47 7525 0000 0200 7507 50,  BLUEITS GmbH",
+      "S Sparkasse Amberg-Sulzbach",
+      "Girokonto 200750750, DE47 7525 0000 0200 7507 50,  BLUEITS GmbH",
+      "S Sparkasse Amberg-Sulzbach",
+      "Girokonto 200750750, DE47 7525 0000 0200 7507 50,  BLUEITS GmbH",
+      "Hinweise zum Kontoauszug:"
+    ],
+    "has_tables": true,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 40193
+}

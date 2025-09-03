@@ -38,6 +38,14 @@ Belege/
 *.pdfplumber.json
 *.pymupdf.txt
 *.pymupdf.json
+
+# Allow processed account files in docs
+!docs/BLUEITS-*/*.thea_extract
+!docs/BLUEITS-*/*.docling.json
+!docs/BLUEITS-*/*.docling.md
+!docs/Ramteid-*/*.thea_extract
+!docs/Ramteid-*/*.docling.json
+!docs/Ramteid-*/*.docling.md
 # Ignore custom prompt files but keep default and prompts directory
 *.prompt
 !.prompt

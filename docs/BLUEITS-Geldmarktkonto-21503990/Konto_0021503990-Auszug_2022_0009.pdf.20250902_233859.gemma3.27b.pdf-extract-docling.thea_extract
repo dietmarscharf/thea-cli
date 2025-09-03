@@ -1,0 +1,214 @@
+{
+  "version": "2.0",
+  "metadata": {
+    "file": {
+      "pdf_path": "docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0009.pdf",
+      "pdf_absolute_path": "/mnt/c/Projects/THEA/docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0009.pdf",
+      "pdf_size_bytes": 117559,
+      "pdf_pages": 0,
+      "output_file": "docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0009.pdf.20250902_233859.gemma3.27b.pdf-extract-docling.thea_extract"
+    },
+    "processing": {
+      "timestamp": "20250902_233859",
+      "start_time": "2025-09-02T23:38:59.817419Z",
+      "end_time": "2025-09-02T23:39:23.018650Z",
+      "processing_time_seconds": 23.199594974517822,
+      "hostname": "BLUEITS-DS-Privat",
+      "platform": "linux",
+      "pipeline": "pdf-extract-docling",
+      "pipeline_metadata": {
+        "pipeline": "pdf-extract-docling",
+        "timestamp": "2025-09-02T23:38:55.064954Z",
+        "pdf_path": "docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0009.pdf",
+        "extractor": "docling",
+        "fallback_model": "gemma3:27b",
+        "save_sidecars": true,
+        "saved_files": [
+          {
+            "extractor": "docling",
+            "type": "text/plain",
+            "text_file": "docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0009.pdf.20250902_233855.gemma3.27b.pdf-extract-docling.docling.txt",
+            "json_file": "docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0009.pdf.20250902_233855.gemma3.27b.pdf-extract-docling.docling.json",
+            "confidence": 0.9500000000000001,
+            "character_count": 12639,
+            "file_size": 12741,
+            "md_file": "docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0009.pdf.20250902_233855.gemma3.27b.pdf-extract-docling.docling.md"
+          }
+        ],
+        "extraction_success": true,
+        "text_length": 12639,
+        "confidence": 0.9500000000000001,
+        "has_tables": true,
+        "has_formulas": false,
+        "document_type": "invoice",
+        "pages": 6
+      }
+    },
+    "model": {
+      "name": "gemma3:27b",
+      "endpoint": "https://b1s.hey.bahn.business/api/chat",
+      "stream": true,
+      "format": "json"
+    }
+  },
+  "settings": {
+    "mode": "skip",
+    "suffix": "pdf-extract-docling",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "save_sidecars": true,
+    "dpi": 300,
+    "max_attempts": 3,
+    "initial_temperature": 0.2,
+    "temperature_progression": [
+      0.2
+    ],
+    "timeout": 300,
+    "max_tokens": 50000
+  },
+  "execution": {
+    "retry_count": 0,
+    "final_temperature": 0.2,
+    "stuck_pattern_detected": false,
+    "pattern_type": null,
+    "chunks_received": 620,
+    "request_time_seconds": 23.199440240859985,
+    "files_processed": [
+      {
+        "extractor": "docling",
+        "type": "text/plain",
+        "text_file": "docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0009.pdf.20250902_233855.gemma3.27b.pdf-extract-docling.docling.txt",
+        "json_file": "docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0009.pdf.20250902_233855.gemma3.27b.pdf-extract-docling.docling.json",
+        "confidence": 0.9500000000000001,
+        "character_count": 12639,
+        "file_size": 12741,
+        "md_file": "docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0009.pdf.20250902_233855.gemma3.27b.pdf-extract-docling.docling.md"
+      }
+    ]
+  },
+  "prompt": {
+    "system": "You are a vision-based text extractor and analyzer. Always use <thinking></thinking> tags to show your analysis process. You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text. Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }.: {\"extracted_text\": \"<string (complete verified text from document)>\", \"character_count\": \"<number (exact count of extracted text)>\", \"document_type\": \"<string (e.g., Invoice, Contract, Report, Statement, Technical)>\", \"three_word_description_german\": \"<string (exactly 3 words)>\", \"three_word_description_english\": \"<string (exactly 3 words)>\", \"content_summary_german\": \"<string (2-3 sentences)>\", \"content_summary_english\": \"<string (2-3 sentences)>\", \"extraction_quality\": \"<string (excellent/good/fair/poor)>\", \"has_tables\": \"<boolean>\", \"has_formulas\": \"<boolean>\", \"document_sections\": \"<array of strings (main section headings if present)>\"}",
+    "user": "Analyze the Docling extraction from PDF 'docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0009.pdf'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON.",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "prompt_config": {
+      "version": "2.0",
+      "name": "pdf-extract-docling",
+      "description": "Advanced document extraction using Docling with gemma3:27b fallback for complex documents",
+      "system_prompt": {
+        "suffix": "You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text.",
+        "output_format": {
+          "type": "json",
+          "schema": {
+            "extracted_text": "string (complete verified text from document)",
+            "character_count": "number (exact count of extracted text)",
+            "document_type": "string (e.g., Invoice, Contract, Report, Statement, Technical)",
+            "three_word_description_german": "string (exactly 3 words)",
+            "three_word_description_english": "string (exactly 3 words)",
+            "content_summary_german": "string (2-3 sentences)",
+            "content_summary_english": "string (2-3 sentences)",
+            "extraction_quality": "string (excellent/good/fair/poor)",
+            "has_tables": "boolean",
+            "has_formulas": "boolean",
+            "document_sections": "array of strings (main section headings if present)"
+          },
+          "instructions": "Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }."
+        }
+      },
+      "user_prompt": {
+        "template": "Analyze the Docling extraction from PDF '{{pdf_path}}'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON."
+      },
+      "settings": {
+        "model": "gemma3:27b",
+        "temperature": 0.2,
+        "max_attempts": 3,
+        "timeout": 300,
+        "max_tokens": 50000,
+        "mode": "skip",
+        "save_sidecars": true,
+        "format": "json",
+        "pipeline": "pdf-extract-docling",
+        "pipeline_config": {
+          "use_fallback_model": true,
+          "fallback_model": "gemma3:27b"
+        },
+        "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+      }
+    }
+  },
+  "response": {
+    "text": "{\"response\": {\n  \"extracted_data\": {\n    \"document_type\": \"bank statement\",\n    \"account_number\": \"21503990\",\n    \"account_holder\": \"BLUEITS GmbH\",\n    \"statement_period\": \"01.07.2022 - 30.09.2022\",\n    \"opening_balance\": \"331.272,54\",\n    \"closing_balance\": \"331.146,17\",\n    \"total_debit\": \"126,37 + 1,95 = 128,32\",\n    \"total_credit\": \"331.272,54\",\n    \"fees\": [\n      {\n        \"fee_type\": \"Verwahrentgelt\",\n        \"amount\": \"126,37\"\n      },\n      {\n        \"fee_type\": \"Kontoführung\",\n        \"amount\": \"1,95\"\n      }\n    ],\n    \"transactions\": [\n      {\n        \"date\": \"30.09.2022\",\n        \"description\": \"Abrechnung 30.09.2022\",\n        \"amount\": \"126,37\",\n        \"type\": \"debit\"\n      },\n      {\n        \"date\": \"30.09.2022\",\n        \"description\": \"Abrechnung 30.09.2022\",\n        \"amount\": \"1,95\",\n        \"type\": \"debit\"\n      }\n    ],\n    \"disclaimer\": \"Sehr geehrte Kundin, sehr geehrter Kunde, bitte prüfen Sie die Buchungen und Berechnungen in diesem Kontoauszug. Eventuelle Rückfragen besprechen Sie bitte mit Ihrem Kundenberater.\"\n  },\n  \"metadata\": {\n    \"extraction_time\": 4.744173288345337,\n    \"pages\": 6,\n    \"tables\": [\n      \"Table 1\",\n      \"Table 2\"\n    ],\n    \"sections\": [\n      \"Kontoauszug 9/2022\",\n      \"Geldmarktkonto 21503990\",\n      \"Geldmarktkonto 21503990,   BLUEITS GmbH\",\n      \"Kundenmitteilungen:\",\n      \"(4) Erstattung:\",\n      \"Hinweise zum Kontoauszug:\"\n    ],\n    \"has_tables\": true,\n    \"has_formulas\": false,\n    \"document_type\": \"invoice\"\n  }\n}}",
+    "thinking": null,
+    "json": {
+      "response": {
+        "extracted_data": {
+          "document_type": "bank statement",
+          "account_number": "21503990",
+          "account_holder": "BLUEITS GmbH",
+          "statement_period": "01.07.2022 - 30.09.2022",
+          "opening_balance": "331.272,54",
+          "closing_balance": "331.146,17",
+          "total_debit": "126,37 + 1,95 = 128,32",
+          "total_credit": "331.272,54",
+          "fees": [
+            {
+              "fee_type": "Verwahrentgelt",
+              "amount": "126,37"
+            },
+            {
+              "fee_type": "Kontoführung",
+              "amount": "1,95"
+            }
+          ],
+          "transactions": [
+            {
+              "date": "30.09.2022",
+              "description": "Abrechnung 30.09.2022",
+              "amount": "126,37",
+              "type": "debit"
+            },
+            {
+              "date": "30.09.2022",
+              "description": "Abrechnung 30.09.2022",
+              "amount": "1,95",
+              "type": "debit"
+            }
+          ],
+          "disclaimer": "Sehr geehrte Kundin, sehr geehrter Kunde, bitte prüfen Sie die Buchungen und Berechnungen in diesem Kontoauszug. Eventuelle Rückfragen besprechen Sie bitte mit Ihrem Kundenberater."
+        },
+        "metadata": {
+          "extraction_time": 4.744173288345337,
+          "pages": 6,
+          "tables": [
+            "Table 1",
+            "Table 2"
+          ],
+          "sections": [
+            "Kontoauszug 9/2022",
+            "Geldmarktkonto 21503990",
+            "Geldmarktkonto 21503990,   BLUEITS GmbH",
+            "Kundenmitteilungen:",
+            "(4) Erstattung:",
+            "Hinweise zum Kontoauszug:"
+          ],
+          "has_tables": true,
+          "has_formulas": false,
+          "document_type": "invoice"
+        }
+      }
+    }
+  },
+  "statistics": {
+    "tokens": {
+      "input_estimated": 3942,
+      "output_estimated": 374,
+      "total_estimated": 4316,
+      "tokens_per_second": 16.12097109500392
+    },
+    "characters": {
+      "response_total": 1499,
+      "extracted_text": 0,
+      "json_formatted": 1628
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

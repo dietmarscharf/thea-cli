@@ -1,0 +1,21 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9500000000000001,
+  "character_count": 6084,
+  "extraction_metadata": {
+    "extraction_time": 3.445662498474121,
+    "pages": 2,
+    "tables": [
+      "Table 1"
+    ],
+    "sections": [
+      "Kontoauszug 2/2024",
+      "Girokonto 21377502, DE51 7525 0000 0021 3775 02",
+      "Hinweise zum Kontoauszug:"
+    ],
+    "has_tables": true,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 6144
+}

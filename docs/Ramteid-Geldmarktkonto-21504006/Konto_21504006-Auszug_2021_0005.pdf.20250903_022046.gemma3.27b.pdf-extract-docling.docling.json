@@ -1,0 +1,17 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9,
+  "character_count": 2989,
+  "extraction_metadata": {
+    "extraction_time": 3.1500494480133057,
+    "pages": 2,
+    "tables": [],
+    "sections": [
+      "Hinweise zum Kontoauszug:"
+    ],
+    "has_tables": false,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 3034
+}

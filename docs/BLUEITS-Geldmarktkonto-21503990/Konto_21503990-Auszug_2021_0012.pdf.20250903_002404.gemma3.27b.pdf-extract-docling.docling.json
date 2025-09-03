@@ -1,0 +1,21 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9500000000000001,
+  "character_count": 4829,
+  "extraction_metadata": {
+    "extraction_time": 3.323513984680176,
+    "pages": 4,
+    "tables": [
+      "Table 1"
+    ],
+    "sections": [
+      "Kontoauszug 12/2021",
+      "Geldmarktkonto 21503990",
+      "Hinweise zum Kontoauszug:"
+    ],
+    "has_tables": true,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 4875
+}

@@ -1,0 +1,24 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9500000000000001,
+  "character_count": 11397,
+  "extraction_metadata": {
+    "extraction_time": 4.91403341293335,
+    "pages": 3,
+    "tables": [
+      "Table 1",
+      "Table 2"
+    ],
+    "sections": [
+      "Kontoauszug 7/2023",
+      "Geldmarktkonto 21503990",
+      "S Sparkasse Amberg-Sulzbach",
+      "Geldmarktkonto 21503990,   BLUEITS GmbH",
+      "Hinweise zum Kontoauszug:"
+    ],
+    "has_tables": true,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 11476
+}

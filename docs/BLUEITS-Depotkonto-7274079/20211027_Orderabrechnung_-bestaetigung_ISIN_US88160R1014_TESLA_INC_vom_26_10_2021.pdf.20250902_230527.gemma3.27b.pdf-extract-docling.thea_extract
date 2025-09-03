@@ -1,0 +1,173 @@
+{
+  "version": "2.0",
+  "metadata": {
+    "file": {
+      "pdf_path": "docs/BLUEITS-Depotkonto-7274079/20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021.pdf",
+      "pdf_absolute_path": "/mnt/c/Projects/THEA/docs/BLUEITS-Depotkonto-7274079/20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021.pdf",
+      "pdf_size_bytes": 58862,
+      "pdf_pages": 0,
+      "output_file": "docs/BLUEITS-Depotkonto-7274079/20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021.pdf.20250902_230527.gemma3.27b.pdf-extract-docling.thea_extract"
+    },
+    "processing": {
+      "timestamp": "20250902_230527",
+      "start_time": "2025-09-02T23:05:27.468767Z",
+      "end_time": "2025-09-02T23:06:18.064913Z",
+      "processing_time_seconds": 50.59461450576782,
+      "hostname": "BLUEITS-DS-Privat",
+      "platform": "linux",
+      "pipeline": "pdf-extract-docling",
+      "pipeline_metadata": {
+        "pipeline": "pdf-extract-docling",
+        "timestamp": "2025-09-02T23:05:24.247503Z",
+        "pdf_path": "docs/BLUEITS-Depotkonto-7274079/20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021.pdf",
+        "extractor": "docling",
+        "fallback_model": "gemma3:27b",
+        "save_sidecars": true,
+        "saved_files": [
+          {
+            "extractor": "docling",
+            "type": "text/plain",
+            "text_file": "docs/BLUEITS-Depotkonto-7274079/20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021.pdf.20250902_230524.gemma3.27b.pdf-extract-docling.docling.txt",
+            "json_file": "docs/BLUEITS-Depotkonto-7274079/20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021.pdf.20250902_230524.gemma3.27b.pdf-extract-docling.docling.json",
+            "confidence": 0.9500000000000001,
+            "character_count": 2674,
+            "file_size": 2705,
+            "md_file": "docs/BLUEITS-Depotkonto-7274079/20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021.pdf.20250902_230524.gemma3.27b.pdf-extract-docling.docling.md"
+          }
+        ],
+        "extraction_success": true,
+        "text_length": 2674,
+        "confidence": 0.9500000000000001,
+        "has_tables": true,
+        "has_formulas": false,
+        "document_type": "invoice",
+        "pages": 2
+      }
+    },
+    "model": {
+      "name": "gemma3:27b",
+      "endpoint": "https://b1s.hey.bahn.business/api/chat",
+      "stream": true,
+      "format": "json"
+    }
+  },
+  "settings": {
+    "mode": "skip",
+    "suffix": "pdf-extract-docling",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "save_sidecars": true,
+    "dpi": 300,
+    "max_attempts": 3,
+    "initial_temperature": 0.2,
+    "temperature_progression": [
+      0.2
+    ],
+    "timeout": 300,
+    "max_tokens": 50000
+  },
+  "execution": {
+    "retry_count": 0,
+    "final_temperature": 0.2,
+    "stuck_pattern_detected": false,
+    "pattern_type": null,
+    "chunks_received": 1609,
+    "request_time_seconds": 50.59448313713074,
+    "files_processed": [
+      {
+        "extractor": "docling",
+        "type": "text/plain",
+        "text_file": "docs/BLUEITS-Depotkonto-7274079/20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021.pdf.20250902_230524.gemma3.27b.pdf-extract-docling.docling.txt",
+        "json_file": "docs/BLUEITS-Depotkonto-7274079/20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021.pdf.20250902_230524.gemma3.27b.pdf-extract-docling.docling.json",
+        "confidence": 0.9500000000000001,
+        "character_count": 2674,
+        "file_size": 2705,
+        "md_file": "docs/BLUEITS-Depotkonto-7274079/20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021.pdf.20250902_230524.gemma3.27b.pdf-extract-docling.docling.md"
+      }
+    ]
+  },
+  "prompt": {
+    "system": "You are a vision-based text extractor and analyzer. Always use <thinking></thinking> tags to show your analysis process. You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text. Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }.: {\"extracted_text\": \"<string (complete verified text from document)>\", \"character_count\": \"<number (exact count of extracted text)>\", \"document_type\": \"<string (e.g., Invoice, Contract, Report, Statement, Technical)>\", \"three_word_description_german\": \"<string (exactly 3 words)>\", \"three_word_description_english\": \"<string (exactly 3 words)>\", \"content_summary_german\": \"<string (2-3 sentences)>\", \"content_summary_english\": \"<string (2-3 sentences)>\", \"extraction_quality\": \"<string (excellent/good/fair/poor)>\", \"has_tables\": \"<boolean>\", \"has_formulas\": \"<boolean>\", \"document_sections\": \"<array of strings (main section headings if present)>\"}",
+    "user": "Analyze the Docling extraction from PDF 'docs/BLUEITS-Depotkonto-7274079/20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021.pdf'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON.",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "prompt_config": {
+      "version": "2.0",
+      "name": "pdf-extract-docling",
+      "description": "Advanced document extraction using Docling with gemma3:27b fallback for complex documents",
+      "system_prompt": {
+        "suffix": "You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text.",
+        "output_format": {
+          "type": "json",
+          "schema": {
+            "extracted_text": "string (complete verified text from document)",
+            "character_count": "number (exact count of extracted text)",
+            "document_type": "string (e.g., Invoice, Contract, Report, Statement, Technical)",
+            "three_word_description_german": "string (exactly 3 words)",
+            "three_word_description_english": "string (exactly 3 words)",
+            "content_summary_german": "string (2-3 sentences)",
+            "content_summary_english": "string (2-3 sentences)",
+            "extraction_quality": "string (excellent/good/fair/poor)",
+            "has_tables": "boolean",
+            "has_formulas": "boolean",
+            "document_sections": "array of strings (main section headings if present)"
+          },
+          "instructions": "Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }."
+        }
+      },
+      "user_prompt": {
+        "template": "Analyze the Docling extraction from PDF '{{pdf_path}}'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON."
+      },
+      "settings": {
+        "model": "gemma3:27b",
+        "temperature": 0.2,
+        "max_attempts": 3,
+        "timeout": 300,
+        "max_tokens": 50000,
+        "mode": "skip",
+        "save_sidecars": true,
+        "format": "json",
+        "pipeline": "pdf-extract-docling",
+        "pipeline_config": {
+          "use_fallback_model": true,
+          "fallback_model": "gemma3:27b"
+        },
+        "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+      }
+    }
+  },
+  "response": {
+    "text": "{\"extracted_text\": \"Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\\n\\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\\n\\n## Wertpapier Abrechnung Verkauf\\n\\nTeilausführung\\n\\nNominale\\n\\nWertpapierbezeichnung\\n\\nISIN\\n\\n(WKN)\\n\\nStück 500\\n\\nTESLA INC.\\n\\nREGISTERED SHARES DL-,001\\n\\nUS88160R1014\\n\\n(A1CX3T)\\n\\nHandels-/Ausführungsplatz Börsensegment\\n\\nTradegate (gemäß Weisung)\\n\\nXGAT\\n\\nLimit-Orde r\\n\\nLimit\\n\\n900,00 EUR\\n\\nSchlusstag/-Zeit 26.10.2021 15:50:15\\n\\nAusführungskurs 913,10 EUR\\n\\nAuftraggeber\\n\\nScharf, Dietmar\\n\\nAuftragserteilung/ -ort Online-Banking\\n\\nDie restliche Auftragsmenge über Stück 200 haben wir vorgemerkt Girosammelverw. mehrere Sammelurkunden - kein Stückeausdruck -\\n\\nKurswert\\n\\n456.550,00\\n\\nEUR\\n\\nProvision\\n\\n463,31- EUR\\n\\nErmittlung steuerrelevante Erträge\\n\\nVeräußerungsgewinn\\n\\n151.601,17 EUR\\n\\nAusmachender Betrag\\n\\n456.086,69 EUR\\n\\nDen Gegenwert buchen wir mit Valuta  28.10.2021 zu Gunsten des Kontos  21503990, BLZ  75250000. Die Wertpapiere entnehmen wir Ihrem Depotkonto.\\n\\nSofern keine Umsatzsteuer ausgewiesen ist, handelt es sich um eine umsatzsteuerbefreite Finanzdienstleistung.\\n\\nFür das Geschäft wurde keine Anlageberatung erbracht. Initiator der Besprechung war der Kunde.\\n\\nSeite 1 von 2\\n\\n## Depotnummer\\n\\n7274079\\n\\nKundennummer\\n\\n24711383 BLUEITS GmbH 315960/16.01 26.10.2021 W02279-0000017457/21 DE131841737\\n\\nAuftragsnummer Datum Rechnungsnummer Umsatzsteuer-ID\\n\\n<!-- image -->\\n\\n## Depotnummer\\n\\nKundennummer Auftragsnummer Datum\\n\\nSeite 2 von 2 7274079 24711383 315960/16.01 26.10.2021\\n\\nBerücksichtigte Anschaffungsgeschäfte (alle ermittelten Beträge in EUR)\\n\\n| Geschäft   |   Auftragsnr. | Ausführ.-tag   | Whr./St.   | Nennwert/Stück   | AS-Kosten   | Erlös      | ant. Ergebnis   |     |\\n|------------|---------------|----------------|------------|------------------|-------------|------------|-----------------|-----|\\n| Kauf       |    7204682200 | 08.03.2021     | Stück      | 30,0000          | 14.904,30-  | 27.365,20  | 12.460,90       | (D) |\\n| Kauf       |    7245841300 | 19.03.2021     | Stück      | 150,0000         | 81.047,21-  | 136.826,01 | 55.778,80       | (D) |\\n| Kauf       |    7612469601 | 14.04.2021     | Stück      | 100,0000         | 65.120,00-  | 91.217,34  | 26.097,34       | (D) |\\n| Kauf       |    7612469602 | 14.04.2021     | Stück      | 100,0000         | 65.120,00-  | 91.217,34  | 26.097,34       | (D) |\\n| Kauf       |    7612469600 | 14.04.2021     | Stück      | 120,0000         | 78.294,01-  | 109.460,80 | 31.166,79       | (D) |\\n\\nSumme aller Erträge nach Differenzmethode und/oder Ersatzbemessungsgrundlage\\n\\n151.601,17\\n\\nTelefon 09621 300-0 Telefax 09621 300-5439 BLZ: 752 500 00 BIC: BYLADEMIABG USt Id-Nr: DE 131841737\",\n    \"character_count\": 2674,\n    \"document_type\": \"invoice\",\n    \"three_word_description_german\": \"Wertpapierabrechnung Verkauf\",\n    \"three_word_description_english\": \"Stock Trade Confirmation\",\n    \"content_summary_german\": \"Dieses Dokument ist eine Wertpapierabrechnung für den Verkauf von Aktien der Firma Tesla. Es enthält Details zur Transaktion, einschließlich der Stückzahl, des Kurses und der erzielten Gewinne. Die Abrechnung dient zur Information des Kunden über die erfolgte Transaktion.\",\n    \"content_summary_english\": \"This document is a stock trade confirmation for the sale of Tesla shares. It contains details of the transaction, including the number of shares, the price, and the profits realized. The confirmation informs the customer about the completed transaction.\",\n    \"extraction_quality\": \"excellent\",\n    \"has_tables\": true,\n    \"has_formulas\": false,\n    \"document_sections\": [\"Wertpapier Abrechnung Verkauf\", \"Depotnummer\", \"Depotnummer\"]}",
+    "thinking": null,
+    "json": {
+      "extracted_text": "Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\n\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\n\n## Wertpapier Abrechnung Verkauf\n\nTeilausführung\n\nNominale\n\nWertpapierbezeichnung\n\nISIN\n\n(WKN)\n\nStück 500\n\nTESLA INC.\n\nREGISTERED SHARES DL-,001\n\nUS88160R1014\n\n(A1CX3T)\n\nHandels-/Ausführungsplatz Börsensegment\n\nTradegate (gemäß Weisung)\n\nXGAT\n\nLimit-Orde r\n\nLimit\n\n900,00 EUR\n\nSchlusstag/-Zeit 26.10.2021 15:50:15\n\nAusführungskurs 913,10 EUR\n\nAuftraggeber\n\nScharf, Dietmar\n\nAuftragserteilung/ -ort Online-Banking\n\nDie restliche Auftragsmenge über Stück 200 haben wir vorgemerkt Girosammelverw. mehrere Sammelurkunden - kein Stückeausdruck -\n\nKurswert\n\n456.550,00\n\nEUR\n\nProvision\n\n463,31- EUR\n\nErmittlung steuerrelevante Erträge\n\nVeräußerungsgewinn\n\n151.601,17 EUR\n\nAusmachender Betrag\n\n456.086,69 EUR\n\nDen Gegenwert buchen wir mit Valuta  28.10.2021 zu Gunsten des Kontos  21503990, BLZ  75250000. Die Wertpapiere entnehmen wir Ihrem Depotkonto.\n\nSofern keine Umsatzsteuer ausgewiesen ist, handelt es sich um eine umsatzsteuerbefreite Finanzdienstleistung.\n\nFür das Geschäft wurde keine Anlageberatung erbracht. Initiator der Besprechung war der Kunde.\n\nSeite 1 von 2\n\n## Depotnummer\n\n7274079\n\nKundennummer\n\n24711383 BLUEITS GmbH 315960/16.01 26.10.2021 W02279-0000017457/21 DE131841737\n\nAuftragsnummer Datum Rechnungsnummer Umsatzsteuer-ID\n\n<!-- image -->\n\n## Depotnummer\n\nKundennummer Auftragsnummer Datum\n\nSeite 2 von 2 7274079 24711383 315960/16.01 26.10.2021\n\nBerücksichtigte Anschaffungsgeschäfte (alle ermittelten Beträge in EUR)\n\n| Geschäft   |   Auftragsnr. | Ausführ.-tag   | Whr./St.   | Nennwert/Stück   | AS-Kosten   | Erlös      | ant. Ergebnis   |     |\n|------------|---------------|----------------|------------|------------------|-------------|------------|-----------------|-----|\n| Kauf       |    7204682200 | 08.03.2021     | Stück      | 30,0000          | 14.904,30-  | 27.365,20  | 12.460,90       | (D) |\n| Kauf       |    7245841300 | 19.03.2021     | Stück      | 150,0000         | 81.047,21-  | 136.826,01 | 55.778,80       | (D) |\n| Kauf       |    7612469601 | 14.04.2021     | Stück      | 100,0000         | 65.120,00-  | 91.217,34  | 26.097,34       | (D) |\n| Kauf       |    7612469602 | 14.04.2021     | Stück      | 100,0000         | 65.120,00-  | 91.217,34  | 26.097,34       | (D) |\n| Kauf       |    7612469600 | 14.04.2021     | Stück      | 120,0000         | 78.294,01-  | 109.460,80 | 31.166,79       | (D) |\n\nSumme aller Erträge nach Differenzmethode und/oder Ersatzbemessungsgrundlage\n\n151.601,17\n\nTelefon 09621 300-0 Telefax 09621 300-5439 BLZ: 752 500 00 BIC: BYLADEMIABG USt Id-Nr: DE 131841737",
+      "character_count": 2674,
+      "document_type": "invoice",
+      "three_word_description_german": "Wertpapierabrechnung Verkauf",
+      "three_word_description_english": "Stock Trade Confirmation",
+      "content_summary_german": "Dieses Dokument ist eine Wertpapierabrechnung für den Verkauf von Aktien der Firma Tesla. Es enthält Details zur Transaktion, einschließlich der Stückzahl, des Kurses und der erzielten Gewinne. Die Abrechnung dient zur Information des Kunden über die erfolgte Transaktion.",
+      "content_summary_english": "This document is a stock trade confirmation for the sale of Tesla shares. It contains details of the transaction, including the number of shares, the price, and the profits realized. The confirmation informs the customer about the completed transaction.",
+      "extraction_quality": "excellent",
+      "has_tables": true,
+      "has_formulas": false,
+      "document_sections": [
+        "Wertpapier Abrechnung Verkauf",
+        "Depotnummer",
+        "Depotnummer"
+      ]
+    }
+  },
+  "statistics": {
+    "tokens": {
+      "input_estimated": 1396,
+      "output_estimated": 940,
+      "total_estimated": 2336,
+      "tokens_per_second": 18.5790525173947
+    },
+    "characters": {
+      "response_total": 3760,
+      "extracted_text": 2658,
+      "json_formatted": 3940
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

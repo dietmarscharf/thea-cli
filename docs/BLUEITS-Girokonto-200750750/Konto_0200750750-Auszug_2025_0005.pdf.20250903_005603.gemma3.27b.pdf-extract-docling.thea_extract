@@ -1,0 +1,237 @@
+{
+  "version": "2.0",
+  "metadata": {
+    "file": {
+      "pdf_path": "docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2025_0005.pdf",
+      "pdf_absolute_path": "/mnt/c/Projects/THEA/docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2025_0005.pdf",
+      "pdf_size_bytes": 46600,
+      "pdf_pages": 0,
+      "output_file": "docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2025_0005.pdf.20250903_005603.gemma3.27b.pdf-extract-docling.thea_extract"
+    },
+    "processing": {
+      "timestamp": "20250903_005603",
+      "start_time": "2025-09-03T00:56:03.201922Z",
+      "end_time": "2025-09-03T00:56:32.036837Z",
+      "processing_time_seconds": 28.833455324172974,
+      "hostname": "BLUEITS-DS-Privat",
+      "platform": "linux",
+      "pipeline": "pdf-extract-docling",
+      "pipeline_metadata": {
+        "pipeline": "pdf-extract-docling",
+        "timestamp": "2025-09-03T00:55:58.801760Z",
+        "pdf_path": "docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2025_0005.pdf",
+        "extractor": "docling",
+        "fallback_model": "gemma3:27b",
+        "save_sidecars": true,
+        "saved_files": [
+          {
+            "extractor": "docling",
+            "type": "text/plain",
+            "text_file": "docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2025_0005.pdf.20250903_005558.gemma3.27b.pdf-extract-docling.docling.txt",
+            "json_file": "docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2025_0005.pdf.20250903_005558.gemma3.27b.pdf-extract-docling.docling.json",
+            "confidence": 0.9500000000000001,
+            "character_count": 22029,
+            "file_size": 22124,
+            "md_file": "docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2025_0005.pdf.20250903_005558.gemma3.27b.pdf-extract-docling.docling.md"
+          }
+        ],
+        "extraction_success": true,
+        "text_length": 22029,
+        "confidence": 0.9500000000000001,
+        "has_tables": true,
+        "has_formulas": false,
+        "document_type": "invoice",
+        "pages": 5
+      }
+    },
+    "model": {
+      "name": "gemma3:27b",
+      "endpoint": "https://b1s.hey.bahn.business/api/chat",
+      "stream": true,
+      "format": "json"
+    }
+  },
+  "settings": {
+    "mode": "skip",
+    "suffix": "pdf-extract-docling",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "save_sidecars": true,
+    "dpi": 300,
+    "max_attempts": 3,
+    "initial_temperature": 0.2,
+    "temperature_progression": [
+      0.2
+    ],
+    "timeout": 300,
+    "max_tokens": 50000
+  },
+  "execution": {
+    "retry_count": 0,
+    "final_temperature": 0.2,
+    "stuck_pattern_detected": false,
+    "pattern_type": null,
+    "chunks_received": 808,
+    "request_time_seconds": 28.833293437957764,
+    "files_processed": [
+      {
+        "extractor": "docling",
+        "type": "text/plain",
+        "text_file": "docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2025_0005.pdf.20250903_005558.gemma3.27b.pdf-extract-docling.docling.txt",
+        "json_file": "docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2025_0005.pdf.20250903_005558.gemma3.27b.pdf-extract-docling.docling.json",
+        "confidence": 0.9500000000000001,
+        "character_count": 22029,
+        "file_size": 22124,
+        "md_file": "docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2025_0005.pdf.20250903_005558.gemma3.27b.pdf-extract-docling.docling.md"
+      }
+    ]
+  },
+  "prompt": {
+    "system": "You are a vision-based text extractor and analyzer. Always use <thinking></thinking> tags to show your analysis process. You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text. Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }.: {\"extracted_text\": \"<string (complete verified text from document)>\", \"character_count\": \"<number (exact count of extracted text)>\", \"document_type\": \"<string (e.g., Invoice, Contract, Report, Statement, Technical)>\", \"three_word_description_german\": \"<string (exactly 3 words)>\", \"three_word_description_english\": \"<string (exactly 3 words)>\", \"content_summary_german\": \"<string (2-3 sentences)>\", \"content_summary_english\": \"<string (2-3 sentences)>\", \"extraction_quality\": \"<string (excellent/good/fair/poor)>\", \"has_tables\": \"<boolean>\", \"has_formulas\": \"<boolean>\", \"document_sections\": \"<array of strings (main section headings if present)>\"}",
+    "user": "Analyze the Docling extraction from PDF 'docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2025_0005.pdf'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON.",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "prompt_config": {
+      "version": "2.0",
+      "name": "pdf-extract-docling",
+      "description": "Advanced document extraction using Docling with gemma3:27b fallback for complex documents",
+      "system_prompt": {
+        "suffix": "You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text.",
+        "output_format": {
+          "type": "json",
+          "schema": {
+            "extracted_text": "string (complete verified text from document)",
+            "character_count": "number (exact count of extracted text)",
+            "document_type": "string (e.g., Invoice, Contract, Report, Statement, Technical)",
+            "three_word_description_german": "string (exactly 3 words)",
+            "three_word_description_english": "string (exactly 3 words)",
+            "content_summary_german": "string (2-3 sentences)",
+            "content_summary_english": "string (2-3 sentences)",
+            "extraction_quality": "string (excellent/good/fair/poor)",
+            "has_tables": "boolean",
+            "has_formulas": "boolean",
+            "document_sections": "array of strings (main section headings if present)"
+          },
+          "instructions": "Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }."
+        }
+      },
+      "user_prompt": {
+        "template": "Analyze the Docling extraction from PDF '{{pdf_path}}'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON."
+      },
+      "settings": {
+        "model": "gemma3:27b",
+        "temperature": 0.2,
+        "max_attempts": 3,
+        "timeout": 300,
+        "max_tokens": 50000,
+        "mode": "skip",
+        "save_sidecars": true,
+        "format": "json",
+        "pipeline": "pdf-extract-docling",
+        "pipeline_config": {
+          "use_fallback_model": true,
+          "fallback_model": "gemma3:27b"
+        },
+        "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+      }
+    }
+  },
+  "response": {
+    "text": "{\"response\": {\n    \"document_analysis\": {\n        \"document_type\": \"bank statement\",\n        \"entities\": [\n            {\"entity_type\": \"ORGANIZATION\", \"value\": \"Sparkasse Amberg-Sulzbach\"},\n            {\"entity_type\": \"ACCOUNT_NUMBER\", \"value\": \"200750750\"},\n            {\"entity_type\": \"IBAN\", \"value\": \"DE47 7525 0000 0200 7507 50\"},\n            {\"entity_type\": \"ORGANIZATION\", \"value\": \"BLUEITS GmbH\"}\n        ],\n        \"summary\": \"This is a bank statement from Sparkasse Amberg-Sulzbach for the month of May 2025, belonging to account number 200750750 (IBAN DE47 7525 0000 0200 7507 50) under the name BLUEITS GmbH. The statement details various transactions, including debits for services, credits, and a final account balance of 44,077.69. It also includes details of charges for the previous month and a loan interest calculation.\"\n    },\n    \"table_extraction\": [\n        {\n            \"table_name\": \"Table 1\",\n            \"headers\": [\n                \"Entgelte vom 01.04.2025 bis 30.04.2025\",\n                \"Umsatzbereitstellung\",\n                \"Kontogrundpreis\",\n                \"Lastschriftseinzug\",\n                \"Überweisung-beleglos\",\n                \"Gutschriftseingang\",\n                \"autom.Darlehensbuchung\"\n            ],\n            \"rows\": [\n                [\n                    \"45,38-\",\n                    \"1 x    5,00                5,00-\",\n                    \"1 x   10,95               10,95-\",\n                    \"24 x    0,75               18,00-\",\n                    \"14 x    0,12                1,68-\",\n                    \"12 x    0,75                9,00-\",\n                    \"1 x    0,75                0,75-\"\n                ]\n            ]\n        },\n        {\n            \"table_name\": \"Table 2\",\n            \"headers\": [\n                \"Abrechnung 30.04.2025 vor Steuer\",\n                \"Umsatzsteuer  19%  auf          45,38-\",\n                \"Abrechnung 30.04.2025\"\n            ],\n            \"rows\": [\n                [\n                    \"45,38-\",\n                    \"USt:          8,62-\",\n                    \"54,00-\"\n                ]\n            ]\n        },\n        {\n            \"table_name\": \"Table 3\",\n            \"headers\": [\n                \"Darlehenszins\",\n                \"Bemessungsgrundlage Umsatzsteuer\",\n                \"Rechnungsbetrag\"\n            ],\n            \"rows\": [\n                [\n                    \"1.312,50 EUR vom 01.05.2025 - 30.05.2025\",\n                    \"1.312,50 EUR Umsatzsteuer 19%\",\n                    \"1.561,88 EUR\"\n                ]\n            ]\n        }\n    ]\n}}",
+    "thinking": null,
+    "json": {
+      "response": {
+        "document_analysis": {
+          "document_type": "bank statement",
+          "entities": [
+            {
+              "entity_type": "ORGANIZATION",
+              "value": "Sparkasse Amberg-Sulzbach"
+            },
+            {
+              "entity_type": "ACCOUNT_NUMBER",
+              "value": "200750750"
+            },
+            {
+              "entity_type": "IBAN",
+              "value": "DE47 7525 0000 0200 7507 50"
+            },
+            {
+              "entity_type": "ORGANIZATION",
+              "value": "BLUEITS GmbH"
+            }
+          ],
+          "summary": "This is a bank statement from Sparkasse Amberg-Sulzbach for the month of May 2025, belonging to account number 200750750 (IBAN DE47 7525 0000 0200 7507 50) under the name BLUEITS GmbH. The statement details various transactions, including debits for services, credits, and a final account balance of 44,077.69. It also includes details of charges for the previous month and a loan interest calculation."
+        },
+        "table_extraction": [
+          {
+            "table_name": "Table 1",
+            "headers": [
+              "Entgelte vom 01.04.2025 bis 30.04.2025",
+              "Umsatzbereitstellung",
+              "Kontogrundpreis",
+              "Lastschriftseinzug",
+              "Überweisung-beleglos",
+              "Gutschriftseingang",
+              "autom.Darlehensbuchung"
+            ],
+            "rows": [
+              [
+                "45,38-",
+                "1 x    5,00                5,00-",
+                "1 x   10,95               10,95-",
+                "24 x    0,75               18,00-",
+                "14 x    0,12                1,68-",
+                "12 x    0,75                9,00-",
+                "1 x    0,75                0,75-"
+              ]
+            ]
+          },
+          {
+            "table_name": "Table 2",
+            "headers": [
+              "Abrechnung 30.04.2025 vor Steuer",
+              "Umsatzsteuer  19%  auf          45,38-",
+              "Abrechnung 30.04.2025"
+            ],
+            "rows": [
+              [
+                "45,38-",
+                "USt:          8,62-",
+                "54,00-"
+              ]
+            ]
+          },
+          {
+            "table_name": "Table 3",
+            "headers": [
+              "Darlehenszins",
+              "Bemessungsgrundlage Umsatzsteuer",
+              "Rechnungsbetrag"
+            ],
+            "rows": [
+              [
+                "1.312,50 EUR vom 01.05.2025 - 30.05.2025",
+                "1.312,50 EUR Umsatzsteuer 19%",
+                "1.561,88 EUR"
+              ]
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "statistics": {
+    "tokens": {
+      "input_estimated": 6388,
+      "output_estimated": 642,
+      "total_estimated": 7030,
+      "tokens_per_second": 22.265801749461826
+    },
+    "characters": {
+      "response_total": 2571,
+      "extracted_text": 0,
+      "json_formatted": 2388
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

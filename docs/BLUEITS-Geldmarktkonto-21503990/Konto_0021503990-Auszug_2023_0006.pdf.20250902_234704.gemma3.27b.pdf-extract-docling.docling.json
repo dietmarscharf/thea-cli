@@ -1,0 +1,24 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9500000000000001,
+  "character_count": 11753,
+  "extraction_metadata": {
+    "extraction_time": 4.409028768539429,
+    "pages": 3,
+    "tables": [
+      "Table 1",
+      "Table 2"
+    ],
+    "sections": [
+      "Kontoauszug 6/2023",
+      "Geldmarktkonto 21503990",
+      "Geldmarktkonto 21503990,   BLUEITS GmbH",
+      "Kundenmitteilungen:",
+      "Hinweise zum Kontoauszug:"
+    ],
+    "has_tables": true,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 11822
+}

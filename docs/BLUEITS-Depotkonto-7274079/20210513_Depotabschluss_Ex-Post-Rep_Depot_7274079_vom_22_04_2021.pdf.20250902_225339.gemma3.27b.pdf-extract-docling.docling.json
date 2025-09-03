@@ -1,0 +1,23 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9500000000000001,
+  "character_count": 5269,
+  "extraction_metadata": {
+    "extraction_time": 3.753335952758789,
+    "pages": 2,
+    "tables": [
+      "Table 1",
+      "Table 2"
+    ],
+    "sections": [
+      "Information \u00fcber Kosten und Nebenkosten f\u00fcr depotverwahrte Finanzinstrumente f\u00fcr das Jahr 2020",
+      "Kostenzusammenfassung",
+      "Information \u00fcber Kosten und Nebenkosten f\u00fcr depotverwahrte Finanzinstrumente f\u00fcr das Jahr 2020",
+      "Erl\u00e4uterungen"
+    ],
+    "has_tables": true,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 5371
+}

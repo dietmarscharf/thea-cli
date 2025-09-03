@@ -1,0 +1,25 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9500000000000001,
+  "character_count": 12639,
+  "extraction_metadata": {
+    "extraction_time": 4.744173288345337,
+    "pages": 6,
+    "tables": [
+      "Table 1",
+      "Table 2"
+    ],
+    "sections": [
+      "Kontoauszug 9/2022",
+      "Geldmarktkonto 21503990",
+      "Geldmarktkonto 21503990,   BLUEITS GmbH",
+      "Kundenmitteilungen:",
+      "(4) Erstattung:",
+      "Hinweise zum Kontoauszug:"
+    ],
+    "has_tables": true,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 12741
+}

@@ -1,0 +1,183 @@
+{
+  "version": "2.0",
+  "metadata": {
+    "file": {
+      "pdf_path": "docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0006.pdf",
+      "pdf_absolute_path": "/mnt/c/Projects/THEA/docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0006.pdf",
+      "pdf_size_bytes": 29313,
+      "pdf_pages": 0,
+      "output_file": "docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0006.pdf.20250902_233555.gemma3.27b.pdf-extract-docling.thea_extract"
+    },
+    "processing": {
+      "timestamp": "20250902_233555",
+      "start_time": "2025-09-02T23:35:55.551750Z",
+      "end_time": "2025-09-02T23:36:56.573443Z",
+      "processing_time_seconds": 61.019970655441284,
+      "hostname": "BLUEITS-DS-Privat",
+      "platform": "linux",
+      "pipeline": "pdf-extract-docling",
+      "pipeline_metadata": {
+        "pipeline": "pdf-extract-docling",
+        "timestamp": "2025-09-02T23:35:52.099750Z",
+        "pdf_path": "docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0006.pdf",
+        "extractor": "docling",
+        "fallback_model": "gemma3:27b",
+        "save_sidecars": true,
+        "saved_files": [
+          {
+            "extractor": "docling",
+            "type": "text/plain",
+            "text_file": "docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0006.pdf.20250902_233552.gemma3.27b.pdf-extract-docling.docling.txt",
+            "json_file": "docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0006.pdf.20250902_233552.gemma3.27b.pdf-extract-docling.docling.json",
+            "confidence": 0.9500000000000001,
+            "character_count": 5662,
+            "file_size": 5708,
+            "md_file": "docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0006.pdf.20250902_233552.gemma3.27b.pdf-extract-docling.docling.md"
+          }
+        ],
+        "extraction_success": true,
+        "text_length": 5662,
+        "confidence": 0.9500000000000001,
+        "has_tables": true,
+        "has_formulas": false,
+        "document_type": "invoice",
+        "pages": 3
+      }
+    },
+    "model": {
+      "name": "gemma3:27b",
+      "endpoint": "https://b1s.hey.bahn.business/api/chat",
+      "stream": true,
+      "format": "json"
+    }
+  },
+  "settings": {
+    "mode": "skip",
+    "suffix": "pdf-extract-docling",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "save_sidecars": true,
+    "dpi": 300,
+    "max_attempts": 3,
+    "initial_temperature": 0.2,
+    "temperature_progression": [
+      0.2
+    ],
+    "timeout": 300,
+    "max_tokens": 50000
+  },
+  "execution": {
+    "retry_count": 0,
+    "final_temperature": 0.2,
+    "stuck_pattern_detected": false,
+    "pattern_type": null,
+    "chunks_received": 1919,
+    "request_time_seconds": 61.0198233127594,
+    "files_processed": [
+      {
+        "extractor": "docling",
+        "type": "text/plain",
+        "text_file": "docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0006.pdf.20250902_233552.gemma3.27b.pdf-extract-docling.docling.txt",
+        "json_file": "docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0006.pdf.20250902_233552.gemma3.27b.pdf-extract-docling.docling.json",
+        "confidence": 0.9500000000000001,
+        "character_count": 5662,
+        "file_size": 5708,
+        "md_file": "docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0006.pdf.20250902_233552.gemma3.27b.pdf-extract-docling.docling.md"
+      }
+    ]
+  },
+  "prompt": {
+    "system": "You are a vision-based text extractor and analyzer. Always use <thinking></thinking> tags to show your analysis process. You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text. Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }.: {\"extracted_text\": \"<string (complete verified text from document)>\", \"character_count\": \"<number (exact count of extracted text)>\", \"document_type\": \"<string (e.g., Invoice, Contract, Report, Statement, Technical)>\", \"three_word_description_german\": \"<string (exactly 3 words)>\", \"three_word_description_english\": \"<string (exactly 3 words)>\", \"content_summary_german\": \"<string (2-3 sentences)>\", \"content_summary_english\": \"<string (2-3 sentences)>\", \"extraction_quality\": \"<string (excellent/good/fair/poor)>\", \"has_tables\": \"<boolean>\", \"has_formulas\": \"<boolean>\", \"document_sections\": \"<array of strings (main section headings if present)>\"}",
+    "user": "Analyze the Docling extraction from PDF 'docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0006.pdf'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON.",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "prompt_config": {
+      "version": "2.0",
+      "name": "pdf-extract-docling",
+      "description": "Advanced document extraction using Docling with gemma3:27b fallback for complex documents",
+      "system_prompt": {
+        "suffix": "You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text.",
+        "output_format": {
+          "type": "json",
+          "schema": {
+            "extracted_text": "string (complete verified text from document)",
+            "character_count": "number (exact count of extracted text)",
+            "document_type": "string (e.g., Invoice, Contract, Report, Statement, Technical)",
+            "three_word_description_german": "string (exactly 3 words)",
+            "three_word_description_english": "string (exactly 3 words)",
+            "content_summary_german": "string (2-3 sentences)",
+            "content_summary_english": "string (2-3 sentences)",
+            "extraction_quality": "string (excellent/good/fair/poor)",
+            "has_tables": "boolean",
+            "has_formulas": "boolean",
+            "document_sections": "array of strings (main section headings if present)"
+          },
+          "instructions": "Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }."
+        }
+      },
+      "user_prompt": {
+        "template": "Analyze the Docling extraction from PDF '{{pdf_path}}'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON."
+      },
+      "settings": {
+        "model": "gemma3:27b",
+        "temperature": 0.2,
+        "max_attempts": 3,
+        "timeout": 300,
+        "max_tokens": 50000,
+        "mode": "skip",
+        "save_sidecars": true,
+        "format": "json",
+        "pipeline": "pdf-extract-docling",
+        "pipeline_config": {
+          "use_fallback_model": true,
+          "fallback_model": "gemma3:27b"
+        },
+        "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+      }
+    }
+  },
+  "response": {
+    "text": "{\"extracted_text\": \"<!-- image -->\\n\\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\\n\\n## Kontoauszug 6/2022\\n\\n## Geldmarktkonto 21503990\\n\\n1. August 2022 Seite 1 von 3\\n\\n| Datum      | Erläuterung                                                                                                                                                            | Betrag EUR   |\\n|------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|\\n|            | Kontostand am 30.06.2022, Auszug Nr. 5                                                                                                                                 | 450.104,01   |\\n| 01.07.2022 | Abrechnung 30.06.2022 siehe Anlage Nr. 1                                                                                                                               | -392,33      |\\n| 01.07.2022 | Entgeltabrechnung siehe Anlage Nr. 2                                                                                                                                   | -1,95        |\\n| 05.07.2022 | Gutschriftseingang BLUEITS GMBH                                                                                                                                        | 300,00       |\\n| 12.07.2022 | Lastschr.Depotentgelt / Wert: 14.07.2022 SPK AMBERG-SULZ DEPOTENTGELT 7274079 DEPOTENTGELT VOM01.04.2022 bis 30.06.2022                                                | -5,95        |\\n| 28.07.2022 | Wertpapierabrechnung / Wert: 29.07.2022 SPK AMBERG-SULZ DEPOT 7274079 WERTP. ABRECHN. 29.07.22 000006941290200 WKNA1CX3T GESCH.ART KV TESLA INC. DL -,001 US88160R1014 | -46.887,97   |\\n| 28.07.2022 | Gutschriftseingang BLUEITS GMBH Übertrag von Girokonto auf Geldmark tkonto                                                                                             | 18.500,00    |\\n|            | Kontostand am 29.07.2022 um20:07 Uhr                                                                                                                                   | 421.615,81   |\\n\\nAnzahl Anlagen\\n\\n2\\n\\n<!-- image -->\\n\\nKontoauszug 6/2022\\n\\nGeldmarktkonto 21503990,   BLUEITS GmbH\\n\\nSeite 2 von 3\\n\\nRechnungsabschluss:\\n\\nAnlage     1\\n\\nKontostand in EUR am 30.06.2022                               450.102,06 +\\n\\n--------------\\n\\nAbrechnungszeitraum vom 01.04.2022 bis 30.06.2022 Verwahrentgelt                                                     392,33-\\n\\n0,5000 v.H. Verw-Entg  bis 30.06.2022 ab      100.000 EUR\\n\\n--------------\\n\\nAbrechnung 30.06.2022                                              392,33-\\n\\nEs handelt sich hierbei um eine umsatzsteuerfreie Leistung.\\n\\nKontostand/Rechnungsabschluss in EUR am 30.06.2022            449.709,73 + Rechnungsnummer: 20220630-BY083-00009395053\\n\\nBitte beachten Sie die Hinweise zum Kontoauszug.\\n\\n<!-- image -->\\n\\nKontoauszug 6/2022\\n\\nGeldmarktkonto 21503990,   BLUEITS GmbH\\n\\nSeite 3 von 3\\n\\nEntgeltabschluss:\\n\\nAnlage     2\\n\\nEntgelte vom 01.06.2022 bis 30.06.2022                               1,95-\\n\\nGrundpreis (Kontoführung)                              1,95-\\n\\n--------------\\n\\nAbrechnung 30.06.2022                                                1,95-\\n\\nEs handelt sich hierbei um eine umsatzsteuerfreie Leistung. Rechnungsnummer: 20220630-BY083-00009395054\\n\\nBitte beachten Sie die Hinweise zum Kontoauszug.\\n\\n## Hinweise zum Kontoauszug:\\n\\nSehr geehrte Kundin, sehr geehrter Kunde, bitte prüfen Sie die Buchungen und Berechnungen in diesem Kontoauszug. Eventuelle Rückfragen besprechen Sie bitte mit Ihrem Kundenberater.\\n\\n- l Der angegebene Kontostand berücksichtigt nicht die Wertstellung der einzelnen Buchungen. Dies bedeutet, dass der genannte Betrag nicht dem für die Zinsrechnung maßgeblichen Kontostand entsprechen muss und bei Verfügungen möglicherweise Zinsen für die Inanspruchnahme einer eingeräumten oder geduldeten Kontoüberziehung anfallen können.\\n- l Einwendungen gegen den Kontoauszug richten Sie bitte unverzüglich an unsere Revisionsabteilung. Unsere Anschrift(en) entnehmen Sie bitte unserem Preis- und Leistungsverzeichnis.\\n- l Rechnungsabschlüsse gelten als genehmigt, sofern Sie innerhalb von sechs Wochen nach Zugang keine Einwendungen erheben. Einwendungen gegen Rechnungsabschlüsse müssen der Sparkasse zugehen. Zur Fristwahrung genügt die rechtzeitige Absendung (Nr. 7 Abs. 3 unserer Allgemeinen Geschäftsbedingungen).\\n- l Schecks und andere Einzugspapiere sind erst dann eingelöst, wenn sie nicht bis zum Ablauf des übernächsten Bankarbeitstages storniert oder korrigiert werden. Diese Papiere sind auch eingelöst, wenn die Sparkasse ihren Einlösungswillen schon vorher Dritten gegenüber erkennbar bekundet hat (z. B. durch Bezahltmeldung). Für Lastschriften gelten die Einlösungsregeln in den hierfür vereinbarten besonderen Bedingungen.\\n- l Gutschriften aus eingereichten Schecks, Lastschriften und anderen Einzugspapieren erfolgen unter dem Vorbehalt der Einlösung.\\n- l Sparkontoauszüge heften Sie bitte in Ihr Loseblatt-Sparkassenbuch ein.\\n- l Guthaben sind als Einlagen nach Maßgabe des Einlagensicherungsgesetzes entschädigungsfähig. Nähere Informationen können dem \\\"Informationsbogen für den Einleger\\\" entnommen werden.\\n- l Dieser Kontoauszug gilt im Zusammenhang mit den zugrunde liegenden Verträgen laut angegebener Kontonummer als Rechnung im Sinne des UStG.\\n- l Dieser Brief wurde maschinell erstellt und ist ohne Unterschrift gültig.\\n\\nUnsere für den Geschäftsverkehr mit Ihnen geltenden Allgemeinen Geschäftsbedingungen und besonderen Bedingungen stellen wir Ihnen auf Wunsch gern zur Verfügung.\\n\\nMit freundlichen Grüßen Ihre Sparkasse\",\n    \"text_length\": 5662,\n    \"metadata\": {\n      \"extraction_time\": 3.4415528774261475,\n      \"pages\": 3,\n      \"tables\": [\n        \"Table 1\"\n      ],\n      \"sections\": [\n        \"Kontoauszug 6/2022\",\n        \"Geldmarktkonto 21503990\",\n        \"Hinweise zum Kontoauszug:\"\n      ],\n      \"has_tables\": true,\n      \"has_formulas\": false,\n      \"document_type\": \"invoice\"\n    },\n    \"sections\": [\n      \"Kontoauszug 6/2022\",\n      \"Geldmarktkonto 21503990\",\n      \"Hinweise zum Kontoauszug:\"\n    ],\n    \"tables\": [\n      \"Table 1\"\n    ]\n  }",
+    "thinking": null,
+    "json": {
+      "extracted_text": "<!-- image -->\n\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\n\n## Kontoauszug 6/2022\n\n## Geldmarktkonto 21503990\n\n1. August 2022 Seite 1 von 3\n\n| Datum      | Erläuterung                                                                                                                                                            | Betrag EUR   |\n|------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|\n|            | Kontostand am 30.06.2022, Auszug Nr. 5                                                                                                                                 | 450.104,01   |\n| 01.07.2022 | Abrechnung 30.06.2022 siehe Anlage Nr. 1                                                                                                                               | -392,33      |\n| 01.07.2022 | Entgeltabrechnung siehe Anlage Nr. 2                                                                                                                                   | -1,95        |\n| 05.07.2022 | Gutschriftseingang BLUEITS GMBH                                                                                                                                        | 300,00       |\n| 12.07.2022 | Lastschr.Depotentgelt / Wert: 14.07.2022 SPK AMBERG-SULZ DEPOTENTGELT 7274079 DEPOTENTGELT VOM01.04.2022 bis 30.06.2022                                                | -5,95        |\n| 28.07.2022 | Wertpapierabrechnung / Wert: 29.07.2022 SPK AMBERG-SULZ DEPOT 7274079 WERTP. ABRECHN. 29.07.22 000006941290200 WKNA1CX3T GESCH.ART KV TESLA INC. DL -,001 US88160R1014 | -46.887,97   |\n| 28.07.2022 | Gutschriftseingang BLUEITS GMBH Übertrag von Girokonto auf Geldmark tkonto                                                                                             | 18.500,00    |\n|            | Kontostand am 29.07.2022 um20:07 Uhr                                                                                                                                   | 421.615,81   |\n\nAnzahl Anlagen\n\n2\n\n<!-- image -->\n\nKontoauszug 6/2022\n\nGeldmarktkonto 21503990,   BLUEITS GmbH\n\nSeite 2 von 3\n\nRechnungsabschluss:\n\nAnlage     1\n\nKontostand in EUR am 30.06.2022                               450.102,06 +\n\n--------------\n\nAbrechnungszeitraum vom 01.04.2022 bis 30.06.2022 Verwahrentgelt                                                     392,33-\n\n0,5000 v.H. Verw-Entg  bis 30.06.2022 ab      100.000 EUR\n\n--------------\n\nAbrechnung 30.06.2022                                              392,33-\n\nEs handelt sich hierbei um eine umsatzsteuerfreie Leistung.\n\nKontostand/Rechnungsabschluss in EUR am 30.06.2022            449.709,73 + Rechnungsnummer: 20220630-BY083-00009395053\n\nBitte beachten Sie die Hinweise zum Kontoauszug.\n\n<!-- image -->\n\nKontoauszug 6/2022\n\nGeldmarktkonto 21503990,   BLUEITS GmbH\n\nSeite 3 von 3\n\nEntgeltabschluss:\n\nAnlage     2\n\nEntgelte vom 01.06.2022 bis 30.06.2022                               1,95-\n\nGrundpreis (Kontoführung)                              1,95-\n\n--------------\n\nAbrechnung 30.06.2022                                                1,95-\n\nEs handelt sich hierbei um eine umsatzsteuerfreie Leistung. Rechnungsnummer: 20220630-BY083-00009395054\n\nBitte beachten Sie die Hinweise zum Kontoauszug.\n\n## Hinweise zum Kontoauszug:\n\nSehr geehrte Kundin, sehr geehrter Kunde, bitte prüfen Sie die Buchungen und Berechnungen in diesem Kontoauszug. Eventuelle Rückfragen besprechen Sie bitte mit Ihrem Kundenberater.\n\n- l Der angegebene Kontostand berücksichtigt nicht die Wertstellung der einzelnen Buchungen. Dies bedeutet, dass der genannte Betrag nicht dem für die Zinsrechnung maßgeblichen Kontostand entsprechen muss und bei Verfügungen möglicherweise Zinsen für die Inanspruchnahme einer eingeräumten oder geduldeten Kontoüberziehung anfallen können.\n- l Einwendungen gegen den Kontoauszug richten Sie bitte unverzüglich an unsere Revisionsabteilung. Unsere Anschrift(en) entnehmen Sie bitte unserem Preis- und Leistungsverzeichnis.\n- l Rechnungsabschlüsse gelten als genehmigt, sofern Sie innerhalb von sechs Wochen nach Zugang keine Einwendungen erheben. Einwendungen gegen Rechnungsabschlüsse müssen der Sparkasse zugehen. Zur Fristwahrung genügt die rechtzeitige Absendung (Nr. 7 Abs. 3 unserer Allgemeinen Geschäftsbedingungen).\n- l Schecks und andere Einzugspapiere sind erst dann eingelöst, wenn sie nicht bis zum Ablauf des übernächsten Bankarbeitstages storniert oder korrigiert werden. Diese Papiere sind auch eingelöst, wenn die Sparkasse ihren Einlösungswillen schon vorher Dritten gegenüber erkennbar bekundet hat (z. B. durch Bezahltmeldung). Für Lastschriften gelten die Einlösungsregeln in den hierfür vereinbarten besonderen Bedingungen.\n- l Gutschriften aus eingereichten Schecks, Lastschriften und anderen Einzugspapieren erfolgen unter dem Vorbehalt der Einlösung.\n- l Sparkontoauszüge heften Sie bitte in Ihr Loseblatt-Sparkassenbuch ein.\n- l Guthaben sind als Einlagen nach Maßgabe des Einlagensicherungsgesetzes entschädigungsfähig. Nähere Informationen können dem \"Informationsbogen für den Einleger\" entnommen werden.\n- l Dieser Kontoauszug gilt im Zusammenhang mit den zugrunde liegenden Verträgen laut angegebener Kontonummer als Rechnung im Sinne des UStG.\n- l Dieser Brief wurde maschinell erstellt und ist ohne Unterschrift gültig.\n\nUnsere für den Geschäftsverkehr mit Ihnen geltenden Allgemeinen Geschäftsbedingungen und besonderen Bedingungen stellen wir Ihnen auf Wunsch gern zur Verfügung.\n\nMit freundlichen Grüßen Ihre Sparkasse",
+      "text_length": 5662,
+      "metadata": {
+        "extraction_time": 3.4415528774261475,
+        "pages": 3,
+        "tables": [
+          "Table 1"
+        ],
+        "sections": [
+          "Kontoauszug 6/2022",
+          "Geldmarktkonto 21503990",
+          "Hinweise zum Kontoauszug:"
+        ],
+        "has_tables": true,
+        "has_formulas": false,
+        "document_type": "invoice"
+      },
+      "sections": [
+        "Kontoauszug 6/2022",
+        "Geldmarktkonto 21503990",
+        "Hinweise zum Kontoauszug:"
+      ],
+      "tables": [
+        "Table 1"
+      ]
+    }
+  },
+  "statistics": {
+    "tokens": {
+      "input_estimated": 2126,
+      "output_estimated": 1579,
+      "total_estimated": 3705,
+      "tokens_per_second": 25.876774161627644
+    },
+    "characters": {
+      "response_total": 6319,
+      "extracted_text": 5662,
+      "json_formatted": 6502
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

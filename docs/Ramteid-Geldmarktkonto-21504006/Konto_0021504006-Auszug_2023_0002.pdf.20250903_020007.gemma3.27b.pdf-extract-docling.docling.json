@@ -1,0 +1,22 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9500000000000001,
+  "character_count": 4128,
+  "extraction_metadata": {
+    "extraction_time": 3.458099126815796,
+    "pages": 2,
+    "tables": [
+      "Table 1"
+    ],
+    "sections": [
+      "Kontoauszug 2/2023",
+      "Geldmarktkonto 21504006",
+      "Kontoauszug 2/2023 Geldmarktkonto 21504006,   Ramteid GmbH",
+      "Hinweise zum Kontoauszug:"
+    ],
+    "has_tables": true,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 4174
+}

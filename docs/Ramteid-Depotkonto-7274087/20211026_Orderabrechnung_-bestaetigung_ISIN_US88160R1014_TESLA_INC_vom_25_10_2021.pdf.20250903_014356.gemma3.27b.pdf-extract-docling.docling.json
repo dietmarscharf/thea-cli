@@ -1,0 +1,17 @@
+{
+  "extractor": "docling",
+  "confidence": 0.85,
+  "character_count": 853,
+  "extraction_metadata": {
+    "extraction_time": 2.772803783416748,
+    "pages": 1,
+    "tables": [],
+    "sections": [
+      "Wertpapier Ausf\u00fchrungsanzeige Verkauf"
+    ],
+    "has_tables": false,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 867
+}

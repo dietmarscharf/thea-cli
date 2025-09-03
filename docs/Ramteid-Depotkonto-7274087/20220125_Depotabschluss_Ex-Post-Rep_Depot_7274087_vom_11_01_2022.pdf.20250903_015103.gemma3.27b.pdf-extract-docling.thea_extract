@@ -1,0 +1,188 @@
+{
+  "version": "2.0",
+  "metadata": {
+    "file": {
+      "pdf_path": "docs/Ramteid-Depotkonto-7274087/20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf",
+      "pdf_absolute_path": "/mnt/c/Projects/THEA/docs/Ramteid-Depotkonto-7274087/20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf",
+      "pdf_size_bytes": 207907,
+      "pdf_pages": 0,
+      "output_file": "docs/Ramteid-Depotkonto-7274087/20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf.20250903_015103.gemma3.27b.pdf-extract-docling.thea_extract"
+    },
+    "processing": {
+      "timestamp": "20250903_015103",
+      "start_time": "2025-09-03T01:51:03.393001Z",
+      "end_time": "2025-09-03T01:51:56.007066Z",
+      "processing_time_seconds": 52.611969232559204,
+      "hostname": "BLUEITS-DS-Privat",
+      "platform": "linux",
+      "pipeline": "pdf-extract-docling",
+      "pipeline_metadata": {
+        "pipeline": "pdf-extract-docling",
+        "timestamp": "2025-09-03T01:50:59.687603Z",
+        "pdf_path": "docs/Ramteid-Depotkonto-7274087/20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf",
+        "extractor": "docling",
+        "fallback_model": "gemma3:27b",
+        "save_sidecars": true,
+        "saved_files": [
+          {
+            "extractor": "docling",
+            "type": "text/plain",
+            "text_file": "docs/Ramteid-Depotkonto-7274087/20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf.20250903_015059.gemma3.27b.pdf-extract-docling.docling.txt",
+            "json_file": "docs/Ramteid-Depotkonto-7274087/20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf.20250903_015059.gemma3.27b.pdf-extract-docling.docling.json",
+            "confidence": 0.9,
+            "character_count": 8687,
+            "file_size": 8851,
+            "md_file": "docs/Ramteid-Depotkonto-7274087/20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf.20250903_015059.gemma3.27b.pdf-extract-docling.docling.md"
+          }
+        ],
+        "extraction_success": true,
+        "text_length": 8687,
+        "confidence": 0.9,
+        "has_tables": false,
+        "has_formulas": false,
+        "document_type": "invoice",
+        "pages": 5
+      }
+    },
+    "model": {
+      "name": "gemma3:27b",
+      "endpoint": "https://b1s.hey.bahn.business/api/chat",
+      "stream": true,
+      "format": "json"
+    }
+  },
+  "settings": {
+    "mode": "skip",
+    "suffix": "pdf-extract-docling",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "save_sidecars": true,
+    "dpi": 300,
+    "max_attempts": 3,
+    "initial_temperature": 0.2,
+    "temperature_progression": [
+      0.2
+    ],
+    "timeout": 300,
+    "max_tokens": 50000
+  },
+  "execution": {
+    "retry_count": 0,
+    "final_temperature": 0.2,
+    "stuck_pattern_detected": false,
+    "pattern_type": null,
+    "chunks_received": 1597,
+    "request_time_seconds": 52.61179971694946,
+    "files_processed": [
+      {
+        "extractor": "docling",
+        "type": "text/plain",
+        "text_file": "docs/Ramteid-Depotkonto-7274087/20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf.20250903_015059.gemma3.27b.pdf-extract-docling.docling.txt",
+        "json_file": "docs/Ramteid-Depotkonto-7274087/20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf.20250903_015059.gemma3.27b.pdf-extract-docling.docling.json",
+        "confidence": 0.9,
+        "character_count": 8687,
+        "file_size": 8851,
+        "md_file": "docs/Ramteid-Depotkonto-7274087/20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf.20250903_015059.gemma3.27b.pdf-extract-docling.docling.md"
+      }
+    ]
+  },
+  "prompt": {
+    "system": "You are a vision-based text extractor and analyzer. Always use <thinking></thinking> tags to show your analysis process. You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text. Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }.: {\"extracted_text\": \"<string (complete verified text from document)>\", \"character_count\": \"<number (exact count of extracted text)>\", \"document_type\": \"<string (e.g., Invoice, Contract, Report, Statement, Technical)>\", \"three_word_description_german\": \"<string (exactly 3 words)>\", \"three_word_description_english\": \"<string (exactly 3 words)>\", \"content_summary_german\": \"<string (2-3 sentences)>\", \"content_summary_english\": \"<string (2-3 sentences)>\", \"extraction_quality\": \"<string (excellent/good/fair/poor)>\", \"has_tables\": \"<boolean>\", \"has_formulas\": \"<boolean>\", \"document_sections\": \"<array of strings (main section headings if present)>\"}",
+    "user": "Analyze the Docling extraction from PDF 'docs/Ramteid-Depotkonto-7274087/20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON.",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "prompt_config": {
+      "version": "2.0",
+      "name": "pdf-extract-docling",
+      "description": "Advanced document extraction using Docling with gemma3:27b fallback for complex documents",
+      "system_prompt": {
+        "suffix": "You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text.",
+        "output_format": {
+          "type": "json",
+          "schema": {
+            "extracted_text": "string (complete verified text from document)",
+            "character_count": "number (exact count of extracted text)",
+            "document_type": "string (e.g., Invoice, Contract, Report, Statement, Technical)",
+            "three_word_description_german": "string (exactly 3 words)",
+            "three_word_description_english": "string (exactly 3 words)",
+            "content_summary_german": "string (2-3 sentences)",
+            "content_summary_english": "string (2-3 sentences)",
+            "extraction_quality": "string (excellent/good/fair/poor)",
+            "has_tables": "boolean",
+            "has_formulas": "boolean",
+            "document_sections": "array of strings (main section headings if present)"
+          },
+          "instructions": "Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }."
+        }
+      },
+      "user_prompt": {
+        "template": "Analyze the Docling extraction from PDF '{{pdf_path}}'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON."
+      },
+      "settings": {
+        "model": "gemma3:27b",
+        "temperature": 0.2,
+        "max_attempts": 3,
+        "timeout": 300,
+        "max_tokens": 50000,
+        "mode": "skip",
+        "save_sidecars": true,
+        "format": "json",
+        "pipeline": "pdf-extract-docling",
+        "pipeline_config": {
+          "use_fallback_model": true,
+          "fallback_model": "gemma3:27b"
+        },
+        "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+      }
+    }
+  },
+  "response": {
+    "text": "{\"extracted_text\": \"Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\\n\\nFirma Ramteid GmbH Auf den Hochäckern 5 92224 Amberg\\n\\n## Jahresabschluss 2021\\n\\nSehr geehrte Damen und Herren, gerne übersenden wir Ihnen den Jahresdepotauszug per 31.12.2021.\\n\\nWir danken Ihnen für Ihr Vertrauen und wünschen Ihnen ein gesundes und erfolgreiches neues Jahr.\\n\\nMit freundlichen Grüßen\\n\\nSPK AMBERG-SULZBACH\\n\\nSeite 1 von 1\\n\\nDatum Depotnummer\\n\\nim Januar 2022\\n\\n7274087\\n\\nKundendepot Ramteid GmbH\\n\\nRechnungs-Nr.\\n\\nDJ-2279003945/22\\n\\nUmsatzsteuer-ID\\n\\nDE131841737\\n\\n<!-- image -->\\n\\nSparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\\n\\nFirma Ramteid GmbH Auf den Hochäckern 5 92224 Amberg\\n\\nSeite 1 von 1\\n\\nDatum Depotnummer\\n\\nim Januar 2022\\n\\n7274087\\n\\nKundendepot Ramteid GmbH\\n\\nRechnungs-Nr.\\n\\nDJ-2279003945/22\\n\\nUmsatzsteuer-ID\\n\\nDE131841737\\n\\n## Depotauszug/Aufstellung über Kundenfinanzinstrumente per 31.12.2021\\n\\nIn Ihrem Depot ist per 31.12.2021 kein Bestand vorhanden.\\n\\nDie Depotentgelte für den Zeitraum vom 01.10.2021 bis 31.12.2021 betragen unter Beachtung des Mindestentgeltes netto 5,00 Euro + 19% USt 0,95 Euro = brutto 5,95 Euro.\\n\\nDiesen Betrag belasten wir mit Valuta 07.02.2022 dem Konto 21504006 (IBAN DE07 7525 0000 0021 5040 06), BLZ 752 500 00 (BIC BYLADEM1ABG).\\n\\nWir bitten Sie, Ihren Depotauszug zu prüfen und Einwendungen gemäß unseren Allgemeinen Geschäftsbedingungen unverzüglich in Textform bei unserer Revisionsabteilung zu erheben.\\n\\nDieses Dokument wurde maschinell erstellt und wird nicht unterschrieben.\\n\\n## Kundeninformation über Änderun n im Ka talanla etzbuch\\n\\n## Möglichkeiten zur Steuerung der Zu- und Abflüsse durch Ausgabe und Rücknahme von Anteilen bei Investmentfonds (Liquiditätsmanagementtools)\\n\\n## a) Rückgabefrist\\n\\n## b) Möglichkeit einer Rücknahmebeschränkung\\n\\n## c) Möglichkeit des Swing Pricings\\n\\n## d) Liquiditätsmanagementtools ausländischer Fonds\\n\\n<!-- image -->\\n\\nSehr geehrte Kundin, sehr geehrter Kunde, der Gesetzgeber hat als neuen Standard festgelegt, dass die Sparkasse ihren Kunden bestimmte Wertpapierinformationen zukünftig als digitale Dokumente zur Verfügung stellt.\\n\\nAuch alle anderen Wertpapierinformationen können künftig weiterhin mit Zustimmung der Kunden digital bereitgestellt werden.\\n\\nAufgrund dieser neuen Regelungen empfehlen wir Ihnen jetzt schon auf ein elektronisches Postfach für Ihre Unterlagen umzustellen.\\n\\nWerden Sie somit jetzt aktiv und melden Sie sich für das Sparkassen-Online-Banking an. Sie nutzen bereits Online-Banking? Dann müssen Sie evtl. nur noch Ihr Depot und gleichzeitig das elektronische Postfach freischalten. So erhalten Sie in Zukunft alle Dokumente digital.\\n\\nEs lohnt sich gleich mehrfach:\\n\\n- -Sie behalten leichter den Überblick, denn Sie erhalten alle Wertpapierdokumente in digitaler Form - nicht nur die vom Gesetzgeber vorgeschriebenen Unterlagen.\\n- -Sie sind jederzeit z.B. mit der S-Invest-App auf Ihrem Depot auf dem Laufenden.\\n\\n<!-- image -->\\n\\n<!-- image -->\\n\\nwww.sparkasse-amberg-sulzbach.de/onlinekunde\\\\_werden\\n\\nSie erledigen die Umstellung auf Online-Banking ganz einfach über den obenstehenden QR-Code oder über den Link.\\n\\nSie erledigen die Umstellung auf das elektronische Postfach ganz einfach über den obenstehenden QR-Code (unter Einstellungen) oder über folgenden Link:\\n\\nwww.sparkasse-amberg-sulzbach.de/elpo\\\\_freischalten\\n\\nFalls Sie Unterstützung benötigen, können Sie sich jederzeit gerne telefonisch unter 09621-3000 bei uns melden.\\n\\nMit freundlichen Grüßen\\n\\nSparkasse Amberg-Sulzbach\",\n    \"text_length\": 8687,\n    \"metadata\": {\n      \"extraction_time\": 3.6953883171081543,\n      \"pages\": 5,\n      \"tables\": [],\n      \"sections\": [\n        \"Jahresabschluss 2021\",\n        \"Depotauszug/Aufstellung über Kundenfinanzinstrumente per 31.12.2021\",\n        \"Kundeninformation über Änderun n im Ka talanla etzbuch\",\n        \"Möglichkeiten zur Steuerung der Zu- und Abflüsse durch Ausgabe und Rücknahme von Anteilen bei Investmentfonds (Liquiditätsmanagementtools)\",\n        \"a) Rückgabefrist\",\n        \"b) Möglichkeit einer Rücknahmebeschränkung\",\n        \"c) Möglichkeit des Swing Pricings\",\n        \"d) Liquiditätsmanagementtools ausländischer Fonds\"\n      ],\n      \"has_tables\": false,\n      \"has_formulas\": false,\n      \"document_type\": \"invoice\"\n    },\n    \"sections\": [\n      \"Jahresabschluss 2021\",\n      \"Depotauszug/Aufstellung über Kundenfinanzinstrumente per 31.12.2021\",\n      \"Kundeninformation über Änderun n im Ka talanla etzbuch\",\n      \"Möglichkeiten zur Steuerung der Zu- und Abflüsse durch Ausgabe und Rücknahme von Anteilen bei Investmentfonds (Liquiditätsmanagementtools)\",\n      \"a) Rückgabefrist\",\n      \"b) Möglichkeit einer Rücknahmebeschränkung\",\n      \"c) Möglichkeit des Swing Pricings\",\n      \"d) Liquiditätsmanagementtools ausländischer Fonds\"\n    ]\n  }",
+    "thinking": null,
+    "json": {
+      "extracted_text": "Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\n\nFirma Ramteid GmbH Auf den Hochäckern 5 92224 Amberg\n\n## Jahresabschluss 2021\n\nSehr geehrte Damen und Herren, gerne übersenden wir Ihnen den Jahresdepotauszug per 31.12.2021.\n\nWir danken Ihnen für Ihr Vertrauen und wünschen Ihnen ein gesundes und erfolgreiches neues Jahr.\n\nMit freundlichen Grüßen\n\nSPK AMBERG-SULZBACH\n\nSeite 1 von 1\n\nDatum Depotnummer\n\nim Januar 2022\n\n7274087\n\nKundendepot Ramteid GmbH\n\nRechnungs-Nr.\n\nDJ-2279003945/22\n\nUmsatzsteuer-ID\n\nDE131841737\n\n<!-- image -->\n\nSparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\n\nFirma Ramteid GmbH Auf den Hochäckern 5 92224 Amberg\n\nSeite 1 von 1\n\nDatum Depotnummer\n\nim Januar 2022\n\n7274087\n\nKundendepot Ramteid GmbH\n\nRechnungs-Nr.\n\nDJ-2279003945/22\n\nUmsatzsteuer-ID\n\nDE131841737\n\n## Depotauszug/Aufstellung über Kundenfinanzinstrumente per 31.12.2021\n\nIn Ihrem Depot ist per 31.12.2021 kein Bestand vorhanden.\n\nDie Depotentgelte für den Zeitraum vom 01.10.2021 bis 31.12.2021 betragen unter Beachtung des Mindestentgeltes netto 5,00 Euro + 19% USt 0,95 Euro = brutto 5,95 Euro.\n\nDiesen Betrag belasten wir mit Valuta 07.02.2022 dem Konto 21504006 (IBAN DE07 7525 0000 0021 5040 06), BLZ 752 500 00 (BIC BYLADEM1ABG).\n\nWir bitten Sie, Ihren Depotauszug zu prüfen und Einwendungen gemäß unseren Allgemeinen Geschäftsbedingungen unverzüglich in Textform bei unserer Revisionsabteilung zu erheben.\n\nDieses Dokument wurde maschinell erstellt und wird nicht unterschrieben.\n\n## Kundeninformation über Änderun n im Ka talanla etzbuch\n\n## Möglichkeiten zur Steuerung der Zu- und Abflüsse durch Ausgabe und Rücknahme von Anteilen bei Investmentfonds (Liquiditätsmanagementtools)\n\n## a) Rückgabefrist\n\n## b) Möglichkeit einer Rücknahmebeschränkung\n\n## c) Möglichkeit des Swing Pricings\n\n## d) Liquiditätsmanagementtools ausländischer Fonds\n\n<!-- image -->\n\nSehr geehrte Kundin, sehr geehrter Kunde, der Gesetzgeber hat als neuen Standard festgelegt, dass die Sparkasse ihren Kunden bestimmte Wertpapierinformationen zukünftig als digitale Dokumente zur Verfügung stellt.\n\nAuch alle anderen Wertpapierinformationen können künftig weiterhin mit Zustimmung der Kunden digital bereitgestellt werden.\n\nAufgrund dieser neuen Regelungen empfehlen wir Ihnen jetzt schon auf ein elektronisches Postfach für Ihre Unterlagen umzustellen.\n\nWerden Sie somit jetzt aktiv und melden Sie sich für das Sparkassen-Online-Banking an. Sie nutzen bereits Online-Banking? Dann müssen Sie evtl. nur noch Ihr Depot und gleichzeitig das elektronische Postfach freischalten. So erhalten Sie in Zukunft alle Dokumente digital.\n\nEs lohnt sich gleich mehrfach:\n\n- -Sie behalten leichter den Überblick, denn Sie erhalten alle Wertpapierdokumente in digitaler Form - nicht nur die vom Gesetzgeber vorgeschriebenen Unterlagen.\n- -Sie sind jederzeit z.B. mit der S-Invest-App auf Ihrem Depot auf dem Laufenden.\n\n<!-- image -->\n\n<!-- image -->\n\nwww.sparkasse-amberg-sulzbach.de/onlinekunde\\_werden\n\nSie erledigen die Umstellung auf Online-Banking ganz einfach über den obenstehenden QR-Code oder über den Link.\n\nSie erledigen die Umstellung auf das elektronische Postfach ganz einfach über den obenstehenden QR-Code (unter Einstellungen) oder über folgenden Link:\n\nwww.sparkasse-amberg-sulzbach.de/elpo\\_freischalten\n\nFalls Sie Unterstützung benötigen, können Sie sich jederzeit gerne telefonisch unter 09621-3000 bei uns melden.\n\nMit freundlichen Grüßen\n\nSparkasse Amberg-Sulzbach",
+      "text_length": 8687,
+      "metadata": {
+        "extraction_time": 3.6953883171081543,
+        "pages": 5,
+        "tables": [],
+        "sections": [
+          "Jahresabschluss 2021",
+          "Depotauszug/Aufstellung über Kundenfinanzinstrumente per 31.12.2021",
+          "Kundeninformation über Änderun n im Ka talanla etzbuch",
+          "Möglichkeiten zur Steuerung der Zu- und Abflüsse durch Ausgabe und Rücknahme von Anteilen bei Investmentfonds (Liquiditätsmanagementtools)",
+          "a) Rückgabefrist",
+          "b) Möglichkeit einer Rücknahmebeschränkung",
+          "c) Möglichkeit des Swing Pricings",
+          "d) Liquiditätsmanagementtools ausländischer Fonds"
+        ],
+        "has_tables": false,
+        "has_formulas": false,
+        "document_type": "invoice"
+      },
+      "sections": [
+        "Jahresabschluss 2021",
+        "Depotauszug/Aufstellung über Kundenfinanzinstrumente per 31.12.2021",
+        "Kundeninformation über Änderun n im Ka talanla etzbuch",
+        "Möglichkeiten zur Steuerung der Zu- und Abflüsse durch Ausgabe und Rücknahme von Anteilen bei Investmentfonds (Liquiditätsmanagementtools)",
+        "a) Rückgabefrist",
+        "b) Möglichkeit einer Rücknahmebeschränkung",
+        "c) Möglichkeit des Swing Pricings",
+        "d) Liquiditätsmanagementtools ausländischer Fonds"
+      ]
+    }
+  },
+  "statistics": {
+    "tokens": {
+      "input_estimated": 3054,
+      "output_estimated": 1221,
+      "total_estimated": 4275,
+      "tokens_per_second": 23.207646811371916
+    },
+    "characters": {
+      "response_total": 4887,
+      "extracted_text": 3461,
+      "json_formatted": 5210
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

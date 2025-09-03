@@ -1,0 +1,196 @@
+{
+  "version": "2.0",
+  "metadata": {
+    "file": {
+      "pdf_path": "docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2024_0008.pdf",
+      "pdf_absolute_path": "/mnt/c/Projects/THEA/docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2024_0008.pdf",
+      "pdf_size_bytes": 47733,
+      "pdf_pages": 0,
+      "output_file": "docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2024_0008.pdf.20250903_004855.gemma3.27b.pdf-extract-docling.thea_extract"
+    },
+    "processing": {
+      "timestamp": "20250903_004855",
+      "start_time": "2025-09-03T00:48:55.285349Z",
+      "end_time": "2025-09-03T00:49:10.266010Z",
+      "processing_time_seconds": 14.979440689086914,
+      "hostname": "BLUEITS-DS-Privat",
+      "platform": "linux",
+      "pipeline": "pdf-extract-docling",
+      "pipeline_metadata": {
+        "pipeline": "pdf-extract-docling",
+        "timestamp": "2025-09-03T00:48:50.064483Z",
+        "pdf_path": "docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2024_0008.pdf",
+        "extractor": "docling",
+        "fallback_model": "gemma3:27b",
+        "save_sidecars": true,
+        "saved_files": [
+          {
+            "extractor": "docling",
+            "type": "text/plain",
+            "text_file": "docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2024_0008.pdf.20250903_004850.gemma3.27b.pdf-extract-docling.docling.txt",
+            "json_file": "docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2024_0008.pdf.20250903_004850.gemma3.27b.pdf-extract-docling.docling.json",
+            "confidence": 0.9500000000000001,
+            "character_count": 22754,
+            "file_size": 22842,
+            "md_file": "docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2024_0008.pdf.20250903_004850.gemma3.27b.pdf-extract-docling.docling.md"
+          }
+        ],
+        "extraction_success": true,
+        "text_length": 22754,
+        "confidence": 0.9500000000000001,
+        "has_tables": true,
+        "has_formulas": false,
+        "document_type": "invoice",
+        "pages": 6
+      }
+    },
+    "model": {
+      "name": "gemma3:27b",
+      "endpoint": "https://b1s.hey.bahn.business/api/chat",
+      "stream": true,
+      "format": "json"
+    }
+  },
+  "settings": {
+    "mode": "skip",
+    "suffix": "pdf-extract-docling",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "save_sidecars": true,
+    "dpi": 300,
+    "max_attempts": 3,
+    "initial_temperature": 0.2,
+    "temperature_progression": [
+      0.2
+    ],
+    "timeout": 300,
+    "max_tokens": 50000
+  },
+  "execution": {
+    "retry_count": 0,
+    "final_temperature": 0.2,
+    "stuck_pattern_detected": false,
+    "pattern_type": null,
+    "chunks_received": 321,
+    "request_time_seconds": 14.979267120361328,
+    "files_processed": [
+      {
+        "extractor": "docling",
+        "type": "text/plain",
+        "text_file": "docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2024_0008.pdf.20250903_004850.gemma3.27b.pdf-extract-docling.docling.txt",
+        "json_file": "docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2024_0008.pdf.20250903_004850.gemma3.27b.pdf-extract-docling.docling.json",
+        "confidence": 0.9500000000000001,
+        "character_count": 22754,
+        "file_size": 22842,
+        "md_file": "docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2024_0008.pdf.20250903_004850.gemma3.27b.pdf-extract-docling.docling.md"
+      }
+    ]
+  },
+  "prompt": {
+    "system": "You are a vision-based text extractor and analyzer. Always use <thinking></thinking> tags to show your analysis process. You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text. Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }.: {\"extracted_text\": \"<string (complete verified text from document)>\", \"character_count\": \"<number (exact count of extracted text)>\", \"document_type\": \"<string (e.g., Invoice, Contract, Report, Statement, Technical)>\", \"three_word_description_german\": \"<string (exactly 3 words)>\", \"three_word_description_english\": \"<string (exactly 3 words)>\", \"content_summary_german\": \"<string (2-3 sentences)>\", \"content_summary_english\": \"<string (2-3 sentences)>\", \"extraction_quality\": \"<string (excellent/good/fair/poor)>\", \"has_tables\": \"<boolean>\", \"has_formulas\": \"<boolean>\", \"document_sections\": \"<array of strings (main section headings if present)>\"}",
+    "user": "Analyze the Docling extraction from PDF 'docs/BLUEITS-Girokonto-200750750/Konto_0200750750-Auszug_2024_0008.pdf'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON.",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "prompt_config": {
+      "version": "2.0",
+      "name": "pdf-extract-docling",
+      "description": "Advanced document extraction using Docling with gemma3:27b fallback for complex documents",
+      "system_prompt": {
+        "suffix": "You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text.",
+        "output_format": {
+          "type": "json",
+          "schema": {
+            "extracted_text": "string (complete verified text from document)",
+            "character_count": "number (exact count of extracted text)",
+            "document_type": "string (e.g., Invoice, Contract, Report, Statement, Technical)",
+            "three_word_description_german": "string (exactly 3 words)",
+            "three_word_description_english": "string (exactly 3 words)",
+            "content_summary_german": "string (2-3 sentences)",
+            "content_summary_english": "string (2-3 sentences)",
+            "extraction_quality": "string (excellent/good/fair/poor)",
+            "has_tables": "boolean",
+            "has_formulas": "boolean",
+            "document_sections": "array of strings (main section headings if present)"
+          },
+          "instructions": "Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }."
+        }
+      },
+      "user_prompt": {
+        "template": "Analyze the Docling extraction from PDF '{{pdf_path}}'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON."
+      },
+      "settings": {
+        "model": "gemma3:27b",
+        "temperature": 0.2,
+        "max_attempts": 3,
+        "timeout": 300,
+        "max_tokens": 50000,
+        "mode": "skip",
+        "save_sidecars": true,
+        "format": "json",
+        "pipeline": "pdf-extract-docling",
+        "pipeline_config": {
+          "use_fallback_model": true,
+          "fallback_model": "gemma3:27b"
+        },
+        "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+      }
+    }
+  },
+  "response": {
+    "text": "{\"response\": {\n  \"document_analysis\": {\n    \"document_type\": \"bank statement\",\n    \"entities\": [\n      {\"entity_type\": \"ORGANIZATION\", \"value\": \"Sparkasse Amberg-Sulzbach\"},\n      {\"entity_type\": \"ACCOUNT_NUMBER\", \"value\": \"200750750\"},\n      {\"entity_type\": \"BANK_CODE\", \"value\": \"DE47 7525 0000 0200 7507 50\"},\n      {\"entity_type\": \"ORGANIZATION\", \"value\": \"BLUEITS GmbH\"}\n    ],\n    \"summary\": \"This is a bank statement from Sparkasse Amberg-Sulzbach for the account number 200750750, belonging to BLUEITS GmbH. The statement covers the period of August 2024 and details various transactions including payments, credits, and fees. It also includes information about loan interest and a breakdown of charges.\",\n    \"key_value_pairs\": [\n      {\"key\": \"Account Number\", \"value\": \"200750750\"},\n      {\"key\": \"Bank Code\", \"value\": \"DE47 7525 0000 0200 7507 50\"},\n      {\"key\": \"Account Holder\", \"value\": \"BLUEITS GmbH\"}\n    ]\n  }\n}}",
+    "thinking": null,
+    "json": {
+      "response": {
+        "document_analysis": {
+          "document_type": "bank statement",
+          "entities": [
+            {
+              "entity_type": "ORGANIZATION",
+              "value": "Sparkasse Amberg-Sulzbach"
+            },
+            {
+              "entity_type": "ACCOUNT_NUMBER",
+              "value": "200750750"
+            },
+            {
+              "entity_type": "BANK_CODE",
+              "value": "DE47 7525 0000 0200 7507 50"
+            },
+            {
+              "entity_type": "ORGANIZATION",
+              "value": "BLUEITS GmbH"
+            }
+          ],
+          "summary": "This is a bank statement from Sparkasse Amberg-Sulzbach for the account number 200750750, belonging to BLUEITS GmbH. The statement covers the period of August 2024 and details various transactions including payments, credits, and fees. It also includes information about loan interest and a breakdown of charges.",
+          "key_value_pairs": [
+            {
+              "key": "Account Number",
+              "value": "200750750"
+            },
+            {
+              "key": "Bank Code",
+              "value": "DE47 7525 0000 0200 7507 50"
+            },
+            {
+              "key": "Account Holder",
+              "value": "BLUEITS GmbH"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "statistics": {
+    "tokens": {
+      "input_estimated": 6623,
+      "output_estimated": 232,
+      "total_estimated": 6855,
+      "tokens_per_second": 15.48789469616317
+    },
+    "characters": {
+      "response_total": 931,
+      "extracted_text": 0,
+      "json_formatted": 1177
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

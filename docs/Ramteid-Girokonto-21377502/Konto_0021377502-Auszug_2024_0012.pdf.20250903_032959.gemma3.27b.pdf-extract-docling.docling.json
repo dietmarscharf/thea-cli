@@ -1,0 +1,23 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9500000000000001,
+  "character_count": 14113,
+  "extraction_metadata": {
+    "extraction_time": 4.503706932067871,
+    "pages": 5,
+    "tables": [
+      "Table 1",
+      "Table 2"
+    ],
+    "sections": [
+      "Kontoauszug 12/2024",
+      "Girokonto 21377502, DE51 7525 0000 0021 3775 02",
+      "Girokonto 21377502, DE51 7525 0000 0021 3775 02,  Ramteid GmbH",
+      "Hinweise zum Kontoauszug:"
+    ],
+    "has_tables": true,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 14190
+}

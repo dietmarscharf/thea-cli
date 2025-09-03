@@ -1,0 +1,17 @@
+{
+  "extractor": "docling",
+  "confidence": 0.85,
+  "character_count": 1257,
+  "extraction_metadata": {
+    "extraction_time": 2.883577823638916,
+    "pages": 1,
+    "tables": [],
+    "sections": [
+      "Wertpapier Abrechnung Kauf"
+    ],
+    "has_tables": false,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 1272
+}

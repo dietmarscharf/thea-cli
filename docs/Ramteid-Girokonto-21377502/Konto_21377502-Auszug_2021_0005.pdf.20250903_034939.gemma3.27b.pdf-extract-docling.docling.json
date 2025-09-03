@@ -1,0 +1,27 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9500000000000001,
+  "character_count": 12483,
+  "extraction_metadata": {
+    "extraction_time": 4.6467673778533936,
+    "pages": 4,
+    "tables": [
+      "Table 1",
+      "Table 2",
+      "Table 3",
+      "Table 4",
+      "Table 5"
+    ],
+    "sections": [
+      "Kontoauszug 5/2021",
+      "S Sparkasse Amberg-Sulzbach",
+      "Girokonto 21377502, DE51 7525 0000 0021 3775 02,  Ramteid GmbH",
+      "Girokonto 21377502, DE51 7525 0000 0021 3775 02,  Ramteid GmbH",
+      "Hinweise zum Kontoauszug:"
+    ],
+    "has_tables": true,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 12558
+}

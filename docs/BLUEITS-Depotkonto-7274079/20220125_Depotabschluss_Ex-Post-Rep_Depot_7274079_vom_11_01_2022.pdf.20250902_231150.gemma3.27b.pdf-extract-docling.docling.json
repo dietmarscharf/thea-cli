@@ -1,0 +1,27 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9500000000000001,
+  "character_count": 10414,
+  "extraction_metadata": {
+    "extraction_time": 4.471130609512329,
+    "pages": 6,
+    "tables": [
+      "Table 1"
+    ],
+    "sections": [
+      "Jahresabschluss 2021",
+      "Depotauszug/Aufstellung \u00fcber Kundenfinanzinstrumente per 31.12.2021",
+      "Depotauszug/Aufstellung \u00fcber Kundenfinanzinstrumente per 31.12.2021",
+      "Kundeninformation \u00fcber \u00c4nderun n im Ka talanla etzbuch",
+      "M\u00f6glichkeiten zur Steuerung der Zu- und Abfl\u00fcsse durch Ausgabe und R\u00fccknahme von Anteilen bei Investmentfonds (Liquidit\u00e4tsmanagementtools)",
+      "a) R\u00fcckgabefrist",
+      "b) M\u00f6glichkeit einer R\u00fccknahmebeschr\u00e4nkung",
+      "c) M\u00f6glichkeit des Swing Pricings",
+      "d) Liquidit\u00e4tsmanagementtools ausl\u00e4ndischer Fonds"
+    ],
+    "has_tables": true,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 10600
+}

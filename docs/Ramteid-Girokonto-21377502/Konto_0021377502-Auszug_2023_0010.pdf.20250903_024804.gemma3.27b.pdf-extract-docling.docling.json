@@ -1,0 +1,23 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9500000000000001,
+  "character_count": 12717,
+  "extraction_metadata": {
+    "extraction_time": 4.41452956199646,
+    "pages": 4,
+    "tables": [
+      "Table 1"
+    ],
+    "sections": [
+      "Kontoauszug 10/2023",
+      "Girokonto 21377502, DE51 7525 0000 0021 3775 02",
+      "Kundenmitteilungen:",
+      "(4) Erstattung:",
+      "Hinweise zum Kontoauszug:"
+    ],
+    "has_tables": true,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 12824
+}

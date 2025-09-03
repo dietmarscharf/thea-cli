@@ -1,0 +1,21 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9500000000000001,
+  "character_count": 5132,
+  "extraction_metadata": {
+    "extraction_time": 3.6701483726501465,
+    "pages": 3,
+    "tables": [
+      "Table 1"
+    ],
+    "sections": [
+      "Kontoauszug 4/2021",
+      "Geldmarktkonto 21504006",
+      "Hinweise zum Kontoauszug:"
+    ],
+    "has_tables": true,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 5179
+}
