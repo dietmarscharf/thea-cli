@@ -53,12 +53,15 @@ The text pipeline uses multiple extractors (`extractors/` directory):
 
 The main `process_with_model()` function in `thea.py:348` orchestrates:
 
-1. **Skip Mode Logic** - Checks for existing files based on mode (`thea.py:1536-1568`)
-   - Normal mode: Checks for `.thea_extract` files matching `*.{model}.{suffix}.thea_extract`
-   - Sidecars-only mode: Checks for ANY existing pipeline-specific sidecar files:
-     - Docling: `*.docling.*` (catches all variations regardless of model/suffix)
-     - Text: `*.pypdf2.txt`, `*.pdfplumber.txt`, `*.pymupdf.txt`
-     - PNG: `*.png`
+1. **Skip Mode Logic** - Intelligent file skipping with different patterns (`thea.py:1536-1568`)
+   - **Normal mode**: Checks for specific `.thea_extract` files:
+     - Pattern: `*.{timestamp}.{model}.{suffix}.thea_extract` or `*.{timestamp}.{model}.thea_extract`
+     - Only skips if exact model/suffix combination exists
+   - **Sidecars-only mode**: Broader pattern matching for ANY existing sidecar files:
+     - Docling: `*.*.docling.*` - skips if ANY docling files exist
+     - Text: `*.*.pypdf2.txt`, `*.*.pdfplumber.txt`, `*.*.pymupdf.txt` - skips if ANY text extraction exists
+     - PNG: `*.*.png` - skips if ANY PNG extraction exists
+     - This prevents duplicate extraction even when switching models or suffixes
 2. **Pipeline Processing** - Runs selected pipeline to extract content
 3. **Ollama API Streaming** - Sends to model with chunk-by-chunk processing
 4. **Pattern Detection** - Monitors for stuck responses (1-100 char repetitions)
@@ -72,8 +75,9 @@ The main `process_with_model()` function in `thea.py:348` orchestrates:
 JSON prompt files in `prompts/` directory control model behavior:
 
 **Critical Model Differences:**
-- **Gemma models**: Must use `<thinking>` tags BEFORE outputting JSON
-- **Qwen models**: Must NOT use thinking tags when outputting JSON
+- **Gemma models**: MUST use `<thinking>` tags BEFORE outputting JSON to prevent corruption
+- **Qwen models**: MUST NOT use thinking tags when outputting JSON (causes parsing failures)
+- **Hardcoded prefix** (line 53): Always adds "Always use <thinking></thinking> tags" to system prompt
 
 Prompt structure:
 - `system_prompt.suffix` - Model-specific instructions
@@ -124,6 +128,10 @@ npm run thea:sidecars-force         # Force auto-detect pipeline
 # Bank statement processing
 npm run thea:kontoauszug:gemma   # Gemma for bank statements
 npm run thea:kontoauszug:qwen    # Qwen for bank statements
+
+# Account documents processing (docs/ folder)
+npm run thea:konten:docling      # Process 361 PDFs in 6 account folders (~3.7 hours)
+npm run thea:konten:docling-windows  # Windows version
 
 # Direct execution with options
 python3 thea.py --pipeline pdf-extract-png --model gemma3:27b "*.pdf"
@@ -227,32 +235,44 @@ npm run build-macos      # Creates thea-macos
 Timestamp format: `YYYYMMDD_HHMMSS`
 Extractors: `pypdf2`, `pdfplumber`, `pymupdf`, `docling`
 
+### Git Repository Notes
+The `.gitignore` file excludes most THEA output files but makes exceptions for processed account documents in `docs/`:
+- `docs/BLUEITS-*/*.thea_extract`, `*.docling.json`, `*.docling.md`
+- `docs/Ramteid-*/*.thea_extract`, `*.docling.json`, `*.docling.md`
+
 ## Key Implementation Details
 
-### Pattern Detection Thresholds
-- 1-char patterns: 100+ repetitions
-- 2-char patterns: 75+ repetitions  
-- 3-char patterns: 50+ repetitions
-- 4-99 char patterns: 25+ repetitions
-- 100+ char patterns: 10+ repetitions
+### Critical Functions
 
-### Temperature Progression Formula
+**`clean_json_response(response_text)`** (thea.py:278-390)
+- Central response parsing function
+- Extracts both `<thinking>` and `<think>` tags
+- Handles markdown code blocks (`\`\`\`json`)
+- Multiple fallback strategies for JSON extraction
+- Critical for Gemma/Qwen model compatibility
+
+**`extract_thinking_content(text)`** (thea.py:240-276)
+- Extracts thinking tags from model responses
+- Supports both `<thinking>` and `<think>` formats
+- Handles multiple thinking blocks with separation
+
+### Pattern Detection Thresholds
+Stuck response detection (thea.py:688-750):
+- 1-char: 50+ repetitions
+- 2-char: 25+ repetitions
+- 3-10 char: 10+ repetitions
+- Longer patterns: fewer repetitions needed
+
+### Temperature Scaling
 ```python
 temperature = initial_temp + (retry_count * (1.0 - initial_temp) / max_attempts)
 ```
-Example with 3 retries: 0.10 → 0.40 → 0.70
 
-### Pipeline Selection Logic
-1. Check prompt file `settings.pipeline`
-2. Check `--pipeline` command-line override
-3. Auto-detect based on model name (qwen→txt, gemma→png)
-4. Default to `pdf-extract-png`
-
-### Ollama API Configuration
-- Default endpoint: `https://b1s.hey.bahn.business/api/chat`
-- Streaming enabled with chunk-by-chunk processing
-- Token limit controlled via `num_predict` parameter
-- Timeout configurable (default: 100-200 seconds)
+### Pipeline Selection Priority
+1. Prompt file `settings.pipeline`
+2. CLI `--pipeline` override
+3. Auto-detect: qwen→txt, gemma→png
+4. Default: `pdf-extract-png`
 
 ## Pipeline-Specific Details
 
@@ -388,71 +408,32 @@ When creating new prompt files:
 7. Set appropriate temperature (0.15-0.2 recommended)
 8. Use `{{pdf_path}}` placeholder in user_prompt.template
 
-## Performance and Processing
+## Key Processing Information
 
 ### Processing Rates
-
-Typical processing speeds (may vary based on PDF complexity and system resources):
-
-- **pdf-extract-png**: ~45-60 seconds per PDF (vision processing)
-- **pdf-extract-txt**: ~5-10 seconds per PDF (text extraction only)
+- **pdf-extract-png**: ~45-60 seconds per PDF
+- **pdf-extract-txt**: ~5-10 seconds per PDF
 - **pdf-extract-docling**: ~37 seconds per PDF (1.6 files/minute)
 
 ### Batch Processing
-
-For large batches (1000+ PDFs):
+For overnight runs:
 ```bash
-# Estimate completion time
-# Files: 1420 PDFs
-# Rate: 1.6 files/minute (Docling)
-# Time: ~15 hours
-
-# Run overnight with logging
 nohup python3 thea.py --pipeline pdf-extract-docling "Belege/*.pdf" > processing.log 2>&1 &
-
-# Monitor progress
-tail -f processing.log
-find Belege -name "*.thea_extract" | wc -l  # Count completed
+tail -f processing.log  # Monitor progress
 ```
 
-### Resource Usage
-
-- **Memory**: ~2-4GB for standard PDFs, up to 8GB for complex documents
-- **Disk Space**: 
-  - Main `.thea_extract` files: ~5-50KB per PDF
-  - PNG sidecars: ~100-500KB per page
-  - Docling sidecars: ~10-100KB per PDF
-  - Text sidecars: ~5-50KB per PDF
-
-### Optimization Tips
-
-1. **Skip Mode**: Default behavior - skips already processed files
-2. **Pipeline Selection**: Use text pipeline for simple documents (5-10x faster)
-3. **DPI Settings**: Lower DPI (150) for faster processing, higher (300+) for accuracy
-4. **Parallel Processing**: Run multiple instances on different directories
-5. **Clean Regularly**: Use pipeline-specific clean commands to manage disk space
-
-## Common Issues and Solutions
+## Critical Issues and Solutions
 
 ### Model outputs thinking tags instead of JSON
-- **Qwen**: Add "Do NOT use thinking tags" to system prompt
-- **Gemma**: Clarify "Use thinking THEN output JSON separately"
-- Always set `"format": "json"` in settings
+- **Root cause**: Hardcoded system prompt prefix encourages thinking tags
+- **Qwen fix**: Explicitly add "Do NOT use thinking tags" in prompt file
+- **Gemma fix**: Ensure "Use thinking THEN output JSON separately"
+- **Always**: Set `"format": "json"` in settings
 
-### Inconsistent extraction quality
-- Check extractor confidence scores in metadata
-- PyMuPDF typically has highest confidence (1.0)
-- Consider adjusting `extractors` list in prompt settings
-
-### Pattern detection triggers too early
-- Increase initial temperature slightly (0.1 → 0.15)
-- Reduce max_attempts if model consistently gets stuck
-- Check for actual repetitive content in source PDF
-
-### Poppler not found errors
-- Ensure poppler-utils is installed (Linux/macOS)
-- On Windows, verify poppler bin directory is in PATH
-- Test with: `pdftoppm -h` in terminal
+### Poppler not found (required for PNG pipeline)
+- Linux/macOS: `sudo apt-get install poppler-utils` or `brew install poppler`
+- Windows: Download from GitHub, add bin folder to PATH
+- Verify: `pdftoppm -h`
 
 ## Directory Structure
 
