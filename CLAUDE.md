@@ -4,12 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-THEA is a multi-pipeline PDF processing system that extracts content from PDFs using three distinct approaches:
-1. **Image extraction** for vision models (pdf-extract-png)
-2. **Text extraction** for text-only models (pdf-extract-txt)
-3. **Deep learning extraction** using IBM Docling (pdf-extract-docling)
+THEA is a comprehensive PDF processing and financial document analysis system that combines:
+1. **Multi-pipeline PDF extraction** with three distinct approaches (image, text, deep learning)
+2. **AI-powered document analysis** using Ollama models with retry logic and pattern detection
+3. **Financial account analysis system** for processing bank statements and investment documents
 
-It processes documents through Ollama models with sophisticated retry logic, pattern detection, and streaming response handling. Output files use the `.thea_extract` extension.
+The system processes 618+ financial documents across 6 account types, extracting structured data and generating comprehensive markdown reports. Output files use the `.thea_extract` extension with additional sidecar files for metadata.
 
 ## Architecture
 
@@ -20,18 +20,29 @@ The modular pipeline architecture (`pipelines/` directory) consists of:
 1. **`pdf-extract-png` Pipeline** - Extracts PDF pages as PNG images for vision models
    - Class: `PdfExtractPngPipeline` in `pipelines/pdf_extract_png.py`
    - Converts PDFs to base64-encoded PNG images using pdf2image/poppler
+   - Saves PNG sidecar files when `--save-sidecars` is enabled
    - Optimized for Gemma models with thinking tag support
 
 2. **`pdf-extract-txt` Pipeline** - Extracts text using multiple methods for text-only models
    - Class: `PdfExtractTxtPipeline` in `pipelines/pdf_extract_txt.py`
    - Runs PyPDF2, pdfplumber, and pymupdf extractors in parallel
+   - Saves text extraction sidecar files when `--save-sidecars` is enabled
    - Optimized for Qwen models without thinking tags in JSON output
 
 3. **`pdf-extract-docling` Pipeline** - Advanced extraction using IBM Docling deep learning
    - Class: `PdfExtractDoclingPipeline` in `pipelines/pdf_extract_docling.py`
    - Uses Docling's ML models for complex documents with tables/formulas
+   - Saves `.docling.txt`, `.docling.json`, and `.docling.md` sidecar files
    - Falls back to gemma3:27b when confidence < 0.7
    - Requires: `pip install docling` (includes torch dependencies, ~3.5GB)
+
+### Text Extractors
+
+The text pipeline uses multiple extractors (`extractors/` directory):
+- **PyPDF2Extractor**: Basic text extraction, confidence ~0.8
+- **PdfPlumberExtractor**: Advanced extraction with table support, confidence ~0.9
+- **PyMuPDFExtractor**: Fast extraction with formatting, confidence ~1.0
+- **DoclingExtractor**: ML-based extraction for complex layouts
 
 ### Account Document Analysis System
 
@@ -57,9 +68,11 @@ The repository includes specialized scripts for analyzing financial documents:
 
 ### Core Processing Flow
 
-The main `process_with_model()` function in `thea.py:392` orchestrates:
+The main `process_with_model()` function in `thea.py:348` orchestrates:
 
-1. **Skip Mode Logic** - Intelligent file skipping with different patterns
+1. **Skip Mode Logic** - Intelligent file skipping with different patterns (`thea.py:1536-1568`)
+   - Normal mode: Checks for specific `.thea_extract` files
+   - Sidecars-only mode: Broader pattern matching for ANY existing sidecar files
 2. **Pipeline Processing** - Runs selected pipeline to extract content
 3. **Ollama API Streaming** - Sends to model with chunk-by-chunk processing
 4. **Pattern Detection** - Monitors for stuck responses (1-100 char repetitions)
@@ -103,9 +116,20 @@ npm run thea:pdf-extract-txt     # Text extraction with Qwen
 npm run thea:pdf-extract-docling # Docling extraction with gemma3:27b
 
 # Sidecar-only mode (extraction without AI analysis)
-npm run thea:sidecars:png        # Extract PNG images only
-npm run thea:sidecars:txt        # Extract text only
-npm run thea:sidecars:docling    # Docling extraction only
+npm run thea:sidecars:png        # Extract PNG images only (skip existing)
+npm run thea:sidecars:txt        # Extract text only (skip existing)
+npm run thea:sidecars:docling    # Docling extraction only (skip existing)
+npm run thea:sidecars            # Auto-detect pipeline (skip existing)
+
+# Force regeneration of sidecars
+npm run thea:sidecars:png-force     # Force PNG extraction
+npm run thea:sidecars:txt-force     # Force text extraction
+npm run thea:sidecars:docling-force # Force Docling extraction
+npm run thea:sidecars-force         # Force auto-detect pipeline
+
+# Bank statement processing
+npm run thea:kontoauszug:gemma   # Gemma for bank statements
+npm run thea:kontoauszug:qwen    # Qwen for bank statements
 
 # Account documents processing (docs/ folder with 618 PDFs)
 npm run thea:konten:docling      # Process all account PDFs (~2-3 hours)
@@ -154,42 +178,80 @@ python3 thea.py --prompt prompts/pdf-extract-txt.prompt "Belege/*.pdf"
 # Clean all THEA files
 python3 thea.py --clean                  # With confirmation
 python3 thea.py --clean --force          # No confirmation
+python3 thea.py --clean --dry-run        # Preview only
 
 # Pipeline-specific cleaning
-python3 thea.py --clean --pipeline txt          # Clean text extraction files
-python3 thea.py --clean --pipeline png          # Clean PNG/image files
-python3 thea.py --clean --pipeline docling      # Clean Docling files
+python3 thea.py --clean --pipeline txt          # Clean only text extraction files
+python3 thea.py --clean --pipeline png          # Clean only PNG/image files
+python3 thea.py --clean --pipeline docling      # Clean only Docling files
 
 # NPM scripts for pipeline-specific cleaning
 npm run thea:clean:txt                   # Clean text pipeline files
+npm run thea:clean:txt-dry              # Dry run for text pipeline
+npm run thea:clean:txt-force            # Force clean text pipeline
+
 npm run thea:clean:png                   # Clean PNG pipeline files
+npm run thea:clean:png-dry              # Dry run for PNG pipeline
+npm run thea:clean:png-force            # Force clean PNG pipeline
+
 npm run thea:clean:docling              # Clean Docling pipeline files
+npm run thea:clean:docling-dry          # Dry run for Docling pipeline
+npm run thea:clean:docling-force        # Force clean Docling pipeline
+
+# Windows variants available for all commands (append -windows)
+npm run thea:clean:txt-windows
+npm run thea:clean:png-force-windows
+# etc.
 ```
 
 ## File Naming Conventions
 
+### Output Files
 - **Main results**: `<pdf>.<timestamp>.<model>.<suffix>.thea_extract`
 - **PNG sidecars**: `<pdf>.<timestamp>.<model>.<suffix>.<dpi>p<page>.png`
 - **Text sidecars**: `<pdf>.<timestamp>.<model>.<suffix>.<extractor>.txt`
 - **Docling sidecars**: `<pdf>.<timestamp>.<model>.<suffix>.docling.{txt,json,md}`
+- **Metadata**: `<pdf>.<timestamp>.<model>.<suffix>.<extractor>.json`
 
 Timestamp format: `YYYYMMDD_HHMMSS`
+Extractors: `pypdf2`, `pdfplumber`, `pymupdf`, `docling`
+
+### Git Repository Notes
+The `.gitignore` file excludes most THEA output files but makes exceptions for processed account documents in `docs/`:
+- `docs/BLUEITS-*/*.thea_extract`, `*.docling.json`, `*.docling.md`
+- `docs/Ramteid-*/*.thea_extract`, `*.docling.json`, `*.docling.md`
+
+### File Transfer and Sync
+```bash
+# Transfer extraction results to another project
+npm run thea:sync-sidecars         # Linux/macOS rsync
+npm run thea:sync-sidecars-windows # Windows robocopy
+npm run thea:sync-sidecars-dry     # Dry run to preview
+
+# Syncs: *.thea_extract, *.docling.*, *.pypdf2.txt, *.pdfplumber.txt, *.pymupdf.txt, *.png
+# Target: ../Sparkasse/docs/
+```
 
 ## Key Implementation Details
 
 ### Critical Functions
 
-**`clean_json_response(response_text)`** (thea.py:278)
+**`clean_json_response(response_text)`** (thea.py:278-390)
 - Central response parsing function
 - Extracts both `<thinking>` and `<think>` tags
-- Handles markdown code blocks
+- Handles markdown code blocks (`\`\`\`json`)
 - Multiple fallback strategies for JSON extraction
 - Critical for Gemma/Qwen model compatibility
 
-**`process_with_model()`** (thea.py:392)
+**`extract_thinking_content(text)`** (thea.py:240-276)
+- Extracts thinking tags from model responses
+- Supports both `<thinking>` and `<think>` formats
+- Handles multiple thinking blocks with separation
+
+**`process_with_model()`** (thea.py:348)
 - Core processing orchestrator
 - Handles retry logic with temperature scaling
-- Pattern detection for stuck responses
+- Pattern detection for stuck responses (thea.py:688-750)
 - Streaming response handling
 
 **`BaseKontoAnalyzer`** (Konten.py:16)
@@ -315,10 +377,123 @@ The `docs/` folder contains 618 PDF documents organized into 6 account folders:
 
 ## Available Prompt Files
 
-- `prompts/pdf-extract-png.prompt` - Vision-based extraction with Gemma models
-- `prompts/pdf-extract-txt.prompt` - Text extraction for Qwen models
-- `prompts/pdf-extract-docling.prompt` - Docling ML extraction
-- `prompts/bank_gemma.prompt` - Bank statement processing (Gemma)
-- `prompts/bank_qwen.prompt` - Bank statement processing (Qwen)
-- `prompts/bank_konto_kontoauszuege.prompt` - German bank account statements
-- `prompts/thinking_test.prompt` - Testing thinking tag behavior
+- **`pdf-extract-png.prompt`** - Vision-based extraction with Gemma models
+- **`pdf-extract-txt.prompt`** - Text extraction for Qwen models  
+- **`pdf-extract-docling.prompt`** - Docling ML extraction
+- **`bank_gemma.prompt`** - Bank statement processing (Gemma)
+- **`bank_qwen.prompt`** - Bank statement processing (Qwen)
+- **`bank_konto_kontoauszuege.prompt`** - German bank account statements
+- **`bank_konto_kontoauszuege_v2.prompt`** - Enhanced with validation and cross-references
+- **`thinking_test.prompt`** - Testing thinking tag behavior
+
+## Key Processing Information
+
+### Processing Rates
+- **pdf-extract-png**: ~45-60 seconds per PDF
+- **pdf-extract-txt**: ~5-10 seconds per PDF
+- **pdf-extract-docling**: ~37 seconds per PDF (1.6 files/minute)
+
+### Batch Processing
+For overnight runs:
+```bash
+nohup python3 thea.py --pipeline pdf-extract-docling "Belege/*.pdf" > processing.log 2>&1 &
+tail -f processing.log  # Monitor progress
+```
+
+## Critical Issues and Solutions
+
+### Model outputs thinking tags instead of JSON
+- **Root cause**: Hardcoded system prompt prefix encourages thinking tags
+- **Qwen fix**: Explicitly add "Do NOT use thinking tags" in prompt file
+- **Gemma fix**: Ensure "Use thinking THEN output JSON separately"
+- **Always**: Set `"format": "json"` in settings
+
+### Poppler not found (required for PNG pipeline)
+- Linux/macOS: `sudo apt-get install poppler-utils` or `brew install poppler`
+- Windows: Download from GitHub, add bin folder to PATH
+- Verify: `pdftoppm -h`
+
+## Prompt File Development
+
+When creating new prompt files:
+1. Use existing prompts as templates (`prompts/pdf-extract-*.prompt`)
+2. For Qwen: Explicitly forbid thinking tags in JSON output
+3. For Gemma: Instruct to use thinking tags THEN output JSON
+4. Always include `format: "json"` in settings for JSON enforcement
+5. Use consistent schema field names (e.g., `three_word_description_*`)
+6. Include `document_type` field for classification
+7. Set appropriate temperature (0.15-0.2 recommended)
+8. Use `{{pdf_path}}` placeholder in user_prompt.template
+
+## Building Executables
+
+```bash
+npm run build-windows    # Creates thea-windows.exe
+npm run build-linux      # Creates thea-linux
+npm run build-macos      # Creates thea-macos
+```
+
+## Directory Structure
+
+```
+THEA/
+├── thea.py                 # Main entry point, CLI argument handling
+├── pipelines/              # Pipeline implementations
+│   ├── __init__.py
+│   ├── base.py            # BasePipeline abstract class
+│   ├── manager.py         # Pipeline selection and management
+│   ├── pdf_extract_png.py # Image extraction pipeline
+│   ├── pdf_extract_txt.py # Text extraction pipeline
+│   └── pdf_extract_docling.py # Docling ML pipeline
+├── extractors/            # Text extraction implementations
+│   ├── __init__.py
+│   ├── pypdf2_extractor.py
+│   ├── pdfplumber_extractor.py
+│   ├── pymupdf_extractor.py
+│   └── docling_extractor.py
+├── prompts/               # Prompt configuration files
+│   ├── pdf-extract-png.prompt
+│   ├── pdf-extract-txt.prompt
+│   ├── pdf-extract-docling.prompt
+│   ├── bank_gemma.prompt
+│   ├── bank_qwen.prompt
+│   ├── bank_konto_kontoauszuege.prompt
+│   ├── bank_konto_kontoauszuege_v2.prompt
+│   └── thinking_test.prompt
+├── docs/                  # Financial documents (618 PDFs)
+│   ├── BLUEITS-Depotkonto-7274079/     # 314 files
+│   ├── BLUEITS-Geldmarktkonto-21503990/ # 55 files
+│   ├── BLUEITS-Girokonto-200750750/    # 59 files
+│   ├── Ramteid-Depotkonto-7274087/     # 88 files
+│   ├── Ramteid-Geldmarktkonto-21504006/ # 43 files
+│   └── Ramteid-Girokonto-21377502/     # 59 files
+├── Konten.py              # Base account analyzer class
+├── Depotkonto.py          # Depot account analysis
+├── Girokonto.py           # Checking account analysis
+├── Geldmarktkonto.py      # Money market analysis
+├── test_thinking.py       # Test suite for thinking tags
+├── requirements.txt       # Python dependencies
+├── package.json          # NPM scripts and project metadata
+└── CLAUDE.md             # This documentation file
+```
+
+## Key Entry Points and Functions
+
+### Main Entry Point
+- `thea.py:main()` - CLI entry point, argument parsing
+- `thea.py:process_with_model()` (line 348) - Core processing orchestrator
+
+### Pipeline Functions
+- `pipelines/manager.py:PipelineManager.get_pipeline()` - Pipeline selection
+- `pipelines/base.py:Pipeline.process()` - Abstract pipeline interface
+- `pipelines/base.py:Pipeline.format_for_model()` - Model formatting
+
+### Prompt Loading
+- `thea.py:load_prompt_file()` (line 25) - Load JSON/text prompts
+- `thea.py:build_system_prompt()` (line 50) - Build system prompt
+- `thea.py:build_user_prompt()` (line 78) - Build user prompt with substitutions
+
+### Utility Functions
+- `thea.py:clean_thea_files()` (line 89) - Clean generated files
+- `thea.py:extract_thinking_content()` - Extract thinking tags
+- `thea.py:clean_json_response()` - Clean and validate JSON
