@@ -1,0 +1,22 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9500000000000001,
+  "character_count": 4035,
+  "extraction_metadata": {
+    "extraction_time": 14.339630365371704,
+    "pages": 2,
+    "tables": [
+      "Table 1"
+    ],
+    "sections": [
+      "Wertpapier Abrechnung Verkauf",
+      "Limit-Orde r",
+      "Ermittlung steuerrelevante Ertr\u00e4ge",
+      "Depotnummer"
+    ],
+    "has_tables": true,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 4066
+}

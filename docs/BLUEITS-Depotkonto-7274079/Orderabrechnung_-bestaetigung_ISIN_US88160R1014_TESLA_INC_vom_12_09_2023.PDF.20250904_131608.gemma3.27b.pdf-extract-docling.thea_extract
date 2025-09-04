@@ -1,0 +1,161 @@
+{
+  "version": "2.0",
+  "metadata": {
+    "file": {
+      "pdf_path": "docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_09_2023.PDF",
+      "pdf_absolute_path": "/mnt/c/Projects/THEA/docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_09_2023.PDF",
+      "pdf_size_bytes": 59839,
+      "pdf_pages": 0,
+      "output_file": "docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_09_2023.PDF.20250904_131608.gemma3.27b.pdf-extract-docling.thea_extract"
+    },
+    "processing": {
+      "timestamp": "20250904_131608",
+      "start_time": "2025-09-04T13:16:08.729243Z",
+      "end_time": "2025-09-04T13:18:10.318748Z",
+      "processing_time_seconds": 121.58690667152405,
+      "hostname": "BLUEITS-DS",
+      "platform": "linux",
+      "pipeline": "pdf-extract-docling",
+      "pipeline_metadata": {
+        "pipeline": "pdf-extract-docling",
+        "timestamp": "2025-09-04T13:15:58.210943Z",
+        "pdf_path": "docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_09_2023.PDF",
+        "extractor": "docling",
+        "fallback_model": "gemma3:27b",
+        "save_sidecars": true,
+        "saved_files": [
+          {
+            "extractor": "docling",
+            "type": "text/plain",
+            "text_file": "docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_09_2023.PDF.20250904_131558.gemma3.27b.pdf-extract-docling.docling.txt",
+            "json_file": "docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_09_2023.PDF.20250904_131558.gemma3.27b.pdf-extract-docling.docling.json",
+            "confidence": 0.9500000000000001,
+            "character_count": 4180,
+            "file_size": 4208,
+            "md_file": "docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_09_2023.PDF.20250904_131558.gemma3.27b.pdf-extract-docling.docling.md"
+          }
+        ],
+        "extraction_success": true,
+        "text_length": 4180,
+        "confidence": 0.9500000000000001,
+        "has_tables": true,
+        "has_formulas": false,
+        "document_type": "invoice",
+        "pages": 2
+      }
+    },
+    "model": {
+      "name": "gemma3:27b",
+      "endpoint": "https://b1s.hey.bahn.business/api/chat",
+      "stream": true,
+      "format": "json"
+    }
+  },
+  "settings": {
+    "mode": "skip",
+    "suffix": "pdf-extract-docling",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "save_sidecars": true,
+    "dpi": 300,
+    "max_attempts": 3,
+    "initial_temperature": 0.2,
+    "temperature_progression": [
+      0.2,
+      0.6000000000000001,
+      1.0
+    ],
+    "timeout": 300,
+    "max_tokens": 50000
+  },
+  "execution": {
+    "retry_count": 2,
+    "final_temperature": 1.0,
+    "stuck_pattern_detected": true,
+    "pattern_type": "22_chunk_long_pattern",
+    "chunks_received": 1261,
+    "request_time_seconds": 40.491326570510864,
+    "files_processed": [
+      {
+        "extractor": "docling",
+        "type": "text/plain",
+        "text_file": "docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_09_2023.PDF.20250904_131558.gemma3.27b.pdf-extract-docling.docling.txt",
+        "json_file": "docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_09_2023.PDF.20250904_131558.gemma3.27b.pdf-extract-docling.docling.json",
+        "confidence": 0.9500000000000001,
+        "character_count": 4180,
+        "file_size": 4208,
+        "md_file": "docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_09_2023.PDF.20250904_131558.gemma3.27b.pdf-extract-docling.docling.md"
+      }
+    ]
+  },
+  "prompt": {
+    "system": "You are a vision-based text extractor and analyzer. Always use <thinking></thinking> tags to show your analysis process. You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text. Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }.: {\"extracted_text\": \"<string (complete verified text from document)>\", \"character_count\": \"<number (exact count of extracted text)>\", \"document_type\": \"<string (e.g., Invoice, Contract, Report, Statement, Technical)>\", \"three_word_description_german\": \"<string (exactly 3 words)>\", \"three_word_description_english\": \"<string (exactly 3 words)>\", \"content_summary_german\": \"<string (2-3 sentences)>\", \"content_summary_english\": \"<string (2-3 sentences)>\", \"extraction_quality\": \"<string (excellent/good/fair/poor)>\", \"has_tables\": \"<boolean>\", \"has_formulas\": \"<boolean>\", \"document_sections\": \"<array of strings (main section headings if present)>\"}",
+    "user": "Analyze the Docling extraction from PDF 'docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_09_2023.PDF'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON.",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "prompt_config": {
+      "version": "2.0",
+      "name": "pdf-extract-docling",
+      "description": "Advanced document extraction using Docling with gemma3:27b fallback for complex documents",
+      "system_prompt": {
+        "suffix": "You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text.",
+        "output_format": {
+          "type": "json",
+          "schema": {
+            "extracted_text": "string (complete verified text from document)",
+            "character_count": "number (exact count of extracted text)",
+            "document_type": "string (e.g., Invoice, Contract, Report, Statement, Technical)",
+            "three_word_description_german": "string (exactly 3 words)",
+            "three_word_description_english": "string (exactly 3 words)",
+            "content_summary_german": "string (2-3 sentences)",
+            "content_summary_english": "string (2-3 sentences)",
+            "extraction_quality": "string (excellent/good/fair/poor)",
+            "has_tables": "boolean",
+            "has_formulas": "boolean",
+            "document_sections": "array of strings (main section headings if present)"
+          },
+          "instructions": "Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }."
+        }
+      },
+      "user_prompt": {
+        "template": "Analyze the Docling extraction from PDF '{{pdf_path}}'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON."
+      },
+      "settings": {
+        "model": "gemma3:27b",
+        "temperature": 0.2,
+        "max_attempts": 3,
+        "timeout": 300,
+        "max_tokens": 50000,
+        "mode": "skip",
+        "save_sidecars": true,
+        "format": "json",
+        "pipeline": "pdf-extract-docling",
+        "pipeline_config": {
+          "use_fallback_model": true,
+          "fallback_model": "gemma3:27b"
+        },
+        "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+      }
+    }
+  },
+  "response": {
+    "text": "{\"extracted_text\": \"Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\\n\\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\\n\\n## Wertpapier Abrechnung Verkauf\\n\\nAuftrag vom 11.09.2023 12:37:19 Uhr\\n\\nNominale\\n\\nWertpapierbezeichnung\\n\\nISIN\\n\\n(WKN)\\n\\nStück 77\\n\\nTESLA INC.\\n\\nREGISTERED SHARES DL-,001\\n\\nUS88160R1014\\n\\n(A1CX3T)\\n\\nHandels-/Ausführungsplatz Börsensegment\\n\\nTradegate (Best Execution)\\n\\nXGAT\\n\\nLimit-Orde r\\n\\nLimit\\n\\n258,50 EUR\\n\\nSchlusstag/-Zeit 12.09.2023 15:57:06\\n\\nAusführungskurs 258,50 EUR\\n\\nAuftraggeber\\n\\nDietmar Scharf\\n\\nAuftragserteilung/ -ort\\n\\nOnline-Banking\\n\\nGirosammelverwahrung Sammelurkunde\\n\\nKurswert\\n\\n19.904,50\\n\\nEUR\\n\\nProvision\\n\\n19,41- EUR\\n\\nErmittlung steuerrelevante Erträge Veräußerungsgewinn\\n\\n8.608,32\\n\\nEUR\\n\\nAusmachender Betrag\\n\\n19.885,09\\n\\nEUR\\n\\nDen Gegenwert buchen wir mit Valuta 14.09.2023 zu Gunsten des Kontos 9001290015 (IBAN DE69 7525 0000 9001 2900 15), BLZ 75250000 (BIC BYLADEM1ABG). Die Wertpapiere entnehmen wir Ihrem Depotkonto.\\n\\nSofern keine Umsatzsteuer ausgewiesen ist, handelt es sich um eine umsatzsteuerbefreite Finanzdienstleistung.\\n\\nFür das Geschäft wurde keine Anlageberatung erbracht.\\n\\nSeite 1 von 2 7274079 24711383 BLUEITS GmbH 503471/24.00 12.09.2023 W02279-0000012476/23\\n\\nDepotnummer Kundennummer\\n\\nAuftragsnummer Datum Rechnungsnummer Umsatzsteuer-ID\\n\\nDE131841737\\n\\nTelefon 09621 300-0 Telefax 09621 300-5439 BLZ: 752 500 00 BIC: BYLADEMIABG USt Id-Nr: DE 131 841 737\\n\\n<!-- image -->\\n\\n## Depotnummer\\n\\nKundennummer Auftragsnummer Datum\\n\\nSeite 2 von 2 7274079 24711383 503471/24.00 12.09.2023\\n\\nBerücksichtigte Anschaffungsgeschäfte (alle ermittelten Beträge in EUR)\\n\\n| Geschäft                                                                     | Auftragsnr.                                                                  | Ausführ.-tag                                                                 | Whr./St. Nennwert/Stück                                                      |                                                                              | AS-Kosten                                                                    | Erlös                                                                        | ant. Ergebnis                                                                |          |\\n|------------------------------------------------------------------------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------|----------|\\n| Kauf                                                                         | 4168788800                                                                   | 04.05.2023                                                                   | Stück                                                                        | 77,0000                                                                      | 11.273,27-                                                                   | 19.881,59                                                                    | 8.608,32                                                                     | (D)      |\\n| Summe aller Erträge nach Differenzmethode und/oder Ersatzbemessungsgrundlage | Summe aller Erträge nach Differenzmethode und/oder Ersatzbemessungsgrundlage | Summe aller Erträge nach Differenzmethode und/oder Ersatzbemessungsgrundlage | Summe aller Erträge nach Differenzmethode und/oder Ersatzbemessungsgrundlage | Summe aller Erträge nach Differenzmethode und/oder Ersatzbemessungsgrundlage | Summe aller Erträge nach Differenzmethode und/oder Ersatzbemessungsgrundlage | Summe aller Erträge nach Differenzmethode und/oder Ersatzbemessungsgrundlage | Summe aller Erträge nach Differenzmethode und/oder Ersatzbemessungsgrundlage |",
+    "thinking": null,
+    "json": null
+  },
+  "statistics": {
+    "tokens": {
+      "input_estimated": 1759,
+      "output_estimated": 1069,
+      "total_estimated": 2828,
+      "tokens_per_second": 8.792065110168334
+    },
+    "characters": {
+      "response_total": 4276,
+      "extracted_text": 0,
+      "json_formatted": 0
+    }
+  },
+  "errors": [
+    "Processing terminated due to: 22_chunk_long_pattern"
+  ],
+  "warnings": []
+}

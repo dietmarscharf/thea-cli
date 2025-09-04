@@ -1,0 +1,18 @@
+{
+  "extractor": "docling",
+  "confidence": 0.85,
+  "character_count": 863,
+  "extraction_metadata": {
+    "extraction_time": 6.48050856590271,
+    "pages": 1,
+    "tables": [],
+    "sections": [
+      "Wertpapier Streichungsbest\u00e4tigung Verkauf",
+      "Limit-Orde r"
+    ],
+    "has_tables": false,
+    "has_formulas": false,
+    "document_type": "document"
+  },
+  "file_size": 873
+}

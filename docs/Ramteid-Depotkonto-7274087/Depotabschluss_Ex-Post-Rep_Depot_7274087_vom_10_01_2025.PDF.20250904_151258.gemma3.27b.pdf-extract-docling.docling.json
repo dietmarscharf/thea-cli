@@ -1,0 +1,18 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9,
+  "character_count": 2061,
+  "extraction_metadata": {
+    "extraction_time": 12.239975690841675,
+    "pages": 2,
+    "tables": [],
+    "sections": [
+      "Jahresabschluss 2024",
+      "Depotauszug/Aufstellung \u00fcber Kundenfinanzinstrumente per 31.12.2024"
+    ],
+    "has_tables": false,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 2088
+}

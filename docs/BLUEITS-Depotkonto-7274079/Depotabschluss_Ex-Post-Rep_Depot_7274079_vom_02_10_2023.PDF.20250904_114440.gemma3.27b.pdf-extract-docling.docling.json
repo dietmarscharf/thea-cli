@@ -1,0 +1,19 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9,
+  "character_count": 2814,
+  "extraction_metadata": {
+    "extraction_time": 6.125467300415039,
+    "pages": 3,
+    "tables": [],
+    "sections": [
+      "Aufstellung \u00fcber Kundenfinanzinstrumente per 30.09.2023",
+      "Aufstellung \u00fcber Kundenfinanzinstrumente per 30.09.2023",
+      "Aufstellung \u00fcber Kundenfinanzinstrumente per 30.09.2023"
+    ],
+    "has_tables": false,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 2852
+}

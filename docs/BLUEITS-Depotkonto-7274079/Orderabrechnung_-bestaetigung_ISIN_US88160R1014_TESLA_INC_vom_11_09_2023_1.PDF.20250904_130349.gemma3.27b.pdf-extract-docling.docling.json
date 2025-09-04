@@ -1,0 +1,20 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9,
+  "character_count": 1096,
+  "extraction_metadata": {
+    "extraction_time": 7.437343120574951,
+    "pages": 1,
+    "tables": [
+      "Table 1"
+    ],
+    "sections": [
+      "Wertpapier Auftragsbest\u00e4tigung Verkauf",
+      "Limit-Orde r"
+    ],
+    "has_tables": true,
+    "has_formulas": false,
+    "document_type": "document"
+  },
+  "file_size": 1107
+}

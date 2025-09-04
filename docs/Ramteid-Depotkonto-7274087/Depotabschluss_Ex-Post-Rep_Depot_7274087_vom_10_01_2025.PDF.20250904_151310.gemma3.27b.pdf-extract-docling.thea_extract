@@ -1,0 +1,172 @@
+{
+  "version": "2.0",
+  "metadata": {
+    "file": {
+      "pdf_path": "docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF",
+      "pdf_absolute_path": "/mnt/c/Projects/THEA/docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF",
+      "pdf_size_bytes": 61170,
+      "pdf_pages": 0,
+      "output_file": "docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF.20250904_151310.gemma3.27b.pdf-extract-docling.thea_extract"
+    },
+    "processing": {
+      "timestamp": "20250904_151310",
+      "start_time": "2025-09-04T15:13:10.296783Z",
+      "end_time": "2025-09-04T15:13:46.183970Z",
+      "processing_time_seconds": 35.884761095047,
+      "hostname": "BLUEITS-DS",
+      "platform": "linux",
+      "pipeline": "pdf-extract-docling",
+      "pipeline_metadata": {
+        "pipeline": "pdf-extract-docling",
+        "timestamp": "2025-09-04T15:12:58.041392Z",
+        "pdf_path": "docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF",
+        "extractor": "docling",
+        "fallback_model": "gemma3:27b",
+        "save_sidecars": true,
+        "saved_files": [
+          {
+            "extractor": "docling",
+            "type": "text/plain",
+            "text_file": "docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF.20250904_151258.gemma3.27b.pdf-extract-docling.docling.txt",
+            "json_file": "docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF.20250904_151258.gemma3.27b.pdf-extract-docling.docling.json",
+            "confidence": 0.9,
+            "character_count": 2061,
+            "file_size": 2088,
+            "md_file": "docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF.20250904_151258.gemma3.27b.pdf-extract-docling.docling.md"
+          }
+        ],
+        "extraction_success": true,
+        "text_length": 2061,
+        "confidence": 0.9,
+        "has_tables": false,
+        "has_formulas": false,
+        "document_type": "invoice",
+        "pages": 2
+      }
+    },
+    "model": {
+      "name": "gemma3:27b",
+      "endpoint": "https://b1s.hey.bahn.business/api/chat",
+      "stream": true,
+      "format": "json"
+    }
+  },
+  "settings": {
+    "mode": "skip",
+    "suffix": "pdf-extract-docling",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "save_sidecars": true,
+    "dpi": 300,
+    "max_attempts": 3,
+    "initial_temperature": 0.2,
+    "temperature_progression": [
+      0.2
+    ],
+    "timeout": 300,
+    "max_tokens": 50000
+  },
+  "execution": {
+    "retry_count": 0,
+    "final_temperature": 0.2,
+    "stuck_pattern_detected": false,
+    "pattern_type": null,
+    "chunks_received": 1129,
+    "request_time_seconds": 35.88464283943176,
+    "files_processed": [
+      {
+        "extractor": "docling",
+        "type": "text/plain",
+        "text_file": "docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF.20250904_151258.gemma3.27b.pdf-extract-docling.docling.txt",
+        "json_file": "docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF.20250904_151258.gemma3.27b.pdf-extract-docling.docling.json",
+        "confidence": 0.9,
+        "character_count": 2061,
+        "file_size": 2088,
+        "md_file": "docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF.20250904_151258.gemma3.27b.pdf-extract-docling.docling.md"
+      }
+    ]
+  },
+  "prompt": {
+    "system": "You are a vision-based text extractor and analyzer. Always use <thinking></thinking> tags to show your analysis process. You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text. Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }.: {\"extracted_text\": \"<string (complete verified text from document)>\", \"character_count\": \"<number (exact count of extracted text)>\", \"document_type\": \"<string (e.g., Invoice, Contract, Report, Statement, Technical)>\", \"three_word_description_german\": \"<string (exactly 3 words)>\", \"three_word_description_english\": \"<string (exactly 3 words)>\", \"content_summary_german\": \"<string (2-3 sentences)>\", \"content_summary_english\": \"<string (2-3 sentences)>\", \"extraction_quality\": \"<string (excellent/good/fair/poor)>\", \"has_tables\": \"<boolean>\", \"has_formulas\": \"<boolean>\", \"document_sections\": \"<array of strings (main section headings if present)>\"}",
+    "user": "Analyze the Docling extraction from PDF 'docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON.",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "prompt_config": {
+      "version": "2.0",
+      "name": "pdf-extract-docling",
+      "description": "Advanced document extraction using Docling with gemma3:27b fallback for complex documents",
+      "system_prompt": {
+        "suffix": "You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text.",
+        "output_format": {
+          "type": "json",
+          "schema": {
+            "extracted_text": "string (complete verified text from document)",
+            "character_count": "number (exact count of extracted text)",
+            "document_type": "string (e.g., Invoice, Contract, Report, Statement, Technical)",
+            "three_word_description_german": "string (exactly 3 words)",
+            "three_word_description_english": "string (exactly 3 words)",
+            "content_summary_german": "string (2-3 sentences)",
+            "content_summary_english": "string (2-3 sentences)",
+            "extraction_quality": "string (excellent/good/fair/poor)",
+            "has_tables": "boolean",
+            "has_formulas": "boolean",
+            "document_sections": "array of strings (main section headings if present)"
+          },
+          "instructions": "Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }."
+        }
+      },
+      "user_prompt": {
+        "template": "Analyze the Docling extraction from PDF '{{pdf_path}}'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON."
+      },
+      "settings": {
+        "model": "gemma3:27b",
+        "temperature": 0.2,
+        "max_attempts": 3,
+        "timeout": 300,
+        "max_tokens": 50000,
+        "mode": "skip",
+        "save_sidecars": true,
+        "format": "json",
+        "pipeline": "pdf-extract-docling",
+        "pipeline_config": {
+          "use_fallback_model": true,
+          "fallback_model": "gemma3:27b"
+        },
+        "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+      }
+    }
+  },
+  "response": {
+    "text": "{\"extracted_text\": \"Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\\n\\nFirma Ramteid GmbH Auf den Hochäckern 5 92224 Amberg\\n\\nSeite 1 von 1 10.01.2025\\n\\nDatum Depotnummer\\n\\n7274087\\n\\nKundendepot Ramteid GmbH\\n\\nRechnungs-Nr.\\n\\nDJ-2279003372/25\\n\\nUmsatzsteuer-ID\\n\\nDE131841737\\n\\n## Jahresabschluss 2024\\n\\nSehr geehrte Damen und Herren, gerne übersenden wir Ihnen den Jahresdepotauszug per 31.12.2024.\\n\\nWiderrufsrecht bei Prospektnachträgen: Aktuelle Informationen hierzu (gültig ab 4. Dezember 2024) finden Sie unter \\\"Information zum Widerrufsrecht im Falle eines Nachtrags zum Wertpapierprospekt\\\" auf unserer Internetseite Danach erhalten Sie eine Nachtragsinfo von uns nur, wenn Sie ein elektr. Postfach bei uns führen. Sprechen Sie uns hierzu gerne an. Ohne Postfach sollten Sie die Website des Emittenten selbst überwachen und prüfen, ob ein Nachtrag veröffentlicht wurde.\\n\\nWir danken Ihnen für Ihr Vertrauen und wünschen Ihnen ein gesundes und erfolgreiches neues Jahr.\\n\\nMit freundlichen Grüßen\\n\\nSPK AMBERG-SULZBACH\\n\\nSparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\\n\\nFirma Ramteid GmbH Auf den Hochäckern 5 92224 Amberg\\n\\nSeite 1 von 1 10.01.2025\\n\\nDatum Depotnummer\\n\\n7274087\\n\\nKundendepot Ramteid GmbH\\n\\nRechnungs-Nr.\\n\\nDJ-2279003372/25\\n\\nUmsatzsteuer-ID\\n\\nDE131841737\\n\\n## Depotauszug/Aufstellung über Kundenfinanzinstrumente per 31.12.2024\\n\\nIn Ihrem Depot ist per 31.12.2024 kein Bestand vorhanden.\\n\\nDie Depotentgelte für den Zeitraum vom 01.10.2024 bis 31.12.2024 betragen unter Beachtung des Mindestentgeltes netto 5,00 Euro + 19% USt 0,95 Euro = brutto 5,95 Euro.\\n\\nDie Belastung erfolgt mit Valuta 07.02.2025 auf dem Konto 21504006 (IBAN DE07 7525 0000 0021 5040 06), BLZ 752 500 00 (BIC BYLADEM1ABG).\\n\\nWir bitten Sie, Ihren Depotauszug zu prüfen und Einwendungen gemäß unseren Allgemeinen Geschäftsbedingungen unverzüglich in Textform bei unserer Revisionsabteilung zu erheben.\\n\\nBei Fragen zu Ihrem Depotauszug wenden Sie sich bitte an Ihre Beraterin/Ihren Berater. Auf Wunsch stehen wir Ihnen für ein Beratungsgespräch gerne zur Verfügung.\", \"character_count\": 2061, \"document_type\": \"Statement\", \"three_word_description_german\": \"Depot Jahresauszug Bericht\", \"three_word_description_english\": \"Depot Year Statement\", \"content_summary_german\": \"Dieses Dokument ist ein Jahresdepotauszug der Sparkasse Amberg-Sulzbach für die Firma Ramteid GmbH. Es zeigt, dass per 31.12.2024 kein Bestand im Depot vorhanden ist und die Depotentgelte für den Zeitraum vom 01.10.2024 bis 31.12.2024 betragen 5,95 Euro.\", \"content_summary_english\": \"This document is a year-end depot statement from Sparkasse Amberg-Sulzbach for Ramteid GmbH. It indicates that there was no balance in the depot as of December 31, 2024, and the depot fees for the period from October 1, 2024, to December 31, 2024, amount to 5.95 Euro.\", \"extraction_quality\": \"excellent\", \"has_tables\": false, \"has_formulas\": false, \"document_sections\": [\"Jahresabschluss 2024\", \"Depotauszug/Aufstellung über Kundenfinanzinstrumente per 31.12.2024\"]}",
+    "thinking": null,
+    "json": {
+      "extracted_text": "Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\n\nFirma Ramteid GmbH Auf den Hochäckern 5 92224 Amberg\n\nSeite 1 von 1 10.01.2025\n\nDatum Depotnummer\n\n7274087\n\nKundendepot Ramteid GmbH\n\nRechnungs-Nr.\n\nDJ-2279003372/25\n\nUmsatzsteuer-ID\n\nDE131841737\n\n## Jahresabschluss 2024\n\nSehr geehrte Damen und Herren, gerne übersenden wir Ihnen den Jahresdepotauszug per 31.12.2024.\n\nWiderrufsrecht bei Prospektnachträgen: Aktuelle Informationen hierzu (gültig ab 4. Dezember 2024) finden Sie unter \"Information zum Widerrufsrecht im Falle eines Nachtrags zum Wertpapierprospekt\" auf unserer Internetseite Danach erhalten Sie eine Nachtragsinfo von uns nur, wenn Sie ein elektr. Postfach bei uns führen. Sprechen Sie uns hierzu gerne an. Ohne Postfach sollten Sie die Website des Emittenten selbst überwachen und prüfen, ob ein Nachtrag veröffentlicht wurde.\n\nWir danken Ihnen für Ihr Vertrauen und wünschen Ihnen ein gesundes und erfolgreiches neues Jahr.\n\nMit freundlichen Grüßen\n\nSPK AMBERG-SULZBACH\n\nSparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\n\nFirma Ramteid GmbH Auf den Hochäckern 5 92224 Amberg\n\nSeite 1 von 1 10.01.2025\n\nDatum Depotnummer\n\n7274087\n\nKundendepot Ramteid GmbH\n\nRechnungs-Nr.\n\nDJ-2279003372/25\n\nUmsatzsteuer-ID\n\nDE131841737\n\n## Depotauszug/Aufstellung über Kundenfinanzinstrumente per 31.12.2024\n\nIn Ihrem Depot ist per 31.12.2024 kein Bestand vorhanden.\n\nDie Depotentgelte für den Zeitraum vom 01.10.2024 bis 31.12.2024 betragen unter Beachtung des Mindestentgeltes netto 5,00 Euro + 19% USt 0,95 Euro = brutto 5,95 Euro.\n\nDie Belastung erfolgt mit Valuta 07.02.2025 auf dem Konto 21504006 (IBAN DE07 7525 0000 0021 5040 06), BLZ 752 500 00 (BIC BYLADEM1ABG).\n\nWir bitten Sie, Ihren Depotauszug zu prüfen und Einwendungen gemäß unseren Allgemeinen Geschäftsbedingungen unverzüglich in Textform bei unserer Revisionsabteilung zu erheben.\n\nBei Fragen zu Ihrem Depotauszug wenden Sie sich bitte an Ihre Beraterin/Ihren Berater. Auf Wunsch stehen wir Ihnen für ein Beratungsgespräch gerne zur Verfügung.",
+      "character_count": 2061,
+      "document_type": "Statement",
+      "three_word_description_german": "Depot Jahresauszug Bericht",
+      "three_word_description_english": "Depot Year Statement",
+      "content_summary_german": "Dieses Dokument ist ein Jahresdepotauszug der Sparkasse Amberg-Sulzbach für die Firma Ramteid GmbH. Es zeigt, dass per 31.12.2024 kein Bestand im Depot vorhanden ist und die Depotentgelte für den Zeitraum vom 01.10.2024 bis 31.12.2024 betragen 5,95 Euro.",
+      "content_summary_english": "This document is a year-end depot statement from Sparkasse Amberg-Sulzbach for Ramteid GmbH. It indicates that there was no balance in the depot as of December 31, 2024, and the depot fees for the period from October 1, 2024, to December 31, 2024, amount to 5.95 Euro.",
+      "extraction_quality": "excellent",
+      "has_tables": false,
+      "has_formulas": false,
+      "document_sections": [
+        "Jahresabschluss 2024",
+        "Depotauszug/Aufstellung über Kundenfinanzinstrumente per 31.12.2024"
+      ]
+    }
+  },
+  "statistics": {
+    "tokens": {
+      "input_estimated": 1197,
+      "output_estimated": 767,
+      "total_estimated": 1964,
+      "tokens_per_second": 21.373975375465587
+    },
+    "characters": {
+      "response_total": 3071,
+      "extracted_text": 2029,
+      "json_formatted": 3257
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

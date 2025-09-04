@@ -1,0 +1,19 @@
+{
+  "extractor": "docling",
+  "confidence": 0.85,
+  "character_count": 1188,
+  "extraction_metadata": {
+    "extraction_time": 9.67159652709961,
+    "pages": 1,
+    "tables": [],
+    "sections": [
+      "Wertpapier Abrechnung Kauf",
+      "Market-Orde r",
+      "Kurswert"
+    ],
+    "has_tables": false,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 1197
+}

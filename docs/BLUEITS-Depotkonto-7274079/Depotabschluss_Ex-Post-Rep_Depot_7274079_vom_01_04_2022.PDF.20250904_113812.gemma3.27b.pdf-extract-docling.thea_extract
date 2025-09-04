@@ -1,0 +1,171 @@
+{
+  "version": "2.0",
+  "metadata": {
+    "file": {
+      "pdf_path": "docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_01_04_2022.PDF",
+      "pdf_absolute_path": "/mnt/c/Projects/THEA/docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_01_04_2022.PDF",
+      "pdf_size_bytes": 61782,
+      "pdf_pages": 0,
+      "output_file": "docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_01_04_2022.PDF.20250904_113812.gemma3.27b.pdf-extract-docling.thea_extract"
+    },
+    "processing": {
+      "timestamp": "20250904_113812",
+      "start_time": "2025-09-04T11:38:12.305319Z",
+      "end_time": "2025-09-04T11:39:53.747143Z",
+      "processing_time_seconds": 101.4386613368988,
+      "hostname": "BLUEITS-DS",
+      "platform": "linux",
+      "pipeline": "pdf-extract-docling",
+      "pipeline_metadata": {
+        "pipeline": "pdf-extract-docling",
+        "timestamp": "2025-09-04T11:36:46.781820Z",
+        "pdf_path": "docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_01_04_2022.PDF",
+        "extractor": "docling",
+        "fallback_model": "gemma3:27b",
+        "save_sidecars": true,
+        "saved_files": [
+          {
+            "extractor": "docling",
+            "type": "text/plain",
+            "text_file": "docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_01_04_2022.PDF.20250904_113646.gemma3.27b.pdf-extract-docling.docling.txt",
+            "json_file": "docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_01_04_2022.PDF.20250904_113646.gemma3.27b.pdf-extract-docling.docling.json",
+            "confidence": 0.9,
+            "character_count": 3184,
+            "file_size": 3226,
+            "md_file": "docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_01_04_2022.PDF.20250904_113646.gemma3.27b.pdf-extract-docling.docling.md"
+          }
+        ],
+        "extraction_success": true,
+        "text_length": 3184,
+        "confidence": 0.9,
+        "has_tables": false,
+        "has_formulas": false,
+        "document_type": "invoice",
+        "pages": 2
+      }
+    },
+    "model": {
+      "name": "gemma3:27b",
+      "endpoint": "https://b1s.hey.bahn.business/api/chat",
+      "stream": true,
+      "format": "json"
+    }
+  },
+  "settings": {
+    "mode": "skip",
+    "suffix": "pdf-extract-docling",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "save_sidecars": true,
+    "dpi": 300,
+    "max_attempts": 3,
+    "initial_temperature": 0.2,
+    "temperature_progression": [
+      0.2
+    ],
+    "timeout": 300,
+    "max_tokens": 50000
+  },
+  "execution": {
+    "retry_count": 0,
+    "final_temperature": 0.2,
+    "stuck_pattern_detected": false,
+    "pattern_type": null,
+    "chunks_received": 1412,
+    "request_time_seconds": 101.43848848342896,
+    "files_processed": [
+      {
+        "extractor": "docling",
+        "type": "text/plain",
+        "text_file": "docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_01_04_2022.PDF.20250904_113646.gemma3.27b.pdf-extract-docling.docling.txt",
+        "json_file": "docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_01_04_2022.PDF.20250904_113646.gemma3.27b.pdf-extract-docling.docling.json",
+        "confidence": 0.9,
+        "character_count": 3184,
+        "file_size": 3226,
+        "md_file": "docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_01_04_2022.PDF.20250904_113646.gemma3.27b.pdf-extract-docling.docling.md"
+      }
+    ]
+  },
+  "prompt": {
+    "system": "You are a vision-based text extractor and analyzer. Always use <thinking></thinking> tags to show your analysis process. You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text. Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }.: {\"extracted_text\": \"<string (complete verified text from document)>\", \"character_count\": \"<number (exact count of extracted text)>\", \"document_type\": \"<string (e.g., Invoice, Contract, Report, Statement, Technical)>\", \"three_word_description_german\": \"<string (exactly 3 words)>\", \"three_word_description_english\": \"<string (exactly 3 words)>\", \"content_summary_german\": \"<string (2-3 sentences)>\", \"content_summary_english\": \"<string (2-3 sentences)>\", \"extraction_quality\": \"<string (excellent/good/fair/poor)>\", \"has_tables\": \"<boolean>\", \"has_formulas\": \"<boolean>\", \"document_sections\": \"<array of strings (main section headings if present)>\"}",
+    "user": "Analyze the Docling extraction from PDF 'docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_01_04_2022.PDF'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON.",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "prompt_config": {
+      "version": "2.0",
+      "name": "pdf-extract-docling",
+      "description": "Advanced document extraction using Docling with gemma3:27b fallback for complex documents",
+      "system_prompt": {
+        "suffix": "You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text.",
+        "output_format": {
+          "type": "json",
+          "schema": {
+            "extracted_text": "string (complete verified text from document)",
+            "character_count": "number (exact count of extracted text)",
+            "document_type": "string (e.g., Invoice, Contract, Report, Statement, Technical)",
+            "three_word_description_german": "string (exactly 3 words)",
+            "three_word_description_english": "string (exactly 3 words)",
+            "content_summary_german": "string (2-3 sentences)",
+            "content_summary_english": "string (2-3 sentences)",
+            "extraction_quality": "string (excellent/good/fair/poor)",
+            "has_tables": "boolean",
+            "has_formulas": "boolean",
+            "document_sections": "array of strings (main section headings if present)"
+          },
+          "instructions": "Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }."
+        }
+      },
+      "user_prompt": {
+        "template": "Analyze the Docling extraction from PDF '{{pdf_path}}'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON."
+      },
+      "settings": {
+        "model": "gemma3:27b",
+        "temperature": 0.2,
+        "max_attempts": 3,
+        "timeout": 300,
+        "max_tokens": 50000,
+        "mode": "skip",
+        "save_sidecars": true,
+        "format": "json",
+        "pipeline": "pdf-extract-docling",
+        "pipeline_config": {
+          "use_fallback_model": true,
+          "fallback_model": "gemma3:27b"
+        },
+        "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+      }
+    }
+  },
+  "response": {
+    "text": "{\"extracted_text\": \"Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\\n\\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\\n\\nDatum Depotnummer\\n\\nim April 2022 7274079 Kundendepot\\n\\nBLUEITS GmbH\\n\\nRechnungs-Nr.\\n\\nDJ-2279008626/22\\n\\nUmsatzsteuer-ID\\n\\nDE131841737\\n\\n## Aufstellung über Kundenfinanzinstrumente per 31.03.2022\\n\\nSehr geehrte Damen und Herren, gerne übersenden wir Ihnen zu Ihrem Depot die Aufstellung der Wertpapierbestände per 31.03.2022.\\n\\nWiderrufsrecht bei Prospektnachträgen: Der Wertpapierprospekt enthält eine Beschreibung des Wertpapiers. Es kann einen Nachtrag zum Wertpapierprospekt geben, den der Emittent auf seiner Website veröffentlicht. Bei einem Nachtrag kann Ihnen ein Widerrufsrecht zustehen (gesetzliche Widerrufsfrist aktuell drei Arbeitstage). Hierzu werden Sie zeitnah informiert, wenn Sie ein elektronisches Postfach haben. Wir empfehlen die Einrichtung eines elektronischen Postfachs. Ihr Berater wird Sie bei der Ausübung des Widerrufsrechts gerne unterstützen.\\n\\nWir danken Ihnen für Ihr Vertrauen und stehen für Fragen gerne zur Verfügung.\\n\\nMit freundlichen Grüßen\\n\\nSPK AMBERG-SULZBACH\\n\\nSparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\\n\\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\\n\\nSeite 1 von 1 im April 2022\\n\\nDatum Depotnummer\\n\\n7274079\\n\\nKundendepot BLUEITS GmbH\\n\\nRechnungs-Nr.\\n\\nDJ-2279008626/22\\n\\nUmsatzsteuer-ID\\n\\nDE131841737\\n\\n## Aufstellung über Kundenfinanzinstrumente per 31.03.2022\\n\\nNominale\\n\\nWertpapierinformationen\\n\\nKurs in Währung pro Stück / % Devisenkurs Kursdatum Handelsplatz\\n\\nKurswert in EUR Depotentgelt\\n\\nAktienwerte\\n\\nStück\\n\\n100\\n\\nTESLA INC. REGISTERED SHARES DL-,001\\n\\nUS88160R1014 (A1CX3T)\\n\\n975,00 EUR\\n\\n31.03.2022\\n\\nTradegate Freiverk.\\n\\n97.500,00 9,45\\n\\n1 Posten\\n\\nSumme Kurswerte\\n\\n97.500,00\\n\\nDie Depotentgelte für den Zeitraum vom 01.01.2022 bis 31.03.2022 betragen netto 9,45 Euro + 19% USt 1,80 Euro = brutto 11,25 Euro.\\n\\nDiesen Betrag belasten wir mit Valuta 14.04.2022 dem Konto 21503990 (IBAN DE51 7525 0000 0021 5039 90), BLZ 752 500 00 (BIC BYLADEM1ABG).\\n\\nBitte beachten Sie die folgenden Hinweise zur Bewertung Ihres Wertpapierbestandes:\\n\\n- Die Kurse verstehen sich in Prozent, wenn die Bestände nicht auf Stück lauten. Soweit Kursangaben fehlen, handelt es sich entweder um Wertpapiere, für die ein Kurs nicht oder nicht rechtzeitig festgestellt werden konnte oder um nicht notierte Wertpapiere. Eine Gewähr für die Richtigkeit der Kurse können wir nicht übernehmen.\\n- Der Kurswert lautet in allen Fällen auf Euro. Bei in Fremdwährung angegebenen Kursen wurden - sofern keine festen Devisenkurse anzusetzen sind - die Kurswerte nach dem zum Stichtag zugrunde liegenden Devisenkurs errechnet. Die Devisenkurse beziehen sich auf 1 Euro.\\n\\nSofern nicht anders angegeben, sind Ihre Wertpapierbestände in Girosammelverwahrung gebucht.\\n\\nSofern für in diesem Depotauszug aufgeführte Wertpapiere kein Kurs ermittelt werden konnte, kann dies auf mangelnde Liquidität hindeuten.\\n\\nSämtliche in diesem Depotauszug aufgeführten Wertpapiere unterliegen der Richtlinie 2014/65/EU (MiFID II) sowie deren ergänzenden Durchführungsmaßnahmen.\\n\\nDieses Dokument wurde maschinell erstellt und wird nicht unterschrieben.\", \"character_count\": 3184, \"document_type\": \"Statement\", \"three_word_description_german\": \"Depotabrechnung Kundenkonto Finanz\", \"three_word_description_english\": \"Account statement finance\", \"content_summary_german\": \"Dieses Dokument ist eine Depotabrechnung der Sparkasse Amberg-Sulzbach für die Firma BLUEITS GmbH. Es enthält eine Aufstellung der Wertpapierbestände per 31.03.2022 sowie Informationen zu Depotentgelten und Kontobelastungen.\", \"content_summary_english\": \"This document is an account statement from Sparkasse Amberg-Sulzbach for BLUEITS GmbH. It contains a listing of securities holdings as of March 31, 2022, as well as information on custody fees and account charges.\", \"extraction_quality\": \"excellent\", \"has_tables\": false, \"has_formulas\": false, \"document_sections\": [\"Aufstellung über Kundenfinanzinstrumente per 31.03.2022\"]}",
+    "thinking": null,
+    "json": {
+      "extracted_text": "Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\n\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\n\nDatum Depotnummer\n\nim April 2022 7274079 Kundendepot\n\nBLUEITS GmbH\n\nRechnungs-Nr.\n\nDJ-2279008626/22\n\nUmsatzsteuer-ID\n\nDE131841737\n\n## Aufstellung über Kundenfinanzinstrumente per 31.03.2022\n\nSehr geehrte Damen und Herren, gerne übersenden wir Ihnen zu Ihrem Depot die Aufstellung der Wertpapierbestände per 31.03.2022.\n\nWiderrufsrecht bei Prospektnachträgen: Der Wertpapierprospekt enthält eine Beschreibung des Wertpapiers. Es kann einen Nachtrag zum Wertpapierprospekt geben, den der Emittent auf seiner Website veröffentlicht. Bei einem Nachtrag kann Ihnen ein Widerrufsrecht zustehen (gesetzliche Widerrufsfrist aktuell drei Arbeitstage). Hierzu werden Sie zeitnah informiert, wenn Sie ein elektronisches Postfach haben. Wir empfehlen die Einrichtung eines elektronischen Postfachs. Ihr Berater wird Sie bei der Ausübung des Widerrufsrechts gerne unterstützen.\n\nWir danken Ihnen für Ihr Vertrauen und stehen für Fragen gerne zur Verfügung.\n\nMit freundlichen Grüßen\n\nSPK AMBERG-SULZBACH\n\nSparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\n\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\n\nSeite 1 von 1 im April 2022\n\nDatum Depotnummer\n\n7274079\n\nKundendepot BLUEITS GmbH\n\nRechnungs-Nr.\n\nDJ-2279008626/22\n\nUmsatzsteuer-ID\n\nDE131841737\n\n## Aufstellung über Kundenfinanzinstrumente per 31.03.2022\n\nNominale\n\nWertpapierinformationen\n\nKurs in Währung pro Stück / % Devisenkurs Kursdatum Handelsplatz\n\nKurswert in EUR Depotentgelt\n\nAktienwerte\n\nStück\n\n100\n\nTESLA INC. REGISTERED SHARES DL-,001\n\nUS88160R1014 (A1CX3T)\n\n975,00 EUR\n\n31.03.2022\n\nTradegate Freiverk.\n\n97.500,00 9,45\n\n1 Posten\n\nSumme Kurswerte\n\n97.500,00\n\nDie Depotentgelte für den Zeitraum vom 01.01.2022 bis 31.03.2022 betragen netto 9,45 Euro + 19% USt 1,80 Euro = brutto 11,25 Euro.\n\nDiesen Betrag belasten wir mit Valuta 14.04.2022 dem Konto 21503990 (IBAN DE51 7525 0000 0021 5039 90), BLZ 752 500 00 (BIC BYLADEM1ABG).\n\nBitte beachten Sie die folgenden Hinweise zur Bewertung Ihres Wertpapierbestandes:\n\n- Die Kurse verstehen sich in Prozent, wenn die Bestände nicht auf Stück lauten. Soweit Kursangaben fehlen, handelt es sich entweder um Wertpapiere, für die ein Kurs nicht oder nicht rechtzeitig festgestellt werden konnte oder um nicht notierte Wertpapiere. Eine Gewähr für die Richtigkeit der Kurse können wir nicht übernehmen.\n- Der Kurswert lautet in allen Fällen auf Euro. Bei in Fremdwährung angegebenen Kursen wurden - sofern keine festen Devisenkurse anzusetzen sind - die Kurswerte nach dem zum Stichtag zugrunde liegenden Devisenkurs errechnet. Die Devisenkurse beziehen sich auf 1 Euro.\n\nSofern nicht anders angegeben, sind Ihre Wertpapierbestände in Girosammelverwahrung gebucht.\n\nSofern für in diesem Depotauszug aufgeführte Wertpapiere kein Kurs ermittelt werden konnte, kann dies auf mangelnde Liquidität hindeuten.\n\nSämtliche in diesem Depotauszug aufgeführten Wertpapiere unterliegen der Richtlinie 2014/65/EU (MiFID II) sowie deren ergänzenden Durchführungsmaßnahmen.\n\nDieses Dokument wurde maschinell erstellt und wird nicht unterschrieben.",
+      "character_count": 3184,
+      "document_type": "Statement",
+      "three_word_description_german": "Depotabrechnung Kundenkonto Finanz",
+      "three_word_description_english": "Account statement finance",
+      "content_summary_german": "Dieses Dokument ist eine Depotabrechnung der Sparkasse Amberg-Sulzbach für die Firma BLUEITS GmbH. Es enthält eine Aufstellung der Wertpapierbestände per 31.03.2022 sowie Informationen zu Depotentgelten und Kontobelastungen.",
+      "content_summary_english": "This document is an account statement from Sparkasse Amberg-Sulzbach for BLUEITS GmbH. It contains a listing of securities holdings as of March 31, 2022, as well as information on custody fees and account charges.",
+      "extraction_quality": "excellent",
+      "has_tables": false,
+      "has_formulas": false,
+      "document_sections": [
+        "Aufstellung über Kundenfinanzinstrumente per 31.03.2022"
+      ]
+    }
+  },
+  "statistics": {
+    "tokens": {
+      "input_estimated": 1498,
+      "output_estimated": 1030,
+      "total_estimated": 2528,
+      "tokens_per_second": 10.153919486172601
+    },
+    "characters": {
+      "response_total": 4121,
+      "extracted_text": 3152,
+      "json_formatted": 4383
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

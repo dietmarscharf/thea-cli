@@ -1,0 +1,18 @@
+{
+  "extractor": "docling",
+  "confidence": 0.85,
+  "character_count": 1593,
+  "extraction_metadata": {
+    "extraction_time": 12.948035955429077,
+    "pages": 2,
+    "tables": [],
+    "sections": [
+      "Jahresabschluss 2023",
+      "Depotauszug/Aufstellung \u00fcber Kundenfinanzinstrumente per 31.12.2023"
+    ],
+    "has_tables": false,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 1614
+}

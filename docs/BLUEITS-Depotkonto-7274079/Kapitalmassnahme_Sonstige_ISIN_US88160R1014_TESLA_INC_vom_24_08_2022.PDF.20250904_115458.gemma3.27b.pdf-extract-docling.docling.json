@@ -1,0 +1,17 @@
+{
+  "extractor": "docling",
+  "confidence": 0.85,
+  "character_count": 1137,
+  "extraction_metadata": {
+    "extraction_time": 5.340280294418335,
+    "pages": 1,
+    "tables": [],
+    "sections": [
+      "Aktiensplit (Neueinteilung des Grundkapitals)"
+    ],
+    "has_tables": false,
+    "has_formulas": false,
+    "document_type": "document"
+  },
+  "file_size": 1149
+}

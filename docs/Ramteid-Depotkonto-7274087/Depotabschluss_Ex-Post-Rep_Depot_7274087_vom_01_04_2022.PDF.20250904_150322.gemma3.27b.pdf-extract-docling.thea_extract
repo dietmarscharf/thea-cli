@@ -1,0 +1,172 @@
+{
+  "version": "2.0",
+  "metadata": {
+    "file": {
+      "pdf_path": "docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF",
+      "pdf_absolute_path": "/mnt/c/Projects/THEA/docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF",
+      "pdf_size_bytes": 58757,
+      "pdf_pages": 0,
+      "output_file": "docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF.20250904_150322.gemma3.27b.pdf-extract-docling.thea_extract"
+    },
+    "processing": {
+      "timestamp": "20250904_150322",
+      "start_time": "2025-09-04T15:03:22.209366Z",
+      "end_time": "2025-09-04T15:03:56.240662Z",
+      "processing_time_seconds": 34.027583360672,
+      "hostname": "BLUEITS-DS",
+      "platform": "linux",
+      "pipeline": "pdf-extract-docling",
+      "pipeline_metadata": {
+        "pipeline": "pdf-extract-docling",
+        "timestamp": "2025-09-04T15:03:12.861573Z",
+        "pdf_path": "docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF",
+        "extractor": "docling",
+        "fallback_model": "gemma3:27b",
+        "save_sidecars": true,
+        "saved_files": [
+          {
+            "extractor": "docling",
+            "type": "text/plain",
+            "text_file": "docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF.20250904_150312.gemma3.27b.pdf-extract-docling.docling.txt",
+            "json_file": "docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF.20250904_150312.gemma3.27b.pdf-extract-docling.docling.json",
+            "confidence": 0.85,
+            "character_count": 1818,
+            "file_size": 1839,
+            "md_file": "docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF.20250904_150312.gemma3.27b.pdf-extract-docling.docling.md"
+          }
+        ],
+        "extraction_success": true,
+        "text_length": 1818,
+        "confidence": 0.85,
+        "has_tables": false,
+        "has_formulas": false,
+        "document_type": "invoice",
+        "pages": 2
+      }
+    },
+    "model": {
+      "name": "gemma3:27b",
+      "endpoint": "https://b1s.hey.bahn.business/api/chat",
+      "stream": true,
+      "format": "json"
+    }
+  },
+  "settings": {
+    "mode": "skip",
+    "suffix": "pdf-extract-docling",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "save_sidecars": true,
+    "dpi": 300,
+    "max_attempts": 3,
+    "initial_temperature": 0.2,
+    "temperature_progression": [
+      0.2
+    ],
+    "timeout": 300,
+    "max_tokens": 50000
+  },
+  "execution": {
+    "retry_count": 0,
+    "final_temperature": 0.2,
+    "stuck_pattern_detected": false,
+    "pattern_type": null,
+    "chunks_received": 1052,
+    "request_time_seconds": 34.02739477157593,
+    "files_processed": [
+      {
+        "extractor": "docling",
+        "type": "text/plain",
+        "text_file": "docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF.20250904_150312.gemma3.27b.pdf-extract-docling.docling.txt",
+        "json_file": "docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF.20250904_150312.gemma3.27b.pdf-extract-docling.docling.json",
+        "confidence": 0.85,
+        "character_count": 1818,
+        "file_size": 1839,
+        "md_file": "docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF.20250904_150312.gemma3.27b.pdf-extract-docling.docling.md"
+      }
+    ]
+  },
+  "prompt": {
+    "system": "You are a vision-based text extractor and analyzer. Always use <thinking></thinking> tags to show your analysis process. You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text. Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }.: {\"extracted_text\": \"<string (complete verified text from document)>\", \"character_count\": \"<number (exact count of extracted text)>\", \"document_type\": \"<string (e.g., Invoice, Contract, Report, Statement, Technical)>\", \"three_word_description_german\": \"<string (exactly 3 words)>\", \"three_word_description_english\": \"<string (exactly 3 words)>\", \"content_summary_german\": \"<string (2-3 sentences)>\", \"content_summary_english\": \"<string (2-3 sentences)>\", \"extraction_quality\": \"<string (excellent/good/fair/poor)>\", \"has_tables\": \"<boolean>\", \"has_formulas\": \"<boolean>\", \"document_sections\": \"<array of strings (main section headings if present)>\"}",
+    "user": "Analyze the Docling extraction from PDF 'docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON.",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "prompt_config": {
+      "version": "2.0",
+      "name": "pdf-extract-docling",
+      "description": "Advanced document extraction using Docling with gemma3:27b fallback for complex documents",
+      "system_prompt": {
+        "suffix": "You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text.",
+        "output_format": {
+          "type": "json",
+          "schema": {
+            "extracted_text": "string (complete verified text from document)",
+            "character_count": "number (exact count of extracted text)",
+            "document_type": "string (e.g., Invoice, Contract, Report, Statement, Technical)",
+            "three_word_description_german": "string (exactly 3 words)",
+            "three_word_description_english": "string (exactly 3 words)",
+            "content_summary_german": "string (2-3 sentences)",
+            "content_summary_english": "string (2-3 sentences)",
+            "extraction_quality": "string (excellent/good/fair/poor)",
+            "has_tables": "boolean",
+            "has_formulas": "boolean",
+            "document_sections": "array of strings (main section headings if present)"
+          },
+          "instructions": "Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }."
+        }
+      },
+      "user_prompt": {
+        "template": "Analyze the Docling extraction from PDF '{{pdf_path}}'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON."
+      },
+      "settings": {
+        "model": "gemma3:27b",
+        "temperature": 0.2,
+        "max_attempts": 3,
+        "timeout": 300,
+        "max_tokens": 50000,
+        "mode": "skip",
+        "save_sidecars": true,
+        "format": "json",
+        "pipeline": "pdf-extract-docling",
+        "pipeline_config": {
+          "use_fallback_model": true,
+          "fallback_model": "gemma3:27b"
+        },
+        "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+      }
+    }
+  },
+  "response": {
+    "text": "{\"extracted_text\": \"Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\\n\\nFirma Ramteid GmbH Auf den Hochäckern 5 92224 Amberg\\n\\nDatum Depotnummer\\n\\nim April 2022 7274087\\n\\nKundendepot Ramteid GmbH\\n\\nRechnungs-Nr.\\n\\nDJ-2279008627/22\\n\\nUmsatzsteuer-ID\\n\\nDE131841737\\n\\n## Aufstellung über Kundenfinanzinstrumente per 31.03.2022\\n\\nSehr geehrte Damen und Herren, gerne übersenden wir Ihnen zu Ihrem Depot die Aufstellung der Wertpapierbestände per 31.03.2022.\\n\\nWiderrufsrecht bei Prospektnachträgen: Der Wertpapierprospekt enthält eine Beschreibung des Wertpapiers. Es kann einen Nachtrag zum Wertpapierprospekt geben, den der Emittent auf seiner Website veröffentlicht. Bei einem Nachtrag kann Ihnen ein Widerrufsrecht zustehen (gesetzliche Widerrufsfrist aktuell drei Arbeitstage). Hierzu werden Sie zeitnah informiert, wenn Sie ein elektronisches Postfach haben. Wir empfehlen die Einrichtung eines elektronischen Postfachs. Ihr Berater wird Sie bei der Ausübung des Widerrufsrechts gerne unterstützen.\\n\\nWir danken Ihnen für Ihr Vertrauen und stehen für Fragen gerne zur Verfügung.\\n\\nMit freundlichen Grüßen\\n\\nSPK AMBERG-SULZBACH\\n\\nSparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\\n\\nFirma Ramteid GmbH Auf den Hochäckern 5 92224 Amberg\\n\\nSeite 1 von 1 im April 2022 7274087 Kundendepot\\n\\nDatum Depotnummer\\n\\nRamteid GmbH\\n\\nRechnungs-Nr.\\n\\nDJ-2279008627/22\\n\\nUmsatzsteuer-ID\\n\\nDE131841737\\n\\n## Aufstellung über Kundenfinanzinstrumente per 31.03.2022\\n\\nIn Ihrem Depot ist per 31.03.2022 kein Bestand vorhanden.\\n\\nDie Depotentgelte für den Zeitraum vom 01.01.2022 bis 31.03.2022 betragen unter Beachtung des Mindestentgeltes netto 5,00 Euro + 19% USt 0,95 Euro = brutto 5,95 Euro.\\n\\nDiesen Betrag belasten wir mit Valuta 14.04.2022 dem Konto 21504006 (IBAN DE07 7525 0000 0021 5040 06), BLZ 752 500 00 (BIC BYLADEM1ABG).\", \"character_count\": 1818, \"document_type\": \"Statement\", \"three_word_description_german\": \"Depotabrechnung Ramteid GmbH\", \"three_word_description_english\": \"Depot statement Ramteid\", \"content_summary_german\": \"Dieses Dokument ist eine Depotabrechnung der Sparkasse Amberg-Sulzbach für die Firma Ramteid GmbH. Es zeigt, dass per 31.03.2022 kein Bestand im Depot vorhanden ist und die Depotentgelte für den Zeitraum vom 01.01.2022 bis 31.03.2022 5,95 Euro betragen.\", \"content_summary_english\": \"This document is a depot statement from Sparkasse Amberg-Sulzbach for Ramteid GmbH. It indicates that there was no balance in the depot as of March 31, 2022, and the depot fees for the period from January 1, 2022, to March 31, 2022, amount to 5.95 Euro.\", \"extraction_quality\": \"excellent\", \"has_tables\": false, \"has_formulas\": false, \"document_sections\": [\"Aufstellung über Kundenfinanzinstrumente per 31.03.2022\", \"Aufstellung über Kundenfinanzinstrumente per 31.03.2022\"]}",
+    "thinking": null,
+    "json": {
+      "extracted_text": "Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\n\nFirma Ramteid GmbH Auf den Hochäckern 5 92224 Amberg\n\nDatum Depotnummer\n\nim April 2022 7274087\n\nKundendepot Ramteid GmbH\n\nRechnungs-Nr.\n\nDJ-2279008627/22\n\nUmsatzsteuer-ID\n\nDE131841737\n\n## Aufstellung über Kundenfinanzinstrumente per 31.03.2022\n\nSehr geehrte Damen und Herren, gerne übersenden wir Ihnen zu Ihrem Depot die Aufstellung der Wertpapierbestände per 31.03.2022.\n\nWiderrufsrecht bei Prospektnachträgen: Der Wertpapierprospekt enthält eine Beschreibung des Wertpapiers. Es kann einen Nachtrag zum Wertpapierprospekt geben, den der Emittent auf seiner Website veröffentlicht. Bei einem Nachtrag kann Ihnen ein Widerrufsrecht zustehen (gesetzliche Widerrufsfrist aktuell drei Arbeitstage). Hierzu werden Sie zeitnah informiert, wenn Sie ein elektronisches Postfach haben. Wir empfehlen die Einrichtung eines elektronischen Postfachs. Ihr Berater wird Sie bei der Ausübung des Widerrufsrechts gerne unterstützen.\n\nWir danken Ihnen für Ihr Vertrauen und stehen für Fragen gerne zur Verfügung.\n\nMit freundlichen Grüßen\n\nSPK AMBERG-SULZBACH\n\nSparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\n\nFirma Ramteid GmbH Auf den Hochäckern 5 92224 Amberg\n\nSeite 1 von 1 im April 2022 7274087 Kundendepot\n\nDatum Depotnummer\n\nRamteid GmbH\n\nRechnungs-Nr.\n\nDJ-2279008627/22\n\nUmsatzsteuer-ID\n\nDE131841737\n\n## Aufstellung über Kundenfinanzinstrumente per 31.03.2022\n\nIn Ihrem Depot ist per 31.03.2022 kein Bestand vorhanden.\n\nDie Depotentgelte für den Zeitraum vom 01.01.2022 bis 31.03.2022 betragen unter Beachtung des Mindestentgeltes netto 5,00 Euro + 19% USt 0,95 Euro = brutto 5,95 Euro.\n\nDiesen Betrag belasten wir mit Valuta 14.04.2022 dem Konto 21504006 (IBAN DE07 7525 0000 0021 5040 06), BLZ 752 500 00 (BIC BYLADEM1ABG).",
+      "character_count": 1818,
+      "document_type": "Statement",
+      "three_word_description_german": "Depotabrechnung Ramteid GmbH",
+      "three_word_description_english": "Depot statement Ramteid",
+      "content_summary_german": "Dieses Dokument ist eine Depotabrechnung der Sparkasse Amberg-Sulzbach für die Firma Ramteid GmbH. Es zeigt, dass per 31.03.2022 kein Bestand im Depot vorhanden ist und die Depotentgelte für den Zeitraum vom 01.01.2022 bis 31.03.2022 5,95 Euro betragen.",
+      "content_summary_english": "This document is a depot statement from Sparkasse Amberg-Sulzbach for Ramteid GmbH. It indicates that there was no balance in the depot as of March 31, 2022, and the depot fees for the period from January 1, 2022, to March 31, 2022, amount to 5.95 Euro.",
+      "extraction_quality": "excellent",
+      "has_tables": false,
+      "has_formulas": false,
+      "document_sections": [
+        "Aufstellung über Kundenfinanzinstrumente per 31.03.2022",
+        "Aufstellung über Kundenfinanzinstrumente per 31.03.2022"
+      ]
+    }
+  },
+  "statistics": {
+    "tokens": {
+      "input_estimated": 1145,
+      "output_estimated": 707,
+      "total_estimated": 1852,
+      "tokens_per_second": 20.777261567658908
+    },
+    "characters": {
+      "response_total": 2830,
+      "extracted_text": 1786,
+      "json_formatted": 2991
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

@@ -1,0 +1,175 @@
+{
+  "version": "2.0",
+  "metadata": {
+    "file": {
+      "pdf_path": "docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_15_05_2023.PDF",
+      "pdf_absolute_path": "/mnt/c/Projects/THEA/docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_15_05_2023.PDF",
+      "pdf_size_bytes": 62591,
+      "pdf_pages": 0,
+      "output_file": "docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_15_05_2023.PDF.20250904_115103.gemma3.27b.pdf-extract-docling.thea_extract"
+    },
+    "processing": {
+      "timestamp": "20250904_115103",
+      "start_time": "2025-09-04T11:51:03.043697Z",
+      "end_time": "2025-09-04T11:51:57.609775Z",
+      "processing_time_seconds": 54.563384771347046,
+      "hostname": "BLUEITS-DS",
+      "platform": "linux",
+      "pipeline": "pdf-extract-docling",
+      "pipeline_metadata": {
+        "pipeline": "pdf-extract-docling",
+        "timestamp": "2025-09-04T11:50:56.203074Z",
+        "pdf_path": "docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_15_05_2023.PDF",
+        "extractor": "docling",
+        "fallback_model": "gemma3:27b",
+        "save_sidecars": true,
+        "saved_files": [
+          {
+            "extractor": "docling",
+            "type": "text/plain",
+            "text_file": "docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_15_05_2023.PDF.20250904_115056.gemma3.27b.pdf-extract-docling.docling.txt",
+            "json_file": "docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_15_05_2023.PDF.20250904_115056.gemma3.27b.pdf-extract-docling.docling.json",
+            "confidence": 0.9500000000000001,
+            "character_count": 5282,
+            "file_size": 5384,
+            "md_file": "docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_15_05_2023.PDF.20250904_115056.gemma3.27b.pdf-extract-docling.docling.md"
+          }
+        ],
+        "extraction_success": true,
+        "text_length": 5282,
+        "confidence": 0.9500000000000001,
+        "has_tables": true,
+        "has_formulas": false,
+        "document_type": "invoice",
+        "pages": 2
+      }
+    },
+    "model": {
+      "name": "gemma3:27b",
+      "endpoint": "https://b1s.hey.bahn.business/api/chat",
+      "stream": true,
+      "format": "json"
+    }
+  },
+  "settings": {
+    "mode": "skip",
+    "suffix": "pdf-extract-docling",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "save_sidecars": true,
+    "dpi": 300,
+    "max_attempts": 3,
+    "initial_temperature": 0.2,
+    "temperature_progression": [
+      0.2
+    ],
+    "timeout": 300,
+    "max_tokens": 50000
+  },
+  "execution": {
+    "retry_count": 0,
+    "final_temperature": 0.2,
+    "stuck_pattern_detected": false,
+    "pattern_type": null,
+    "chunks_received": 1718,
+    "request_time_seconds": 54.56321358680725,
+    "files_processed": [
+      {
+        "extractor": "docling",
+        "type": "text/plain",
+        "text_file": "docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_15_05_2023.PDF.20250904_115056.gemma3.27b.pdf-extract-docling.docling.txt",
+        "json_file": "docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_15_05_2023.PDF.20250904_115056.gemma3.27b.pdf-extract-docling.docling.json",
+        "confidence": 0.9500000000000001,
+        "character_count": 5282,
+        "file_size": 5384,
+        "md_file": "docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_15_05_2023.PDF.20250904_115056.gemma3.27b.pdf-extract-docling.docling.md"
+      }
+    ]
+  },
+  "prompt": {
+    "system": "You are a vision-based text extractor and analyzer. Always use <thinking></thinking> tags to show your analysis process. You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text. Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }.: {\"extracted_text\": \"<string (complete verified text from document)>\", \"character_count\": \"<number (exact count of extracted text)>\", \"document_type\": \"<string (e.g., Invoice, Contract, Report, Statement, Technical)>\", \"three_word_description_german\": \"<string (exactly 3 words)>\", \"three_word_description_english\": \"<string (exactly 3 words)>\", \"content_summary_german\": \"<string (2-3 sentences)>\", \"content_summary_english\": \"<string (2-3 sentences)>\", \"extraction_quality\": \"<string (excellent/good/fair/poor)>\", \"has_tables\": \"<boolean>\", \"has_formulas\": \"<boolean>\", \"document_sections\": \"<array of strings (main section headings if present)>\"}",
+    "user": "Analyze the Docling extraction from PDF 'docs/BLUEITS-Depotkonto-7274079/Depotabschluss_Ex-Post-Rep_Depot_7274079_vom_15_05_2023.PDF'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON.",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "prompt_config": {
+      "version": "2.0",
+      "name": "pdf-extract-docling",
+      "description": "Advanced document extraction using Docling with gemma3:27b fallback for complex documents",
+      "system_prompt": {
+        "suffix": "You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text.",
+        "output_format": {
+          "type": "json",
+          "schema": {
+            "extracted_text": "string (complete verified text from document)",
+            "character_count": "number (exact count of extracted text)",
+            "document_type": "string (e.g., Invoice, Contract, Report, Statement, Technical)",
+            "three_word_description_german": "string (exactly 3 words)",
+            "three_word_description_english": "string (exactly 3 words)",
+            "content_summary_german": "string (2-3 sentences)",
+            "content_summary_english": "string (2-3 sentences)",
+            "extraction_quality": "string (excellent/good/fair/poor)",
+            "has_tables": "boolean",
+            "has_formulas": "boolean",
+            "document_sections": "array of strings (main section headings if present)"
+          },
+          "instructions": "Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }."
+        }
+      },
+      "user_prompt": {
+        "template": "Analyze the Docling extraction from PDF '{{pdf_path}}'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON."
+      },
+      "settings": {
+        "model": "gemma3:27b",
+        "temperature": 0.2,
+        "max_attempts": 3,
+        "timeout": 300,
+        "max_tokens": 50000,
+        "mode": "skip",
+        "save_sidecars": true,
+        "format": "json",
+        "pipeline": "pdf-extract-docling",
+        "pipeline_config": {
+          "use_fallback_model": true,
+          "fallback_model": "gemma3:27b"
+        },
+        "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+      }
+    }
+  },
+  "response": {
+    "text": "{\"extracted_text\": \"Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\\n\\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\\n\\n## Information über Kosten und Nebenkosten für depotverwahrte Finanzinstrumente für das Jahr 2022\\n\\nZur Erfüllung der Vorgaben gem. Art. 50 der Verordnung (EU) 2017/565 erhalten Sie einmal jährlich eine Aufstellung der im Vorjahr im Zusammenhang mit Ihrem Depot angefallenen Kosten und Nebenkosten. Zur Erstellung dieser Information sind wir gesetzlich verpflichtet. Bitte beachten Sie, dass die nachfolgend aufgeführten Kosten dem Vorjahr zuzuordnen sind und bereits beglichen wurden. Die Darstellung dient daher ausschließlich zu Ihrer Information.\\n\\n| Informationen zum Finanzinstrument                         | Dienst- leistungs- kosten   | davon Zuwen- dungen   | Produkt- kosten   | Fremd- währungs- kosten   | Summe je WKN/ISIN¹   |\\n|------------------------------------------------------------|-----------------------------|-----------------------|-------------------|---------------------------|----------------------|\\n| TESLA INC. REGISTERED SHARES DL-,001 US88160R1014 (A1CX3T) | 1.774,00 €                  | 0,00 €                | 0,00 €            | 0,00 €                    | 1.774,00 €           |\\n| Übergreifende Kosten                                       | 55,67 €                     | 0,00 €                | 0,00 €            | 0,00 €                    | 55,67 €              |\\n| Gesamtkosten                                               |                             |                       |                   |                           | 1.829,67 €           |\\n\\n¹ Durch die nachfolgenden Kosten wird die Rendite der Anlage vermindert.\\n\\n## Kostenzusammenfassung\\n\\n|                       | Einmalige Kosten   | Einmalige Kosten   | Laufende Kosten   | Laufende Kosten   | Summe      |\\n|-----------------------|--------------------|--------------------|-------------------|-------------------|------------|\\n|                       | in Euro            | in Prozent²        | in Euro           | in Prozent³       | in Euro    |\\n| Dienstleistungskosten | 1.774,00 €         | 0,07 %             | 55,67 €           | 0,02 %            | 1.829,67 € |\\n| davon Zuwendungen     | 0,00 €             | 0,00 %             | 0,00 €            | 0,00 %            | 0,00 €     |\\n| Produktkosten         | 0,00 €             | 0,00 %             | 0,00 €            | 0,00 %            | 0,00 €     |\\n| Fremdwährungskosten   | 0,00 €             | 0,00 %             | 0,00 €            | 0,00 %            | 0,00 €     |\\n| Gesamtkosten          | 1.774,00 €         | 0,07 %             | 55,67 €           | 0,02 %            | 1.829,67 € |\\n\\n² Prozentwert bezogen auf das Umsatzvolumen in Höhe von 2.427.624,32 Euro.\\n\\n³ Prozentwert bezogen auf den bewerteten Durchschnittsdepotbestand in Höhe von 292.198,36 Euro.\\n\\nDatum Depotnummer\\n\\nSeite 1 von 2 im Mai 2023 7274079 BLUEITS GmbH\\n\\n<!-- image -->\\n\\nSeite 2 von 2 im Mai 2023 7274079\\n\\nDatum Depotnummer\\n\\n## Information über Kosten und Nebenkosten für depotverwahrte Finanzinstrumente für das Jahr 2022\\n\\n## Erläuterungen\\n\\nDie Aufstellung enthält die im angegebenen Berichtszeitraum angefallenen Kosten und Zuwendungen für die aufgeführten Finanzinstrumente sowie die erbrachten Wertpapierdienstleistungen sowie Wertpapiernebendienstleistungen.\\n\\nDie Kosten sind, soweit möglich, den einzelnen Finanzinstrumenten direkt zugeordnet. Übergreifende Kosten sind separat ausgewiesen (z.B. Depotentgelte), diese werden nicht auf die gehaltenen Finanzinstrumente verteilt.\\n\\nFür Depots der Vermögensverwaltung beziehen sich die übergreifenden Kosten ggf. auch auf Vermögensgegenstände, die nicht der Depotverwahrung unterliegen.\\n\\nDie Darstellung enthält die Zahlungen, die im Berichtszeitraum verursacht und bis zu einem bestimmten Stichtag tatsächlich geflossen sind. Damit werden die Kosten weitgehend dem Jahr zugeordnet, in dem sie wirtschaftlich angefallen sind.\\n\\nUnter den Zuwendungen werden Zahlungen Dritter an das depotführende Institut ausgewiesen. Dabei handelt es sich in der Regel um Vertriebsvergütungen. Zuwendungen sind bereits in den aufgeführten Kosten enthalten.\\n\\nWährend die angegebenen Kosten die eventuell anfallende Umsatzsteuer beinhalten, werden Zuwendungen ohne Umsatzsteuer ausgewiesen, da diese netto gezahlt werden.\\n\\nDie Berechnungsmethoden fußen auf gesetzlichen und aufsichtsseitigen Vorgaben. Hinsichtlich der Kosten beruht diese Aufstellung auch auf Daten der Emittenten und Kapitalverwaltungsgesellschaften. Dies betrifft sowohl die Höhe der Beträge als auch die Frage, ob die entsprechenden Kosten für ein Finanzinstrument überhaupt angefallen sind. Soweit die Aufstellung negative Kosten ausweist, führt dies nicht zu einer Auszahlung an den Kunden. Negative Kosten beeinflussen rechnerisch die Höhe der Gesamtkosten.\\n\\nIm Rahmen einer Gesamtbetrachtung werden die einmaligen Kosten dem Umsatzvolumen der Berichtsperiode und die laufenden Kosten dem in der Berichtsperiode durchschnittlich investierten Kapital gegenübergestellt. Diese Angaben erfolgen als Prozentsatz. Das durchschnittlich investierte Kapital im Kalenderjahr wird ermittelt, indem der Depotbestand zu jedem Tagesende über das Jahr ermittelt und der Durchschnitt auf dieser Basis berechnet wird.\",\n    \"text_length\": 5282,\n    \"character_count\": 28868,\n    \"document_type\": \"Report\",\n    \"three_word_description_german\": \"Depotkosten Bericht 2022\",\n    \"three_word_description_english\": \"Depot cost report\",\n    \"content_summary_german\": \"Dieses Dokument fasst die Kosten und Nebenkosten für ein Depot im Jahr 2022 zusammen. Es enthält detaillierte Aufschlüsselungen der Dienstleistungs-, Produkt- und Fremdwährungskosten sowie Erläuterungen zur Berechnungsmethodik.\",\n    \"content_summary_english\": \"This document summarizes the costs and expenses for a depot in 2022. It includes detailed breakdowns of service, product, and foreign exchange costs, as well as explanations of the calculation methodology.\",\n    \"extraction_quality\": \"excellent\",\n    \"has_tables\": true,\n    \"has_formulas\": false,\n    \"document_sections\": [\n      \"Information über Kosten und Nebenkosten für depotverwahrte Finanzinstrumente für das Jahr 2022\",\n      \"Kostenzusammenfassung\",\n      \"Information über Kosten und Nebenkosten für depotverwahrte Finanzinstrumente für das Jahr 2022\",\n      \"Erläuterungen\"\n    ]\n}",
+    "thinking": null,
+    "json": {
+      "extracted_text": "Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\n\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\n\n## Information über Kosten und Nebenkosten für depotverwahrte Finanzinstrumente für das Jahr 2022\n\nZur Erfüllung der Vorgaben gem. Art. 50 der Verordnung (EU) 2017/565 erhalten Sie einmal jährlich eine Aufstellung der im Vorjahr im Zusammenhang mit Ihrem Depot angefallenen Kosten und Nebenkosten. Zur Erstellung dieser Information sind wir gesetzlich verpflichtet. Bitte beachten Sie, dass die nachfolgend aufgeführten Kosten dem Vorjahr zuzuordnen sind und bereits beglichen wurden. Die Darstellung dient daher ausschließlich zu Ihrer Information.\n\n| Informationen zum Finanzinstrument                         | Dienst- leistungs- kosten   | davon Zuwen- dungen   | Produkt- kosten   | Fremd- währungs- kosten   | Summe je WKN/ISIN¹   |\n|------------------------------------------------------------|-----------------------------|-----------------------|-------------------|---------------------------|----------------------|\n| TESLA INC. REGISTERED SHARES DL-,001 US88160R1014 (A1CX3T) | 1.774,00 €                  | 0,00 €                | 0,00 €            | 0,00 €                    | 1.774,00 €           |\n| Übergreifende Kosten                                       | 55,67 €                     | 0,00 €                | 0,00 €            | 0,00 €                    | 55,67 €              |\n| Gesamtkosten                                               |                             |                       |                   |                           | 1.829,67 €           |\n\n¹ Durch die nachfolgenden Kosten wird die Rendite der Anlage vermindert.\n\n## Kostenzusammenfassung\n\n|                       | Einmalige Kosten   | Einmalige Kosten   | Laufende Kosten   | Laufende Kosten   | Summe      |\n|-----------------------|--------------------|--------------------|-------------------|-------------------|------------|\n|                       | in Euro            | in Prozent²        | in Euro           | in Prozent³       | in Euro    |\n| Dienstleistungskosten | 1.774,00 €         | 0,07 %             | 55,67 €           | 0,02 %            | 1.829,67 € |\n| davon Zuwendungen     | 0,00 €             | 0,00 %             | 0,00 €            | 0,00 %            | 0,00 €     |\n| Produktkosten         | 0,00 €             | 0,00 %             | 0,00 €            | 0,00 %            | 0,00 €     |\n| Fremdwährungskosten   | 0,00 €             | 0,00 %             | 0,00 €            | 0,00 %            | 0,00 €     |\n| Gesamtkosten          | 1.774,00 €         | 0,07 %             | 55,67 €           | 0,02 %            | 1.829,67 € |\n\n² Prozentwert bezogen auf das Umsatzvolumen in Höhe von 2.427.624,32 Euro.\n\n³ Prozentwert bezogen auf den bewerteten Durchschnittsdepotbestand in Höhe von 292.198,36 Euro.\n\nDatum Depotnummer\n\nSeite 1 von 2 im Mai 2023 7274079 BLUEITS GmbH\n\n<!-- image -->\n\nSeite 2 von 2 im Mai 2023 7274079\n\nDatum Depotnummer\n\n## Information über Kosten und Nebenkosten für depotverwahrte Finanzinstrumente für das Jahr 2022\n\n## Erläuterungen\n\nDie Aufstellung enthält die im angegebenen Berichtszeitraum angefallenen Kosten und Zuwendungen für die aufgeführten Finanzinstrumente sowie die erbrachten Wertpapierdienstleistungen sowie Wertpapiernebendienstleistungen.\n\nDie Kosten sind, soweit möglich, den einzelnen Finanzinstrumenten direkt zugeordnet. Übergreifende Kosten sind separat ausgewiesen (z.B. Depotentgelte), diese werden nicht auf die gehaltenen Finanzinstrumente verteilt.\n\nFür Depots der Vermögensverwaltung beziehen sich die übergreifenden Kosten ggf. auch auf Vermögensgegenstände, die nicht der Depotverwahrung unterliegen.\n\nDie Darstellung enthält die Zahlungen, die im Berichtszeitraum verursacht und bis zu einem bestimmten Stichtag tatsächlich geflossen sind. Damit werden die Kosten weitgehend dem Jahr zugeordnet, in dem sie wirtschaftlich angefallen sind.\n\nUnter den Zuwendungen werden Zahlungen Dritter an das depotführende Institut ausgewiesen. Dabei handelt es sich in der Regel um Vertriebsvergütungen. Zuwendungen sind bereits in den aufgeführten Kosten enthalten.\n\nWährend die angegebenen Kosten die eventuell anfallende Umsatzsteuer beinhalten, werden Zuwendungen ohne Umsatzsteuer ausgewiesen, da diese netto gezahlt werden.\n\nDie Berechnungsmethoden fußen auf gesetzlichen und aufsichtsseitigen Vorgaben. Hinsichtlich der Kosten beruht diese Aufstellung auch auf Daten der Emittenten und Kapitalverwaltungsgesellschaften. Dies betrifft sowohl die Höhe der Beträge als auch die Frage, ob die entsprechenden Kosten für ein Finanzinstrument überhaupt angefallen sind. Soweit die Aufstellung negative Kosten ausweist, führt dies nicht zu einer Auszahlung an den Kunden. Negative Kosten beeinflussen rechnerisch die Höhe der Gesamtkosten.\n\nIm Rahmen einer Gesamtbetrachtung werden die einmaligen Kosten dem Umsatzvolumen der Berichtsperiode und die laufenden Kosten dem in der Berichtsperiode durchschnittlich investierten Kapital gegenübergestellt. Diese Angaben erfolgen als Prozentsatz. Das durchschnittlich investierte Kapital im Kalenderjahr wird ermittelt, indem der Depotbestand zu jedem Tagesende über das Jahr ermittelt und der Durchschnitt auf dieser Basis berechnet wird.",
+      "text_length": 5282,
+      "character_count": 28868,
+      "document_type": "Report",
+      "three_word_description_german": "Depotkosten Bericht 2022",
+      "three_word_description_english": "Depot cost report",
+      "content_summary_german": "Dieses Dokument fasst die Kosten und Nebenkosten für ein Depot im Jahr 2022 zusammen. Es enthält detaillierte Aufschlüsselungen der Dienstleistungs-, Produkt- und Fremdwährungskosten sowie Erläuterungen zur Berechnungsmethodik.",
+      "content_summary_english": "This document summarizes the costs and expenses for a depot in 2022. It includes detailed breakdowns of service, product, and foreign exchange costs, as well as explanations of the calculation methodology.",
+      "extraction_quality": "excellent",
+      "has_tables": true,
+      "has_formulas": false,
+      "document_sections": [
+        "Information über Kosten und Nebenkosten für depotverwahrte Finanzinstrumente für das Jahr 2022",
+        "Kostenzusammenfassung",
+        "Information über Kosten und Nebenkosten für depotverwahrte Finanzinstrumente für das Jahr 2022",
+        "Erläuterungen"
+      ]
+    }
+  },
+  "statistics": {
+    "tokens": {
+      "input_estimated": 2115,
+      "output_estimated": 1611,
+      "total_estimated": 3726,
+      "tokens_per_second": 29.52529442136051
+    },
+    "characters": {
+      "response_total": 6444,
+      "extracted_text": 5266,
+      "json_formatted": 6855
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

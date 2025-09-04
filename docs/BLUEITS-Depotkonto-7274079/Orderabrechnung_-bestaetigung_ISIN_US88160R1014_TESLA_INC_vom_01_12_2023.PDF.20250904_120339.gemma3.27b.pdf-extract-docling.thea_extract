@@ -1,0 +1,172 @@
+{
+  "version": "2.0",
+  "metadata": {
+    "file": {
+      "pdf_path": "docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_01_12_2023.PDF",
+      "pdf_absolute_path": "/mnt/c/Projects/THEA/docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_01_12_2023.PDF",
+      "pdf_size_bytes": 53183,
+      "pdf_pages": 0,
+      "output_file": "docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_01_12_2023.PDF.20250904_120339.gemma3.27b.pdf-extract-docling.thea_extract"
+    },
+    "processing": {
+      "timestamp": "20250904_120339",
+      "start_time": "2025-09-04T12:03:39.771283Z",
+      "end_time": "2025-09-04T12:03:59.882322Z",
+      "processing_time_seconds": 20.107879161834717,
+      "hostname": "BLUEITS-DS",
+      "platform": "linux",
+      "pipeline": "pdf-extract-docling",
+      "pipeline_metadata": {
+        "pipeline": "pdf-extract-docling",
+        "timestamp": "2025-09-04T12:03:32.790155Z",
+        "pdf_path": "docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_01_12_2023.PDF",
+        "extractor": "docling",
+        "fallback_model": "gemma3:27b",
+        "save_sidecars": true,
+        "saved_files": [
+          {
+            "extractor": "docling",
+            "type": "text/plain",
+            "text_file": "docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_01_12_2023.PDF.20250904_120332.gemma3.27b.pdf-extract-docling.docling.txt",
+            "json_file": "docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_01_12_2023.PDF.20250904_120332.gemma3.27b.pdf-extract-docling.docling.json",
+            "confidence": 0.85,
+            "character_count": 862,
+            "file_size": 873,
+            "md_file": "docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_01_12_2023.PDF.20250904_120332.gemma3.27b.pdf-extract-docling.docling.md"
+          }
+        ],
+        "extraction_success": true,
+        "text_length": 862,
+        "confidence": 0.85,
+        "has_tables": false,
+        "has_formulas": false,
+        "document_type": "document",
+        "pages": 1
+      }
+    },
+    "model": {
+      "name": "gemma3:27b",
+      "endpoint": "https://b1s.hey.bahn.business/api/chat",
+      "stream": true,
+      "format": "json"
+    }
+  },
+  "settings": {
+    "mode": "skip",
+    "suffix": "pdf-extract-docling",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "save_sidecars": true,
+    "dpi": 300,
+    "max_attempts": 3,
+    "initial_temperature": 0.2,
+    "temperature_progression": [
+      0.2
+    ],
+    "timeout": 300,
+    "max_tokens": 50000
+  },
+  "execution": {
+    "retry_count": 0,
+    "final_temperature": 0.2,
+    "stuck_pattern_detected": false,
+    "pattern_type": null,
+    "chunks_received": 602,
+    "request_time_seconds": 20.1076238155365,
+    "files_processed": [
+      {
+        "extractor": "docling",
+        "type": "text/plain",
+        "text_file": "docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_01_12_2023.PDF.20250904_120332.gemma3.27b.pdf-extract-docling.docling.txt",
+        "json_file": "docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_01_12_2023.PDF.20250904_120332.gemma3.27b.pdf-extract-docling.docling.json",
+        "confidence": 0.85,
+        "character_count": 862,
+        "file_size": 873,
+        "md_file": "docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_01_12_2023.PDF.20250904_120332.gemma3.27b.pdf-extract-docling.docling.md"
+      }
+    ]
+  },
+  "prompt": {
+    "system": "You are a vision-based text extractor and analyzer. Always use <thinking></thinking> tags to show your analysis process. You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text. Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }.: {\"extracted_text\": \"<string (complete verified text from document)>\", \"character_count\": \"<number (exact count of extracted text)>\", \"document_type\": \"<string (e.g., Invoice, Contract, Report, Statement, Technical)>\", \"three_word_description_german\": \"<string (exactly 3 words)>\", \"three_word_description_english\": \"<string (exactly 3 words)>\", \"content_summary_german\": \"<string (2-3 sentences)>\", \"content_summary_english\": \"<string (2-3 sentences)>\", \"extraction_quality\": \"<string (excellent/good/fair/poor)>\", \"has_tables\": \"<boolean>\", \"has_formulas\": \"<boolean>\", \"document_sections\": \"<array of strings (main section headings if present)>\"}",
+    "user": "Analyze the Docling extraction from PDF 'docs/BLUEITS-Depotkonto-7274079/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_01_12_2023.PDF'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON.",
+    "prompt_file": "prompts/pdf-extract-docling.prompt",
+    "prompt_config": {
+      "version": "2.0",
+      "name": "pdf-extract-docling",
+      "description": "Advanced document extraction using Docling with gemma3:27b fallback for complex documents",
+      "system_prompt": {
+        "suffix": "You are analyzing structured content extracted from a PDF using Docling's deep learning models. The extraction includes document structure, tables, formulas, and layout information. Analyze the content to: 1) Verify and enhance the extracted text. 2) Count total characters. 3) Classify the document type. 4) Provide a three-word description. 5) Summarize the content. Focus on accuracy and completeness. Output ONLY valid JSON without any thinking tags or additional text.",
+        "output_format": {
+          "type": "json",
+          "schema": {
+            "extracted_text": "string (complete verified text from document)",
+            "character_count": "number (exact count of extracted text)",
+            "document_type": "string (e.g., Invoice, Contract, Report, Statement, Technical)",
+            "three_word_description_german": "string (exactly 3 words)",
+            "three_word_description_english": "string (exactly 3 words)",
+            "content_summary_german": "string (2-3 sentences)",
+            "content_summary_english": "string (2-3 sentences)",
+            "extraction_quality": "string (excellent/good/fair/poor)",
+            "has_tables": "boolean",
+            "has_formulas": "boolean",
+            "document_sections": "array of strings (main section headings if present)"
+          },
+          "instructions": "Analyze the Docling extraction and output ONLY the JSON structure. No thinking tags, no explanations, just JSON starting with { and ending with }."
+        }
+      },
+      "user_prompt": {
+        "template": "Analyze the Docling extraction from PDF '{{pdf_path}}'. The document has been processed using deep learning models. Verify the extraction, count characters, classify the document, and provide summaries. Output only JSON."
+      },
+      "settings": {
+        "model": "gemma3:27b",
+        "temperature": 0.2,
+        "max_attempts": 3,
+        "timeout": 300,
+        "max_tokens": 50000,
+        "mode": "skip",
+        "save_sidecars": true,
+        "format": "json",
+        "pipeline": "pdf-extract-docling",
+        "pipeline_config": {
+          "use_fallback_model": true,
+          "fallback_model": "gemma3:27b"
+        },
+        "endpoint_url": "https://b1s.hey.bahn.business/api/chat"
+      }
+    }
+  },
+  "response": {
+    "text": "{\"extracted_text\": \"Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\\n\\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\\n\\nDepotnummer\\n\\n7274079 24711383 BLUEITS GmbH 508044/04.00 01.12.2023\\n\\nKundennummer\\n\\nAuftragsnummer Datum\\n\\n## Wertpapier Streichungsbestätigung Verkauf\\n\\nAuftrag vom 15.09.2023 09:26:14 Uhr\\n\\nNominale\\n\\nWertpapierbezeichnung\\n\\nISIN\\n\\n(WKN)\\n\\nStück 76\\n\\nTESLA INC.\\n\\nREGISTERED SHARES DL-,001\\n\\nUS88160R1014\\n\\n(A1CX3T)\\n\\nHandels-/Ausführungsplatz\\n\\nTradegate (Best Execution)\\n\\n## Limit-Orde r\\n\\nLimit\\n\\n263,30 EUR\\n\\nGültigkeit\\n\\n30.11.2023\\n\\nAuftraggeber\\n\\nDietmar Scharf\\n\\nAuftragserteilung/ -ort\\n\\nOnline-Banking\\n\\nGirosammelverwahrung Sammelurkunde\\n\\nVorstehenden Auftrag haben wir vorbehaltlich einer zwischenzeitlich erfolgten Orderausführung gestrichen.\\n\\nFür das Geschäft wurde keine Anlageberatung erbracht.\\n\\nDie Order wurde wegen Fristablauf gelöscht.\", \"character_count\": 862, \"document_type\": \"Statement\", \"three_word_description_german\": \"Depotkonto Order Stornierung\", \"three_word_description_english\": \"Account Order Cancellation\", \"content_summary_german\": \"Dieses Dokument ist eine Bestätigung über die Stornierung eines Wertpapierauftrags für 76 Aktien von Tesla Inc. Der Auftrag wurde aufgrund von Fristablauf gelöscht.\", \"content_summary_english\": \"This document confirms the cancellation of a securities order for 76 shares of Tesla Inc. The order was cancelled due to expiry of the validity period.\", \"extraction_quality\": \"excellent\", \"has_tables\": false, \"has_formulas\": false, \"document_sections\": [\"Wertpapier Streichungsbestätigung Verkauf\", \"Limit-Orde r\"]}",
+    "thinking": null,
+    "json": {
+      "extracted_text": "Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\n\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\n\nDepotnummer\n\n7274079 24711383 BLUEITS GmbH 508044/04.00 01.12.2023\n\nKundennummer\n\nAuftragsnummer Datum\n\n## Wertpapier Streichungsbestätigung Verkauf\n\nAuftrag vom 15.09.2023 09:26:14 Uhr\n\nNominale\n\nWertpapierbezeichnung\n\nISIN\n\n(WKN)\n\nStück 76\n\nTESLA INC.\n\nREGISTERED SHARES DL-,001\n\nUS88160R1014\n\n(A1CX3T)\n\nHandels-/Ausführungsplatz\n\nTradegate (Best Execution)\n\n## Limit-Orde r\n\nLimit\n\n263,30 EUR\n\nGültigkeit\n\n30.11.2023\n\nAuftraggeber\n\nDietmar Scharf\n\nAuftragserteilung/ -ort\n\nOnline-Banking\n\nGirosammelverwahrung Sammelurkunde\n\nVorstehenden Auftrag haben wir vorbehaltlich einer zwischenzeitlich erfolgten Orderausführung gestrichen.\n\nFür das Geschäft wurde keine Anlageberatung erbracht.\n\nDie Order wurde wegen Fristablauf gelöscht.",
+      "character_count": 862,
+      "document_type": "Statement",
+      "three_word_description_german": "Depotkonto Order Stornierung",
+      "three_word_description_english": "Account Order Cancellation",
+      "content_summary_german": "Dieses Dokument ist eine Bestätigung über die Stornierung eines Wertpapierauftrags für 76 Aktien von Tesla Inc. Der Auftrag wurde aufgrund von Fristablauf gelöscht.",
+      "content_summary_english": "This document confirms the cancellation of a securities order for 76 shares of Tesla Inc. The order was cancelled due to expiry of the validity period.",
+      "extraction_quality": "excellent",
+      "has_tables": false,
+      "has_formulas": false,
+      "document_sections": [
+        "Wertpapier Streichungsbestätigung Verkauf",
+        "Limit-Orde r"
+      ]
+    }
+  },
+  "statistics": {
+    "tokens": {
+      "input_estimated": 888,
+      "output_estimated": 413,
+      "total_estimated": 1301,
+      "tokens_per_second": 20.53921234935034
+    },
+    "characters": {
+      "response_total": 1652,
+      "extracted_text": 846,
+      "json_formatted": 1768
+    }
+  },
+  "errors": [],
+  "warnings": []
+}
