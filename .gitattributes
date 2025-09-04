@@ -1,0 +1,21 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Enforce LF line endings for text files in repository
+*.json text eol=lf
+*.md text eol=lf
+*.thea_extract text eol=lf
+*.txt text eol=lf
+*.py text eol=lf
+*.prompt text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Binary files (should not be modified)
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.exe binary
