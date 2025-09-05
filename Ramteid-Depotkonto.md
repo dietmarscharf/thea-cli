@@ -8,7 +8,7 @@
 - **PDF-Dokumente:** 88 Dateien
 - **Davon analysiert:** 88 (100.0%)
 - **Letzter Depotbestand:** 58,150.00 EUR (vom 30.09.2023)
-- **Zuletzt aktualisiert:** 2025-09-05 23:45:30
+- **Zuletzt aktualisiert:** 2025-09-06 00:30:59
 
 ## Depotabschluss-Übersicht
 
@@ -40,6 +40,44 @@
 
 **Letzter bekannter Depotbestand: 58.150,00 EUR** (Stand: 30.09.2023)
 *Gesamtzeitraum: 31.12.2020 bis 30.06.2025*
+
+## Jährliche Kostenanalyse (MiFID II)
+
+Gesetzlich vorgeschriebene Kostenaufstellung gemäß Art. 50 der Verordnung (EU) 2017/565:
+
+| Jahr | Dokumentdatum | Dienstleistungskosten (netto) | Depotentgelte (netto) | Zwischensumme (netto) | USt (19%) | Gesamtkosten (brutto) | Umsatzvolumen | Ø Depotbestand | Kostenquote | Dokument |
+|------|---------------|------------------------------|----------------------|---------------------|-----------|----------------------|---------------|----------------|-------------|----------|
+| 2020 | 13.05.2021 | 271,78 € | 4,87 € | 276,66 € | 52,56 € | 329,22 € | 425.926,60 € | 104.338,30 € | 0.32% | [20210513_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20210513_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_22_04_2021.pdf) |
+| 2021 | 28.04.2022 | 1.557,61 € | 20,00 € | 1.577,61 € | 299,75 € | 1.877,36 € | 2.378.049,10 € | 166.642,44 € | 1.13% | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2022.PDF) |
+| 2022 | 15.05.2023 | - € | 20,00 € | 20,00 € | 3,80 € | 23,80 € | - € | - € | - | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_15_05_2023.PDF) |
+| 2023 | 24.04.2024 | 188,38 € | 23,65 € | 212,03 € | 40,28 € | 252,31 € | 221.054,00 € | 62.774,30 € | 0.40% | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_24_04_2024.PDF) |
+| 2024 | 28.04.2025 | 495,60 € | 20,00 € | 515,60 € | 97,96 € | 613,56 € | 789.101,60 € | 101.458,05 € | 0.60% | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2025.PDF) |
+
+**Gesamtkosten 2020-2024: 3.096,25 €**
+*Gesamtes Handelsvolumen: 3.814.131,30 €*
+*Durchschnittliche jährliche Kostenquote: 0.61%*
+
+### Erläuterungen zur Kostenberechnung:
+
+**Kostenzusammensetzung:**
+- **Dienstleistungskosten:** Beinhalten alle Kosten für Wertpapiergeschäfte (Kauf/Verkauf), Ordergebühren und sonstige Transaktionskosten
+- **Depotentgelte:** Jährliche Verwahrungsgebühren für die Führung des Depotkontos (übergreifende Kosten)
+- **Zwischensumme (netto):** Summe aus Dienstleistungskosten und Depotentgelten ohne Umsatzsteuer
+- **USt (19%):** Gesetzliche Umsatzsteuer auf alle Kosten (sowohl Dienstleistungs- als auch Depotentgelte)
+- **Gesamtkosten (brutto):** Vollständige Kosten inklusive 19% Umsatzsteuer
+
+**Wichtige Hinweise:**
+- ✓ Die Depotentgelte sind **in den Gesamtkosten enthalten** (Dienstleistungskosten + Depotentgelte = Gesamtkosten)
+- ✓ Alle Beträge in den verlinkten Dokumenten sind **Bruttobeträge** (bereits inkl. 19% USt)
+- ✓ Die Nettobeträge werden berechnet: Netto = Brutto ÷ 1,19
+- ✓ Die USt wird berechnet: USt = Brutto - Netto
+
+**Berechnungsbeispiel 2021:**
+- Dienstleistungskosten (brutto): 1853.56 € ÷ 1,19 = 1557.61 € (netto)
+- Depotentgelte (brutto): 23.80 € ÷ 1,19 = 20.00 € (netto)
+- **Gesamtkosten: 1853.56 € + 23.80 € = 1877.36 € (brutto)**
+
+*Diese Aufstellung entspricht den gesetzlichen Anforderungen gemäß Art. 50 der Verordnung (EU) 2017/565 (MiFID II).*
 
 ## Dokumentenübersicht
 
