@@ -7,49 +7,38 @@
 - **Depotnummer:** 7274087
 - **PDF-Dokumente:** 88 Dateien
 - **Davon analysiert:** 88 (100.0%)
-- **Letzter Depotbestand:** 101,458.05 EUR (vom 28.04.2025)
-- **Zuletzt aktualisiert:** 2025-09-05 17:42:31
+- **Letzter Depotbestand:** 58,150.00 EUR (vom 30.09.2023)
+- **Zuletzt aktualisiert:** 2025-09-05 23:45:30
 
 ## Depotabschluss-Übersicht
 
-### Jahresabschlüsse
-| Stichtag | Dokumentdatum | Stück | ISIN | Depotbestand (EUR) | Dokument |
-|----------|---------------|-------|------|-------------------|----------|
-| 31.12.2020 | 26.01.2021 | - | - | 0,00 | [20210126_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20210126_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_12_01_2021.pdf) |
-| 31.12.2021 | 25.01.2022 | - | - | 0,00 | [20220125_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf) |
-| 31.12.2022 | 10.01.2023 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2023.PDF) |
-| 31.12.2023 | 10.01.2024 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2024.PDF) |
-| 31.12.2024 | 10.01.2025 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF) |
+### Alle Depotabschlüsse (chronologisch)
+| Typ | Stichtag | Dokumentdatum | Stück | ISIN | Depotbestand (EUR) | Dokument |
+|-----|----------|---------------|-------|------|-------------------|----------|
+| Jahresabschluss | 31.12.2020 | 26.01.2021 | - | - | 0,00 | [20210126_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20210126_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_12_01_2021.pdf) |
+| Quartalsabschluss | 31.03.2021 | 16.04.2021 | 80 | US88160R1014 | 42.696,00 | [20210416_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20210416_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2021.pdf) |
+| Quartalsabschluss | 30.06.2021 | 16.07.2021 | - | - | 0,00 | [20210716_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20210716_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2021.pdf) |
+| Quartalsabschluss | 30.09.2021 | 18.10.2021 | - | - | 0,00 | [20211018_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20211018_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2021.pdf) |
+| Jahresabschluss | 31.12.2021 | 25.01.2022 | - | - | 0,00 | [20220125_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf) |
+| Quartalsabschluss | 31.03.2022 | 01.04.2022 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF) |
+| Quartalsabschluss | 30.06.2022 | 01.07.2022 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2022.PDF) |
+| Quartalsabschluss | 30.09.2022 | 03.10.2022 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_10_2022.PDF) |
+| Jahresabschluss | 31.12.2022 | 10.01.2023 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2023.PDF) |
+| Quartalsabschluss | 31.03.2023 | 03.04.2023 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_04_2023.PDF) |
+| Quartalsabschluss | 30.06.2023 | 03.07.2023 | 350 | US88160R1014 | 82.775,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_07_2023.PDF) |
+| Quartalsabschluss | 30.09.2023 | 02.10.2023 | 250 | US88160R1014 | 58.150,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_10_2023.PDF) |
+| Jahresabschluss | 31.12.2023 | 10.01.2024 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2024.PDF) |
+| Quartalsabschluss | 31.03.2024 | 02.04.2024 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_04_2024.PDF) |
+| Quartalsabschluss | 30.06.2024 | 01.07.2024 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2024.PDF) |
+| Quartalsabschluss | 30.09.2024 | 01.10.2024 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2024.PDF) |
+| Jahresabschluss | 31.12.2024 | 10.01.2025 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF) |
+| Quartalsabschluss | 31.03.2025 | 01.04.2025 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2025.PDF) |
+| Quartalsabschluss | 30.06.2025 | 01.07.2025 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2025.PDF) |
 
-*5 Jahresabschlüsse gefunden*
-
-### Quartalsabschlüsse
-| Stichtag | Dokumentdatum | Stück | ISIN | Depotbestand (EUR) | Dokument |
-|----------|---------------|-------|------|-------------------|----------|
-| 31.03.2021 | 16.04.2021 | 80 | US88160R1014 | 42.696,00 | [20210416_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20210416_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2021.pdf) |
-| 13.05.2021 | 13.05.2021 | - | - | 104.338,30 | [20210513_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20210513_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_22_04_2021.pdf) |
-| 30.06.2021 | 16.07.2021 | - | - | 0,00 | [20210716_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20210716_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2021.pdf) |
-| 30.09.2021 | 18.10.2021 | - | - | 0,00 | [20211018_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20211018_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2021.pdf) |
-| 31.03.2022 | 01.04.2022 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF) |
-| 28.04.2022 | 28.04.2022 | - | US88160R1014 | 166.642,44 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2022.PDF) |
-| 30.06.2022 | 01.07.2022 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2022.PDF) |
-| 30.09.2022 | 03.10.2022 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_10_2022.PDF) |
-| 31.03.2023 | 03.04.2023 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_04_2023.PDF) |
-| 15.05.2023 | 15.05.2023 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_15_05_2023.PDF) |
-| 30.06.2023 | 03.07.2023 | 350 | US88160R1014 | 350,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_07_2023.PDF) |
-| 30.09.2023 | 02.10.2023 | 250 | US88160R1014 | 58.150,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_10_2023.PDF) |
-| 31.03.2024 | 02.04.2024 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_04_2024.PDF) |
-| 24.04.2024 | 24.04.2024 | - | US88160R1014 | 62.774,30 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_24_04_2024.PDF) |
-| 30.06.2024 | 01.07.2024 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2024.PDF) |
-| 30.09.2024 | 01.10.2024 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2024.PDF) |
-| 31.03.2025 | 01.04.2025 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2025.PDF) |
-| 28.04.2025 | 28.04.2025 | - | US88160R1014 | 101.458,05 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2025.PDF) |
-| 30.06.2025 | 01.07.2025 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2025.PDF) |
-
-*19 Quartalsabschlüsse gefunden*
+*Gesamt: 5 Jahresabschlüsse und 14 Quartalsabschlüsse*
 
 
-**Letzter bekannter Depotbestand: 101.458,05 EUR** (Stand: 28.04.2025)
+**Letzter bekannter Depotbestand: 58.150,00 EUR** (Stand: 30.09.2023)
 *Gesamtzeitraum: 31.12.2020 bis 30.06.2025*
 
 ## Dokumentenübersicht
