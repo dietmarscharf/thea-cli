@@ -28,8 +28,21 @@ class BaseKontoAnalyzer:
             "confirmation": "Bestätigung",
             "notification": "Mitteilung",
             "interest": "Zinsabrechnung",
+            "cost_information": "Kostenaufstellung",
             "other": "Sonstiges"
         }
+    
+    def format_date_german(self, date_str: str) -> str:
+        """Konvertiert ISO-Datum (YYYY-MM-DD) in deutsches Format (DD.MM.YYYY)"""
+        if not date_str or date_str == 'N/A' or date_str == '0000-00-00':
+            return 'N/A'
+        try:
+            parts = date_str.split('-')
+            if len(parts) == 3:
+                return f"{parts[2]}.{parts[1]}.{parts[0]}"
+        except:
+            pass
+        return date_str
         
     def load_thea_extract(self, file_path: Path) -> Dict[str, Any]:
         """Lädt eine .thea_extract Datei und gibt die geparsten Daten zurück"""
@@ -45,7 +58,27 @@ class BaseKontoAnalyzer:
         """Extrahiert den Dokumenttyp aus der zugehörigen docling.json Datei"""
         # Fallback basierend auf Dateinamen-Mustern (höchste Priorität)
         filename_lower = pdf_path.name.lower()
-        if 'depotabschluss' in filename_lower or 'ex-post-rep' in filename_lower:
+        
+        # Spezifische Kostenaufstellungs-Dokumente (MiFID II Ex-Post Reports)
+        # Diese 5 speziellen Dokumente sind jährliche Kosteninformationen
+        cost_report_patterns = [
+            'vom_22_04_2021',  # 2020 Kosten
+            'vom_28_04_2022',  # 2021 Kosten
+            'vom_15_05_2023',  # 2022 Kosten
+            'vom_24_04_2024',  # 2023 Kosten
+            'vom_28_04_2025'   # 2024 Kosten
+        ]
+        
+        # Check if this is one of the specific cost information documents
+        if 'ex-post-rep' in filename_lower:
+            for pattern in cost_report_patterns:
+                if pattern in filename_lower:
+                    return 'Kostenaufstellung'
+        
+        # Check for cost information documents first (they often have Depotabschluss in name)
+        if ('depotabschluss' in filename_lower or 'ex-post-rep' in filename_lower) and 'kosten' in filename_lower:
+            return 'Kostenaufstellung'
+        elif 'depotabschluss' in filename_lower or 'ex-post-rep' in filename_lower:
             return 'Depotabschluss'
         elif 'orderabrechnung' in filename_lower:
             return 'Orderabrechnung'
@@ -120,8 +153,8 @@ class BaseKontoAnalyzer:
         """Generiert die Dokumententabelle für den zweiten Abschnitt"""
         md_lines = []
         md_lines.append("\n## Dokumentenübersicht\n")
-        md_lines.append("| Datum | Dokumentname | Dokumenttyp |")
-        md_lines.append("|-------|--------------|-------------|")
+        md_lines.append("| Dokumentdatum | Dokumentname | Dokumenttyp |")
+        md_lines.append("|---------------|--------------|-------------|")
         
         # Sammle alle PDF-Dateien (beide Schreibweisen)
         pdf_files = list(account_path.glob("*.pdf")) + list(account_path.glob("*.PDF"))
@@ -155,7 +188,7 @@ class BaseKontoAnalyzer:
         
         # Generiere Tabellenzeilen
         for info in file_infos:
-            date_display = info['date'] if info['date'] != '0000-00-00' else 'N/A'
+            date_display = self.format_date_german(info['date']) if info['date'] != '0000-00-00' else 'N/A'
             # Erstelle Markdown-Link
             link = f"[{info['name']}]({info['path']})"
             # Markiere unbekannte Dokumente
