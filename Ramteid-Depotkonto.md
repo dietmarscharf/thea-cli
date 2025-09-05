@@ -7,7 +7,50 @@
 - **Depotnummer:** 7274087
 - **PDF-Dokumente:** 88 Dateien
 - **Davon analysiert:** 88 (100.0%)
-- **Stand:** 2025-09-04 15:54:21
+- **Letzter Depotbestand:** 101,458.05 EUR (vom 28.04.2025)
+- **Zuletzt aktualisiert:** 2025-09-05 17:42:31
+
+## Depotabschluss-Übersicht
+
+### Jahresabschlüsse
+| Stichtag | Dokumentdatum | Stück | ISIN | Depotbestand (EUR) | Dokument |
+|----------|---------------|-------|------|-------------------|----------|
+| 31.12.2020 | 26.01.2021 | - | - | 0,00 | [20210126_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20210126_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_12_01_2021.pdf) |
+| 31.12.2021 | 25.01.2022 | - | - | 0,00 | [20220125_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf) |
+| 31.12.2022 | 10.01.2023 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2023.PDF) |
+| 31.12.2023 | 10.01.2024 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2024.PDF) |
+| 31.12.2024 | 10.01.2025 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF) |
+
+*5 Jahresabschlüsse gefunden*
+
+### Quartalsabschlüsse
+| Stichtag | Dokumentdatum | Stück | ISIN | Depotbestand (EUR) | Dokument |
+|----------|---------------|-------|------|-------------------|----------|
+| 31.03.2021 | 16.04.2021 | 80 | US88160R1014 | 42.696,00 | [20210416_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20210416_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2021.pdf) |
+| 13.05.2021 | 13.05.2021 | - | - | 104.338,30 | [20210513_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20210513_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_22_04_2021.pdf) |
+| 30.06.2021 | 16.07.2021 | - | - | 0,00 | [20210716_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20210716_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2021.pdf) |
+| 30.09.2021 | 18.10.2021 | - | - | 0,00 | [20211018_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20211018_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2021.pdf) |
+| 31.03.2022 | 01.04.2022 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF) |
+| 28.04.2022 | 28.04.2022 | - | US88160R1014 | 166.642,44 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2022.PDF) |
+| 30.06.2022 | 01.07.2022 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2022.PDF) |
+| 30.09.2022 | 03.10.2022 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_10_2022.PDF) |
+| 31.03.2023 | 03.04.2023 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_04_2023.PDF) |
+| 15.05.2023 | 15.05.2023 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_15_05_2023.PDF) |
+| 30.06.2023 | 03.07.2023 | 350 | US88160R1014 | 350,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_07_2023.PDF) |
+| 30.09.2023 | 02.10.2023 | 250 | US88160R1014 | 58.150,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_10_2023.PDF) |
+| 31.03.2024 | 02.04.2024 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_04_2024.PDF) |
+| 24.04.2024 | 24.04.2024 | - | US88160R1014 | 62.774,30 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_24_04_2024.PDF) |
+| 30.06.2024 | 01.07.2024 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2024.PDF) |
+| 30.09.2024 | 01.10.2024 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2024.PDF) |
+| 31.03.2025 | 01.04.2025 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2025.PDF) |
+| 28.04.2025 | 28.04.2025 | - | US88160R1014 | 101.458,05 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2025.PDF) |
+| 30.06.2025 | 01.07.2025 | - | - | 0,00 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2025.PDF) |
+
+*19 Quartalsabschlüsse gefunden*
+
+
+**Letzter bekannter Depotbestand: 101.458,05 EUR** (Stand: 28.04.2025)
+*Gesamtzeitraum: 31.12.2020 bis 30.06.2025*
 
 ## Dokumentenübersicht
 
@@ -27,61 +70,61 @@
 | 2021-01-13 | [20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021_3.pdf](docs/Ramteid-Depotkonto-7274087/20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021_3.pdf) | Orderabrechnung |
 | 2021-01-13 | [20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021_4.pdf](docs/Ramteid-Depotkonto-7274087/20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021_4.pdf) | Orderabrechnung |
 | 2021-01-16 | [20210116_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_14_01_2021.pdf](docs/Ramteid-Depotkonto-7274087/20210116_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_14_01_2021.pdf) | Orderabrechnung |
-| 2021-01-26 | [20210126_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_12_01_2021.pdf](docs/Ramteid-Depotkonto-7274087/20210126_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_12_01_2021.pdf) | Orderabrechnung |
+| 2021-01-26 | [20210126_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_12_01_2021.pdf](docs/Ramteid-Depotkonto-7274087/20210126_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_12_01_2021.pdf) | Depotabschluss |
 | 2021-02-11 | [20210211_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_10_02_2021.pdf](docs/Ramteid-Depotkonto-7274087/20210211_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_10_02_2021.pdf) | Orderabrechnung |
 | 2021-02-24 | [20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021.pdf](docs/Ramteid-Depotkonto-7274087/20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021.pdf) | Orderabrechnung |
 | 2021-03-05 | [20210305_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_04_03_2021.pdf](docs/Ramteid-Depotkonto-7274087/20210305_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_04_03_2021.pdf) | Orderabrechnung |
 | 2021-03-10 | [20210310_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_09_03_2021.pdf](docs/Ramteid-Depotkonto-7274087/20210310_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_09_03_2021.pdf) | Orderabrechnung |
 | 2021-03-18 | [20210318_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_17_03_2021.pdf](docs/Ramteid-Depotkonto-7274087/20210318_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_17_03_2021.pdf) | Orderabrechnung |
 | 2021-04-14 | [20210414_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_13_04_2021.pdf](docs/Ramteid-Depotkonto-7274087/20210414_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_13_04_2021.pdf) | Orderabrechnung |
-| 2021-04-16 | [20210416_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2021.pdf](docs/Ramteid-Depotkonto-7274087/20210416_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2021.pdf) | Orderabrechnung |
-| 2021-05-13 | [20210513_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_22_04_2021.pdf](docs/Ramteid-Depotkonto-7274087/20210513_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_22_04_2021.pdf) | Orderabrechnung |
-| 2021-07-16 | [20210716_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2021.pdf](docs/Ramteid-Depotkonto-7274087/20210716_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2021.pdf) | Orderabrechnung |
+| 2021-04-16 | [20210416_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2021.pdf](docs/Ramteid-Depotkonto-7274087/20210416_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2021.pdf) | Depotabschluss |
+| 2021-05-13 | [20210513_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_22_04_2021.pdf](docs/Ramteid-Depotkonto-7274087/20210513_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_22_04_2021.pdf) | Depotabschluss |
+| 2021-07-16 | [20210716_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2021.pdf](docs/Ramteid-Depotkonto-7274087/20210716_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2021.pdf) | Depotabschluss |
 | 2021-10-06 | [20211006_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_05_10_2021.pdf](docs/Ramteid-Depotkonto-7274087/20211006_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_05_10_2021.pdf) | Orderabrechnung |
 | 2021-10-12 | [20211012_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_11_10_2021.pdf](docs/Ramteid-Depotkonto-7274087/20211012_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_11_10_2021.pdf) | Orderabrechnung |
 | 2021-10-15 | [20211015_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_14_10_2021.pdf](docs/Ramteid-Depotkonto-7274087/20211015_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_14_10_2021.pdf) | Orderabrechnung |
 | 2021-10-15 | [20211015_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_14_10_2021_1.pdf](docs/Ramteid-Depotkonto-7274087/20211015_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_14_10_2021_1.pdf) | Orderabrechnung |
-| 2021-10-18 | [20211018_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2021.pdf](docs/Ramteid-Depotkonto-7274087/20211018_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2021.pdf) | Orderabrechnung |
+| 2021-10-18 | [20211018_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2021.pdf](docs/Ramteid-Depotkonto-7274087/20211018_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2021.pdf) | Depotabschluss |
 | 2021-10-20 | [20211020_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_19_10_2021.pdf](docs/Ramteid-Depotkonto-7274087/20211020_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_19_10_2021.pdf) | Orderabrechnung |
 | 2021-10-26 | [20211026_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_25_10_2021.pdf](docs/Ramteid-Depotkonto-7274087/20211026_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_25_10_2021.pdf) | Orderabrechnung |
 | 2021-10-27 | [20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021.pdf](docs/Ramteid-Depotkonto-7274087/20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021.pdf) | Orderabrechnung |
-| 2021-10-27 | [20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021_1.pdf](docs/Ramteid-Depotkonto-7274087/20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021_1.pdf) | Document |
+| 2021-10-27 | [20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021_1.pdf](docs/Ramteid-Depotkonto-7274087/20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021_1.pdf) | Orderabrechnung |
 | 2021-10-29 | [20211029_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_28_10_2021.pdf](docs/Ramteid-Depotkonto-7274087/20211029_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_28_10_2021.pdf) | Orderabrechnung |
-| 2021-10-29 | [20211029_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_28_10_2021.pdf](docs/Ramteid-Depotkonto-7274087/20211029_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_28_10_2021.pdf) | Document |
-| 2021-10-30 | [20211030_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_29_10_2021.pdf](docs/Ramteid-Depotkonto-7274087/20211030_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_29_10_2021.pdf) | Document |
+| 2021-10-29 | [20211029_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_28_10_2021.pdf](docs/Ramteid-Depotkonto-7274087/20211029_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_28_10_2021.pdf) | Orderabrechnung |
+| 2021-10-30 | [20211030_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_29_10_2021.pdf](docs/Ramteid-Depotkonto-7274087/20211030_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_29_10_2021.pdf) | Orderabrechnung |
 | 2021-10-30 | [20211030_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_29_10_2021_1.pdf](docs/Ramteid-Depotkonto-7274087/20211030_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_29_10_2021_1.pdf) | Orderabrechnung |
 | 2021-10-30 | [20211030_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_29_10_2021_2.pdf](docs/Ramteid-Depotkonto-7274087/20211030_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_29_10_2021_2.pdf) | Orderabrechnung |
 | 2021-11-02 | [20211102_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_01_11_2021.pdf](docs/Ramteid-Depotkonto-7274087/20211102_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_01_11_2021.pdf) | Orderabrechnung |
 | 2021-11-02 | [20211102_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_01_11_2021.pdf](docs/Ramteid-Depotkonto-7274087/20211102_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_01_11_2021.pdf) | Orderabrechnung |
 | 2021-11-03 | [20211103_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_02_11_2021.pdf](docs/Ramteid-Depotkonto-7274087/20211103_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_02_11_2021.pdf) | Orderabrechnung |
 | 2021-11-03 | [20211103_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_02_11_2021_1.pdf](docs/Ramteid-Depotkonto-7274087/20211103_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_02_11_2021_1.pdf) | Orderabrechnung |
-| 2022-01-25 | [20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf](docs/Ramteid-Depotkonto-7274087/20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf) | Orderabrechnung |
-| 2022-04-01 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF) | Orderabrechnung |
-| 2022-04-28 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2022.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2022.PDF) | Orderabrechnung |
-| 2022-07-01 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2022.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2022.PDF) | Orderabrechnung |
-| 2022-10-03 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_10_2022.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_10_2022.PDF) | Orderabrechnung |
-| 2023-01-10 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2023.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2023.PDF) | Orderabrechnung |
+| 2022-01-25 | [20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf](docs/Ramteid-Depotkonto-7274087/20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf) | Depotabschluss |
+| 2022-04-01 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF) | Depotabschluss |
+| 2022-04-28 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2022.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2022.PDF) | Depotabschluss |
+| 2022-07-01 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2022.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2022.PDF) | Depotabschluss |
+| 2022-10-03 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_10_2022.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_10_2022.PDF) | Depotabschluss |
+| 2023-01-10 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2023.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2023.PDF) | Depotabschluss |
 | 2023-03-08 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_03_2023.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_03_2023.PDF) | Orderabrechnung |
 | 2023-03-15 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_15_03_2023.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_15_03_2023.PDF) | Orderabrechnung |
-| 2023-04-03 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_04_2023.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_04_2023.PDF) | Orderabrechnung |
+| 2023-04-03 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_04_2023.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_04_2023.PDF) | Depotabschluss |
 | 2023-04-11 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_11_04_2023.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_11_04_2023.PDF) | Orderabrechnung |
 | 2023-04-20 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_20_04_2023.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_20_04_2023.PDF) | Orderabrechnung |
 | 2023-04-21 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_21_04_2023.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_21_04_2023.PDF) | Orderabrechnung |
 | 2023-05-04 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_04_05_2023.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_04_05_2023.PDF) | Orderabrechnung |
-| 2023-05-15 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_15_05_2023.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_15_05_2023.PDF) | Orderabrechnung |
-| 2023-07-03 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_07_2023.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_07_2023.PDF) | Orderabrechnung |
-| 2023-07-17 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_17_07_2023.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_17_07_2023.PDF) | Document |
-| 2023-07-19 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_19_07_2023.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_19_07_2023.PDF) | Document |
+| 2023-05-15 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_15_05_2023.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_15_05_2023.PDF) | Depotabschluss |
+| 2023-07-03 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_07_2023.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_07_2023.PDF) | Depotabschluss |
+| 2023-07-17 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_17_07_2023.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_17_07_2023.PDF) | Orderabrechnung |
+| 2023-07-19 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_19_07_2023.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_19_07_2023.PDF) | Orderabrechnung |
 | 2023-09-11 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_11_09_2023.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_11_09_2023.PDF) | Orderabrechnung |
 | 2023-09-11 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_11_09_2023_1.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_11_09_2023_1.PDF) | Orderabrechnung |
-| 2023-10-02 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_10_2023.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_10_2023.PDF) | Orderabrechnung |
+| 2023-10-02 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_10_2023.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_10_2023.PDF) | Depotabschluss |
 | 2023-10-10 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_10_10_2023.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_10_10_2023.PDF) | Orderabrechnung |
 | 2023-10-13 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_13_10_2023.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_13_10_2023.PDF) | Orderabrechnung |
 | 2023-12-15 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_15_12_2023.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_15_12_2023.PDF) | Orderabrechnung |
-| 2024-01-10 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2024.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2024.PDF) | Orderabrechnung |
-| 2024-04-02 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_04_2024.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_04_2024.PDF) | Orderabrechnung |
-| 2024-04-24 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_24_04_2024.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_24_04_2024.PDF) | Orderabrechnung |
-| 2024-07-01 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2024.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2024.PDF) | Orderabrechnung |
+| 2024-01-10 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2024.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2024.PDF) | Depotabschluss |
+| 2024-04-02 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_04_2024.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_04_2024.PDF) | Depotabschluss |
+| 2024-04-24 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_24_04_2024.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_24_04_2024.PDF) | Depotabschluss |
+| 2024-07-01 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2024.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2024.PDF) | Depotabschluss |
 | 2024-07-05 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_05_07_2024.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_05_07_2024.PDF) | Orderabrechnung |
 | 2024-07-05 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_05_07_2024_1.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_05_07_2024_1.PDF) | Orderabrechnung |
 | 2024-07-15 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_15_07_2024.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_15_07_2024.PDF) | Orderabrechnung |
@@ -96,158 +139,167 @@
 | 2024-09-26 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_09_2024_2.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_09_2024_2.PDF) | Orderabrechnung |
 | 2024-09-27 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_27_09_2024.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_27_09_2024.PDF) | Orderabrechnung |
 | 2024-09-27 | [Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_27_09_2024_1.PDF](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_27_09_2024_1.PDF) | Orderabrechnung |
-| 2024-10-01 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2024.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2024.PDF) | Orderabrechnung |
-| 2025-01-10 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF) | Orderabrechnung |
-| 2025-04-01 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2025.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2025.PDF) | Orderabrechnung |
-| 2025-04-28 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2025.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2025.PDF) | Orderabrechnung |
-| 2025-07-01 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2025.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2025.PDF) | Orderabrechnung |
+| 2024-10-01 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2024.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2024.PDF) | Depotabschluss |
+| 2025-01-10 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF) | Depotabschluss |
+| 2025-04-01 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2025.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2025.PDF) | Depotabschluss |
+| 2025-04-28 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2025.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2025.PDF) | Depotabschluss |
+| 2025-07-01 | [Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2025.PDF](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2025.PDF) | Depotabschluss |
 
 *Gesamt: 88 Dokumente*
+*Depotabschluss: 24 | Orderabrechnung: 64*
 
 
 ## Transaktionsstatistik
 
-- **Verkauf:** 21
+### Depotabschlüsse
+- **Depotabschluss:** 16
+- **Jahresabschluss:** 5
+- **Quartal:** 3
+
+### Orderabrechnungen
+- **Orderabrechnung:** 7
 - **Kauf:** 36
-- **Unbekannt:** 31
+- **Verkauf:** 21
 
 ## Wertpapiere (nach ISIN)
 
 
 ### US88160R1014
 - **Anzahl Transaktionen:** 59
-- **Verkaufssumme:** 1,272,040.80 EUR
-- **Kaufsumme:** 16,455.10 EUR
 
 ### DE000JN9UFS3
 - **Anzahl Transaktionen:** 5
-- **Verkaufssumme:** 193,753.50 EUR
-- **Kaufsumme:** 2.45 EUR
 
-## Transaktionsverlauf
+## Transaktionsverlauf (Detailliert)
 
-| Datum | Typ | ISIN | Betrag (EUR) | Beschreibung |
-|-------|-----|------|--------------|--------------|
-| 2020-12-22 | Verkauf | US88160R1014 | 54,800.00 | Wertpapierabrechnung Verkauf Tesla |
-| 2020-12-22 | Verkauf | US88160R1014 | 45,484.00 | Wertpapierabrechnung Verkauf |
-| 2020-12-22 | Verkauf | US88160R1014 | 6,028.00 | Wertpapierabrechnung Verkauf |
-| 2020-12-23 | Kauf | US88160R1014 | 519.50 | Wertpapierabrechnung Kaufbeleg |
-| 2020-12-23 | Kauf | US88160R1014 | 519.50 | Wertpapierabrechnung Kaufbeleg |
-| 2020-12-29 | Verkauf | US88160R1014 | 112,627.00 | Depotabrechnung Tesla Aktien |
-| 2021-01-07 | Kauf | US88160R1014 | 609.50 | Depotabrechnung Tesla Aktien |
-| 2021-01-08 | Unbekannt | N/A | N/A |  |
-| 2021-01-13 | Kauf | US88160R1014 | 681.50 | Wertpapierabrechnung Kaufbeleg |
-| 2021-01-13 | Kauf | US88160R1014 | 680.00 | Wertpapierabrechnung Kaufbeleg |
-| 2021-01-13 | Kauf | US88160R1014 | 679.90 | Wertpapierabrechnung Kaufbeleg |
-| 2021-01-13 | Kauf | US88160R1014 | 684.00 | Wertpapierabrechnung Kaufbeleg |
-| 2021-01-13 | Kauf | US88160R1014 | 681.00 | Depotabrechnung Tesla Aktien |
-| 2021-01-16 | Kauf | US88160R1014 | 691.00 | Depotabrechnung Tesla Aktie |
-| 2021-01-26 | Unbekannt | N/A | N/A | Depot Jahresabschluss Bericht |
-| 2021-02-11 | Kauf | US88160R1014 | 670.00 | Wertpapierabrechnung Kaufbeleg |
-| 2021-02-24 | Verkauf | US88160R1014 | 253,642.20 | Depotabrechnung Tesla Aktien |
-| 2021-03-05 | Kauf | US88160R1014 | 538.90 | Depotabrechnung Tesla Aktie |
-| 2021-03-10 | Verkauf | US88160R1014 | 31,201.50 | Depotabrechnung Tesla Aktien |
-| 2021-03-18 | Kauf | US88160R1014 | 549.00 | Depotabrechnung Tesla Aktien |
-| 2021-04-14 | Verkauf | US88160R1014 | 49,528.00 | Depotabrechnung Tesla Aktien |
-| 2021-04-16 | Unbekannt | US88160R1014 | 533.70 | Depot Konto Auszug |
-| 2021-05-13 | Unbekannt | N/A | N/A | Depotkosten Bericht jährliche |
-| 2021-07-16 | Unbekannt | N/A | N/A | Depotabrechnung Ramteid GmbH |
-| 2021-10-06 | Kauf | US88160R1014 | 680.00 | Depotabrechnung Tesla Aktie |
-| 2021-10-12 | Kauf | US88160R1014 | 679.00 | Depotabrechnung Tesla Aktie |
-| 2021-10-15 | Kauf | US88160R1014 | 704.70 | Depotabrechnung Tesla Aktien |
-| 2021-10-15 | Kauf | US88160R1014 | 705.00 | Depotabrechnung Tesla Aktie |
-| 2021-10-18 | Unbekannt | N/A | N/A | Depotabrechnung Ramteid GmbH |
-| 2021-10-20 | Kauf | US88160R1014 | 752.90 | Depotabrechnung Tesla Aktie |
-| 2021-10-26 | Verkauf | US88160R1014 | 854.60 | Wertpapierabrechnung Tesla Verkauf |
-| 2021-10-27 | Verkauf | US88160R1014 | 179,466.00 | Wertpapierabrechnung Verkauf |
-| 2021-10-27 | Kauf | US88160R1014 | 825.00 | Aktien Auftragsbestätigung |
-| 2021-10-29 | Kauf | DE000JN9UFS3 | 1.13 | Depotabrechnung Wertpapier Kauf |
-| 2021-10-29 | Kauf | US88160R1014 | 825.00 | Order Stornierung Bestätigung |
-| 2021-10-30 | Verkauf | DE000JN9UFS3 | 3.50 | Depot Auftragsbestätigung Verkauf |
-| 2021-10-30 | Verkauf | DE000JN9UFS3 | 155,000.00 | Wertpapierabrechnung Verkauf |
-| 2021-10-30 | Kauf | DE000JN9UFS3 | 1.32 | Depotabrechnung Wertpapier Kauf |
-| 2021-11-02 | Verkauf | DE000JN9UFS3 | 38,750.00 | Wertpapierabrechnung Verkauf |
-| 2021-11-02 | Kauf | US88160R1014 | 982.00 | Depotabrechnung Tesla Aktie |
-| 2021-11-03 | Verkauf | US88160R1014 | 196,014.00 | Wertpapierabrechnung Verkauf Tesla |
-| 2021-11-03 | Verkauf | US88160R1014 | 50,360.00 | Wertpapierabrechnung Verkauf Tesla |
-| 2022-01-25 | Unbekannt | N/A | N/A |  |
-| 2022-04-01 | Unbekannt | N/A | N/A | Depotabrechnung Ramteid GmbH |
-| 2022-04-28 | Unbekannt | US88160R1014 | N/A | Depotkosten Jahresbericht |
-| 2022-07-01 | Unbekannt | N/A | N/A | Depotabrechnung Ramteid GmbH |
-| 2022-10-03 | Unbekannt | N/A | N/A | Depotabrechnung Ramteid GmbH |
-| 2023-01-10 | Unbekannt | N/A | N/A | Depot Jahresauszug Bericht |
-| 2023-03-08 | Kauf | US88160R1014 | 172.46 | Wertpapierabrechnung Kaufauftrag |
-| 2023-03-15 | Verkauf | US88160R1014 | 17,448.00 | Wertpapierabrechnung Verkauf |
-| 2023-04-03 | Unbekannt | N/A | N/A | Depot Konto Abrechnung |
-| 2023-04-11 | Kauf | US88160R1014 | 173.24 | Wertpapierabrechnung Kaufauftrag |
-| 2023-04-20 | Kauf | US88160R1014 | 155.28 | Wertpapierabrechnung Kaufauftrag |
-| 2023-04-21 | Kauf | US88160R1014 | 150.88 | Wertpapierabrechnung Kaufauftrag |
-| 2023-05-04 | Kauf | US88160R1014 | 146.40 | Depotabrechnung Tesla Aktie |
-| 2023-05-15 | Unbekannt | N/A | N/A | Depotkosten Bericht 2022 |
-| 2023-07-03 | Unbekannt | US88160R1014 | 236.50 | Depotübersicht Wertpapiere |
-| 2023-07-17 | Verkauf | US88160R1014 | 265.00 | Wertpapier Auftragsbestätigung |
-| 2023-07-19 | Verkauf | US88160R1014 | 265.00 | Order Stornierung Bestätigung |
-| 2023-09-11 | Unbekannt | N/A | N/A |  |
-| 2023-09-11 | Unbekannt | N/A | N/A |  |
-| 2023-10-02 | Unbekannt | US88160R1014 | 232.60 | Depotabrechnung Wertpapierbestand Finanz |
-| 2023-10-10 | Verkauf | US88160R1014 | 20,176.00 | Wertpapierabrechnung Verkauf Tesla |
-| 2023-10-13 | Kauf | US88160R1014 | 244.20 | Depotabrechnung Tesla Aktie |
-| 2023-12-15 | Verkauf | US88160R1014 | 62,221.50 | Wertpapierabrechnung Verkauf Tesla |
-| 2024-01-10 | Unbekannt | N/A | N/A | Depot Jahresabschluss Bericht |
-| 2024-04-02 | Unbekannt | N/A | N/A | Depotabrechnung Ramteid GmbH |
-| 2024-04-24 | Unbekannt | US88160R1014 | N/A | Depotkosten Bericht 2023 |
-| 2024-07-01 | Unbekannt | N/A | N/A | Depotabrechnung Ramteid GmbH |
-| 2024-07-05 | Kauf | US88160R1014 | 232.30 | Wertpapierabrechnung Kaufbeleg |
-| 2024-07-05 | Kauf | US88160R1014 | 232.30 | Depotabrechnung Tesla Aktie |
-| 2024-07-15 | Unbekannt | N/A | N/A |  |
-| 2024-07-16 | Kauf | US88160R1014 | 230.00 | Wertpapierabrechnung Kaufauftrag |
-| 2024-07-19 | Kauf | US88160R1014 | 228.80 | Wertpapierabrechnung Kaufauftrag |
-| 2024-08-02 | Kauf | US88160R1014 | 203.00 | Wertpapierabrechnung Kaufbeleg |
-| 2024-09-03 | Kauf | US88160R1014 | 195.94 | Wertpapierabrechnung Kaufauftrag |
-| 2024-09-17 | Verkauf | US88160R1014 | 121,220.00 | Wertpapierabrechnung Verkauf Tesla |
-| 2024-09-17 | Kauf | US88160R1014 | 206.50 | Wertpapierabrechnung Kaufbeleg |
-| 2024-09-26 | Verkauf | US88160R1014 | 70,440.00 | Wertpapierabrechnung Verkauf |
-| 2024-09-26 | Unbekannt | N/A | N/A |  |
-| 2024-09-26 | Kauf | US88160R1014 | 226.40 | Depotabrechnung Tesla Aktie |
-| 2024-09-27 | Unbekannt | N/A | N/A |  |
-| 2024-09-27 | Unbekannt | N/A | N/A |  |
-| 2024-10-01 | Unbekannt | US88160R1014 | N/A | Depot Konto Abrechnung |
-| 2025-01-10 | Unbekannt | N/A | N/A | Depot Jahresauszug Bericht |
-| 2025-04-01 | Unbekannt | N/A | N/A | Depot Konto Abrechnung |
-| 2025-04-28 | Unbekannt | US88160R1014 | N/A | Depotkosten Bericht 2024 |
-| 2025-07-01 | Unbekannt | N/A | N/A | Depot Konto Abrechnung |
+| Datum | Typ | ISIN | Stück | Kurs/Aktie | Brutto (EUR) | Gebühren | Gewinn/Verlust | Netto (EUR) | Dokument |
+|-------|-----|------|-------|------------|--------------|----------|----------------|-------------|----------|
+| 22.12.2020 | Verkauf | US88160R1014 | 100 | 548.00 | 54,800.00 | -77.08 | +2,910.60 | 54,722.92 | [20201222_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20201222_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_21_12_2020.pdf) |
+| 22.12.2020 | Verkauf | US88160R1014 | 83 | 548.00 | 45,484.00 | - | - | 2,429.84 | [20201222_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20201222_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_21_12_2020_1.pdf) |
+| 22.12.2020 | Verkauf | US88160R1014 | 11 | 548.00 | 6,028.00 | - | +316.90 | 6,028.00 | [20201222_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20201222_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_21_12_2020_2.pdf) |
+| 23.12.2020 | Kauf | US88160R1014 | 200 | 519.50 | 103,900.00 | -77.21 | - | 103,900.00 | [20201223_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20201223_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_22_12_2020.pdf) |
+| 23.12.2020 | Kauf | US88160R1014 | 5 | 519.50 | 2,597.50 | - | - | 2,597.50 | [20201223_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20201223_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_22_12_2020_1.pdf) |
+| 29.12.2020 | Verkauf | US88160R1014 | 205 | 549.40 | 112,627.00 | -81.65 | +5,970.64 | 112,545.35 | [20201229_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20201229_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_28_12_2020.pdf) |
+| 07.01.2021 | Kauf | US88160R1014 | 395 | 609.50 | 240,752.50 | -174.55 | - | 240,752.50 | [20210107_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20210107_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_06_01_2021.pdf) |
+| 08.01.2021 | Orderabrechnung | N/A | - | - | - | - | - | N/A | [20210108_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20210108_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_07_01_2021.pdf) |
+| 13.01.2021 | Kauf | US88160R1014 | 60 | 681.50 | 40,890.00 | - | - | 40,890.00 | [20210113_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021.pdf) |
+| 13.01.2021 | Kauf | US88160R1014 | 134 | 680.00 | 91,120.00 | -172.77 | - | 91,120.00 | [20210113_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021_1.pdf) |
+| 13.01.2021 | Kauf | US88160R1014 | 100 | 679.90 | 67,990.00 | - | - | 67,990.00 | [20210113_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021_2.pdf) |
+| 13.01.2021 | Kauf | US88160R1014 | 56 | 684.00 | 38,304.00 | - | - | 38,304.00 | [20210113_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021_3.pdf) |
+| 13.01.2021 | Kauf | US88160R1014 | 33 | 680.80 | 22,466.40 | -21.90 | - | 22,466.40 | [20210113_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021_4.pdf) |
+| 16.01.2021 | Kauf | US88160R1014 | 28 | 691.00 | 19,348.00 | -18.86 | - | 19,348.00 | [20210116_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20210116_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_14_01_2021.pdf) |
+| 26.01.2021 | Depotabschluss | N/A | - | - | - | - | - | N/A | [20210126_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20210126_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_12_01_2021.pdf) |
+| 11.02.2021 | Kauf | US88160R1014 | 50 | 670.00 | 33,500.00 | -24.29 | - | 33,500.00 | [20210211_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20210211_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_10_02_2021.pdf) |
+| 24.02.2021 | Verkauf | US88160R1014 | 461 | 550.20 | 253,642.20 | -183.89 | - | 253,458.31 | [20210224_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021.pdf) |
+| 05.03.2021 | Kauf | US88160R1014 | 55 | 538.90 | 29,639.50 | -21.49 | - | 29,639.50 | [20210305_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20210305_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_04_03_2021.pdf) |
+| 10.03.2021 | Verkauf | US88160R1014 | 55 | 567.30 | 31,201.50 | -22.62 | +1,517.89 | 31,178.88 | [20210310_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20210310_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_09_03_2021.pdf) |
+| 18.03.2021 | Kauf | US88160R1014 | 80 | 549.00 | 43,920.00 | -31.84 | - | 43,920.00 | [20210318_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20210318_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_17_03_2021.pdf) |
+| 14.04.2021 | Verkauf | US88160R1014 | 80 | 619.10 | 49,528.00 | -35.91 | +5,540.25 | 49,492.09 | [20210414_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20210414_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_13_04_2021.pdf) |
+| 16.04.2021 | Depotabschluss | US88160R1014 | - | - | - | - | - | 533.70 | [20210416_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20210416_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2021.pdf) |
+| 13.05.2021 | Depotabschluss | N/A | - | - | - | - | - | N/A | [20210513_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20210513_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_22_04_2021.pdf) |
+| 16.07.2021 | Depotabschluss | N/A | - | - | - | - | - | N/A | [20210716_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20210716_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2021.pdf) |
+| 06.10.2021 | Kauf | US88160R1014 | 50 | 678.30 | 33,915.00 | -24.59 | - | 33,915.00 | [20211006_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20211006_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_05_10_2021.pdf) |
+| 12.10.2021 | Kauf | US88160R1014 | 25 | 678.10 | 16,952.50 | -16.53 | - | 16,952.50 | [20211012_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20211012_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_11_10_2021.pdf) |
+| 15.10.2021 | Kauf | US88160R1014 | 60 | 704.70 | 42,282.00 | -30.65 | - | 42,282.00 | [20211015_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20211015_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_14_10_2021.pdf) |
+| 15.10.2021 | Kauf | US88160R1014 | 25 | 703.70 | 17,592.50 | -17.15 | - | 17,592.50 | [20211015_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20211015_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_14_10_2021_1.pdf) |
+| 18.10.2021 | Depotabschluss | N/A | - | - | - | - | - | N/A | [20211018_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20211018_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2021.pdf) |
+| 20.10.2021 | Kauf | US88160R1014 | 50 | 752.90 | 37,645.00 | -27.29 | - | 37,645.00 | [20211020_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20211020_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_19_10_2021.pdf) |
+| 26.10.2021 | Verkauf | US88160R1014 | 210 | 854.60 | - | - | - | 854.60 | [20211026_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20211026_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_25_10_2021.pdf) |
+| 27.10.2021 | Verkauf | US88160R1014 | 210 | 854.60 | 179,466.00 | - | +30,757.67 | 179,260.88 | [20211027_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021.pdf) |
+| 27.10.2021 | Kauf | US88160R1014 | 200 | Limit: 825.00 | - | - | - | 825.00 | [20211027_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021_1.pdf) |
+| 29.10.2021 | Kauf | DE000JN9UFS3 | 85 | 1.13 | 96,050.00 | -69.64 | - | 96,050.00 | [20211029_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20211029_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_28_10_2021.pdf) |
+| 29.10.2021 | Kauf | US88160R1014 | 200 | Limit: 825.00 | - | - | - | 825.00 | [20211029_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20211029_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_28_10_2021.pdf) |
+| 30.10.2021 | Verkauf | DE000JN9UFS3 | 25 | Limit: 1.55 | - | - | - | 3.50 | [20211030_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20211030_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_29_10_2021.pdf) |
+| 30.10.2021 | Verkauf | DE000JN9UFS3 | 100 | 1.55 | 155,000.00 | -112.38 | +39,381.48 | 154,878.16 | [20211030_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20211030_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_29_10_2021_1.pdf) |
+| 30.10.2021 | Kauf | DE000JN9UFS3 | 40 | 1.29 | 51,600.00 | -37.41 | - | 51,600.00 | [20211030_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20211030_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_29_10_2021_2.pdf) |
+| 02.11.2021 | Verkauf | DE000JN9UFS3 | 25 | 1.55 | 38,750.00 | -28.09 | +6,439.12 | 38,721.91 | [20211102_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20211102_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_01_11_2021.pdf) |
+| 02.11.2021 | Kauf | US88160R1014 | 245 | 981.90 | 240,565.50 | -174.41 | - | 240,565.50 | [20211102_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20211102_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_01_11_2021.pdf) |
+| 03.11.2021 | Verkauf | US88160R1014 | 195 | 1005.20 | 196,014.00 | -178.62 | +4,226.06 | 195,835.38 | [20211103_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20211103_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_02_11_2021.pdf) |
+| 03.11.2021 | Verkauf | US88160R1014 | 50 | 1007.20 | 50,360.00 | - | - | 1,229.41 | [20211103_Orderabrechnung_-bestaetigun...](docs/Ramteid-Depotkonto-7274087/20211103_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_02_11_2021_1.pdf) |
+| 25.01.2022 | Depotabschluss | N/A | - | - | - | - | - | N/A | [20220125_Depotabschluss_Ex-Post-Rep_D...](docs/Ramteid-Depotkonto-7274087/20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf) |
+| 01.04.2022 | Depotabschluss | N/A | - | - | - | - | - | N/A | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF) |
+| 28.04.2022 | Depotabschluss | US88160R1014 | - | - | - | - | - | N/A | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2022.PDF) |
+| 01.07.2022 | Depotabschluss | N/A | - | - | - | - | - | N/A | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2022.PDF) |
+| 03.10.2022 | Depotabschluss | N/A | - | - | - | - | - | N/A | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_10_2022.PDF) |
+| 10.01.2023 | Depotabschluss | N/A | - | - | - | - | - | N/A | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2023.PDF) |
+| 08.03.2023 | Kauf | US88160R1014 | 100 | 172.46 | 17,246.00 | -16.81 | - | 17,246.00 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_03_2023.PDF) |
+| 15.03.2023 | Verkauf | US88160R1014 | 100 | 174.48 | 17,448.00 | -17.01 | +168.18 | 17,430.99 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_15_03_2023.PDF) |
+| 03.04.2023 | Depotabschluss | N/A | - | - | - | - | - | N/A | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_04_2023.PDF) |
+| 11.04.2023 | Kauf | US88160R1014 | 100 | 173.24 | 17,324.00 | -16.89 | - | 17,324.00 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_11_04_2023.PDF) |
+| 20.04.2023 | Kauf | US88160R1014 | 75 | 155.28 | 11,646.00 | -15.00 | - | 11,646.00 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_20_04_2023.PDF) |
+| 21.04.2023 | Kauf | US88160R1014 | 25 | 150.88 | 3,772.00 | -15.00 | - | 3,772.00 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_21_04_2023.PDF) |
+| 04.05.2023 | Kauf | US88160R1014 | 150 | 146.12 | 21,918.00 | -21.37 | - | 21,918.00 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_04_05_2023.PDF) |
+| 15.05.2023 | Depotabschluss | N/A | - | - | - | - | - | N/A | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_15_05_2023.PDF) |
+| 03.07.2023 | Depotabschluss | US88160R1014 | - | - | - | - | - | 236.50 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_07_2023.PDF) |
+| 17.07.2023 | Verkauf | US88160R1014 | 350 | - | - | - | - | 265.00 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_17_07_2023.PDF) |
+| 19.07.2023 | Verkauf | US88160R1014 | 350 | Limit: 265.00 | - | - | - | 265.00 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_19_07_2023.PDF) |
+| 11.09.2023 | Orderabrechnung | N/A | - | - | - | - | - | N/A | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_11_09_2023.PDF) |
+| 11.09.2023 | Orderabrechnung | N/A | - | - | - | - | - | N/A | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_11_09_2023_1.PDF) |
+| 02.10.2023 | Depotabschluss | US88160R1014 | - | - | - | - | - | 232.60 | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_10_2023.PDF) |
+| 10.10.2023 | Verkauf | US88160R1014 | 80 | 252.20 | 20,176.00 | -19.67 | +7,737.93 | 20,156.33 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_10_10_2023.PDF) |
+| 13.10.2023 | Kauf | US88160R1014 | 100 | 244.20 | 24,420.00 | -23.81 | - | 24,420.00 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_13_10_2023.PDF) |
+| 15.12.2023 | Verkauf | US88160R1014 | 270 | 230.45 | 62,221.50 | -45.11 | +14,179.13 | 62,176.39 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_15_12_2023.PDF) |
+| 10.01.2024 | Depotabschluss | N/A | - | - | - | - | - | N/A | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2024.PDF) |
+| 02.04.2024 | Depotabschluss | N/A | - | - | - | - | - | N/A | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_04_2024.PDF) |
+| 24.04.2024 | Depotabschluss | US88160R1014 | - | - | - | - | - | N/A | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_24_04_2024.PDF) |
+| 01.07.2024 | Depotabschluss | N/A | - | - | - | - | - | N/A | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2024.PDF) |
+| 05.07.2024 | Kauf | US88160R1014 | 300 | 232.10 | 69,630.00 | -62.26 | - | 69,630.00 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_05_07_2024.PDF) |
+| 05.07.2024 | Kauf | US88160R1014 | 70 | 232.10 | 16,247.00 | - | - | 16,247.00 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_05_07_2024_1.PDF) |
+| 15.07.2024 | Orderabrechnung | N/A | - | - | - | - | - | N/A | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_15_07_2024.PDF) |
+| 16.07.2024 | Kauf | US88160R1014 | 200 | 229.45 | 45,890.00 | -33.27 | - | 45,890.00 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_16_07_2024.PDF) |
+| 19.07.2024 | Kauf | US88160R1014 | 60 | 228.80 | 13,728.00 | -15.00 | - | 13,728.00 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_19_07_2024.PDF) |
+| 02.08.2024 | Kauf | US88160R1014 | 70 | 202.80 | 14,196.00 | -15.00 | - | 14,196.00 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_02_08_2024.PDF) |
+| 03.09.2024 | Kauf | US88160R1014 | 50 | 195.94 | 9,797.00 | -15.00 | - | 9,797.00 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_03_09_2024.PDF) |
+| 17.09.2024 | Verkauf | US88160R1014 | 580 | 209.00 | 121,220.00 | -87.88 | -1,038.82 | 121,132.12 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_17_09_2024.PDF) |
+| 17.09.2024 | Kauf | US88160R1014 | 500 | 206.50 | 103,250.00 | -74.86 | - | 103,250.00 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_17_09_2024_1.PDF) |
+| 26.09.2024 | Verkauf | US88160R1014 | 300 | 234.80 | 70,440.00 | -85.12 | +8,359.96 | 70,354.88 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_09_2024.PDF) |
+| 26.09.2024 | Orderabrechnung | N/A | - | - | - | - | - | N/A | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_09_2024_1.PDF) |
+| 26.09.2024 | Kauf | US88160R1014 | 519 | 226.40 | 117,501.60 | -85.19 | - | 117,501.60 | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_09_2024_2.PDF) |
+| 27.09.2024 | Orderabrechnung | N/A | - | - | - | - | - | N/A | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_27_09_2024.PDF) |
+| 27.09.2024 | Orderabrechnung | N/A | - | - | - | - | - | N/A | [Orderabrechnung_-bestaetigung_ISIN_US...](docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_27_09_2024_1.PDF) |
+| 01.10.2024 | Depotabschluss | US88160R1014 | - | - | - | - | - | N/A | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2024.PDF) |
+| 10.01.2025 | Depotabschluss | N/A | - | - | - | - | - | N/A | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF) |
+| 01.04.2025 | Depotabschluss | N/A | - | - | - | - | - | N/A | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2025.PDF) |
+| 28.04.2025 | Depotabschluss | US88160R1014 | - | - | - | - | - | N/A | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2025.PDF) |
+| 01.07.2025 | Depotabschluss | N/A | - | - | - | - | - | N/A | [Depotabschluss_Ex-Post-Rep_Depot_7274...](docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2025.PDF) |
+
+*Gesamt: 88 Transaktionen*
+*- Depotabschlüsse: 24*
+*- Orderabrechnungen: 64*
 
 ## Zeitliche Verteilung
 
 | Monat | Anzahl Transaktionen | Gesamtvolumen (EUR) |
 |-------|---------------------|---------------------|
-| 2020-12 | 6 | 219,978.00 |
-| 2021-01 | 9 | 4,706.90 |
-| 2021-02 | 2 | 254,312.20 |
-| 2021-03 | 3 | 32,289.40 |
-| 2021-04 | 2 | 50,061.70 |
+| 2020-12 | 6 | 282,223.61 |
+| 2021-01 | 9 | 520,870.90 |
+| 2021-02 | 2 | 286,958.31 |
+| 2021-03 | 3 | 104,738.38 |
+| 2021-04 | 2 | 50,025.79 |
 | 2021-05 | 1 | 0.00 |
 | 2021-07 | 1 | 0.00 |
-| 2021-10 | 14 | 340,498.15 |
-| 2021-11 | 4 | 286,106.00 |
+| 2021-10 | 14 | 632,684.14 |
+| 2021-11 | 4 | 476,352.20 |
 | 2022-01 | 1 | 0.00 |
 | 2022-04 | 2 | 0.00 |
 | 2022-07 | 1 | 0.00 |
 | 2022-10 | 1 | 0.00 |
 | 2023-01 | 1 | 0.00 |
-| 2023-03 | 2 | 17,620.46 |
-| 2023-04 | 4 | 479.40 |
-| 2023-05 | 2 | 146.40 |
+| 2023-03 | 2 | 34,676.99 |
+| 2023-04 | 4 | 32,742.00 |
+| 2023-05 | 2 | 21,918.00 |
 | 2023-07 | 3 | 766.50 |
 | 2023-09 | 2 | 0.00 |
-| 2023-10 | 3 | 20,652.80 |
-| 2023-12 | 1 | 62,221.50 |
+| 2023-10 | 3 | 44,808.93 |
+| 2023-12 | 1 | 62,176.39 |
 | 2024-01 | 1 | 0.00 |
 | 2024-04 | 2 | 0.00 |
-| 2024-07 | 6 | 923.40 |
-| 2024-08 | 1 | 203.00 |
-| 2024-09 | 8 | 192,288.84 |
+| 2024-07 | 6 | 145,495.00 |
+| 2024-08 | 1 | 14,196.00 |
+| 2024-09 | 8 | 422,035.60 |
 | 2024-10 | 1 | 0.00 |
 | 2025-01 | 1 | 0.00 |
 | 2025-04 | 2 | 0.00 |
 | 2025-07 | 1 | 0.00 |
+
+*Aktivität in 30 Monaten über 6 Jahre (2020-12 bis 2025-07)*
