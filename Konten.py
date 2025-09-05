@@ -43,7 +43,20 @@ class BaseKontoAnalyzer:
     
     def extract_document_type_from_docling(self, pdf_path: Path) -> str:
         """Extrahiert den Dokumenttyp aus der zugehörigen docling.json Datei"""
-        # Suche nach zugehöriger docling.json Datei
+        # Fallback basierend auf Dateinamen-Mustern (höchste Priorität)
+        filename_lower = pdf_path.name.lower()
+        if 'depotabschluss' in filename_lower or 'ex-post-rep' in filename_lower:
+            return 'Depotabschluss'
+        elif 'orderabrechnung' in filename_lower:
+            return 'Orderabrechnung'
+        elif 'kapitalmassnahme' in filename_lower or 'kapitalmaßnahme' in filename_lower:
+            return 'Kapitalmassnahme'
+        elif 'kontoauszug' in filename_lower or 'auszug' in filename_lower:
+            return 'Kontoauszug'
+        elif 'zinsabrechnung' in filename_lower:
+            return 'Zinsabrechnung'
+        
+        # Suche nach zugehöriger docling.json Datei für weitere Hinweise
         pdf_name = pdf_path.stem
         parent_dir = pdf_path.parent
         
@@ -66,21 +79,8 @@ class BaseKontoAnalyzer:
                     return self.doc_type_mapping.get(doc_type, doc_type.capitalize())
                 except Exception as e:
                     print(f"Fehler beim Lesen von {docling_files[0]}: {e}")
-        
-        # Fallback basierend auf Dateinamen-Mustern
-        filename_lower = pdf_path.name.lower()
-        if 'orderabrechnung' in filename_lower:
-            return 'Orderabrechnung'
-        elif 'depotabschluss' in filename_lower:
-            return 'Depotabschluss'
-        elif 'kapitalmassnahme' in filename_lower or 'kapitalmaßnahme' in filename_lower:
-            return 'Kapitalmassnahme'
-        elif 'auszug' in filename_lower:
-            return 'Kontoauszug'
-        elif 'zinsabrechnung' in filename_lower:
-            return 'Zinsabrechnung'
                     
-        return "Unbekannt"
+        return "Document"
     
     def extract_date_from_filename(self, filename: str) -> Optional[str]:
         """Extrahiert das Datum aus dem Dateinamen"""
@@ -126,11 +126,22 @@ class BaseKontoAnalyzer:
         # Sammle alle PDF-Dateien (beide Schreibweisen)
         pdf_files = list(account_path.glob("*.pdf")) + list(account_path.glob("*.PDF"))
         
+        # Tracking für Statistiken
+        doc_type_counts = defaultdict(int)
+        unknown_docs = []
+        
         # Erstelle Liste mit Dateiinformationen
         file_infos = []
         for pdf_file in pdf_files:
             date_str = self.extract_date_from_filename(pdf_file.name)
             doc_type = self.extract_document_type_from_docling(pdf_file)
+            
+            # Zähle Dokumenttypen
+            doc_type_counts[doc_type] += 1
+            
+            # Sammle unbekannte Dokumente
+            if doc_type == "Document":
+                unknown_docs.append(pdf_file.name)
             
             file_infos.append({
                 'date': date_str if date_str else '0000-00-00',
@@ -147,9 +158,29 @@ class BaseKontoAnalyzer:
             date_display = info['date'] if info['date'] != '0000-00-00' else 'N/A'
             # Erstelle Markdown-Link
             link = f"[{info['name']}]({info['path']})"
-            md_lines.append(f"| {date_display} | {link} | {info['type']} |")
+            # Markiere unbekannte Dokumente
+            if info['type'] == "Document":
+                md_lines.append(f"| {date_display} | ⚠️ {link} | **{info['type']}** |")
+            else:
+                md_lines.append(f"| {date_display} | {link} | {info['type']} |")
         
-        md_lines.append(f"\n*Gesamt: {len(pdf_files)} Dokumente*\n")
+        # Erweiterte Zusammenfassung
+        md_lines.append(f"\n*Gesamt: {len(pdf_files)} Dokumente*")
+        
+        # Typ-Statistiken
+        if doc_type_counts:
+            type_summary = " | ".join([f"{typ}: {count}" for typ, count in sorted(doc_type_counts.items())])
+            md_lines.append(f"*{type_summary}*")
+        
+        # Warnung für unbekannte Dokumente
+        if unknown_docs:
+            md_lines.append(f"\n⚠️ **Warnung: {len(unknown_docs)} Dokumente ohne Typ-Klassifizierung:**")
+            for doc in unknown_docs[:10]:  # Zeige max. 10
+                md_lines.append(f"- {doc}")
+            if len(unknown_docs) > 10:
+                md_lines.append(f"- ... und {len(unknown_docs) - 10} weitere")
+        
+        md_lines.append("")
         
         return md_lines
     
@@ -236,16 +267,26 @@ class BaseKontoAnalyzer:
                 md.append(f"- **Noch zu analysieren:** {not_analyzed} Dateien")
         else:
             md.append(f"- **Davon analysiert:** {total_thea_files}")
-            
-        md.append(f"- **Stand:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         
-        # Zusätzliche optionale Felder
-        for key, value in kwargs.items():
-            if value is not None:
-                if key == 'latest_saldo':
-                    md.append(f"- **Aktueller Saldo:** {value:,.2f} EUR")
-                elif key == 'latest_zinssatz':
-                    md.append(f"- **Aktueller Zinssatz:** {value:.2f}%")
+        # Zusätzliche optionale Felder für Saldo und Datum
+        latest_saldo = kwargs.get('latest_saldo')
+        latest_saldo_date = kwargs.get('latest_saldo_date')
+        
+        if latest_saldo is not None:
+            if account_type == "Depotkonto":
+                saldo_text = f"- **Letzter Depotbestand:** {latest_saldo:,.2f} EUR"
+            else:
+                saldo_text = f"- **Letzter Saldo:** {latest_saldo:,.2f} EUR"
+            
+            if latest_saldo_date:
+                saldo_text += f" (vom {latest_saldo_date})"
+            md.append(saldo_text)
+        
+        # Zinssatz für Geldmarktkonto
+        if 'latest_zinssatz' in kwargs and kwargs['latest_zinssatz'] is not None:
+            md.append(f"- **Aktueller Zinssatz:** {kwargs['latest_zinssatz']:.2f}%")
+            
+        md.append(f"- **Zuletzt aktualisiert:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         
         return md
     
