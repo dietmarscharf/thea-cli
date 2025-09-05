@@ -239,7 +239,7 @@ npm run thea:sync-sidecars-dry     # Dry run to preview
 **`clean_json_response(response_text)`** (thea.py:278-390)
 - Central response parsing function
 - Extracts both `<thinking>` and `<think>` tags
-- Handles markdown code blocks (`\`\`\`json`)
+- Handles markdown code blocks (```json)
 - Multiple fallback strategies for JSON extraction
 - Critical for Gemma/Qwen model compatibility
 
