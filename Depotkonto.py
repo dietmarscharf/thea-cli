@@ -136,8 +136,14 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         filename_lower = base_data.get('original_file', '').lower()
         date_str = base_data.get('date', '')
         
+        # Check for cost information documents (MiFID II Kostenaufstellung)
+        # These are specifically the Ex-Post cost reports, not regular orders mentioning cost information
+        if ('information über kosten und nebenkosten' in extracted_lower or 
+            'ex-post-kosteninformation' in extracted_lower or
+            ('dienstleistungskosten' in extracted_lower and 'übergreifende kosten' in extracted_lower)):
+            transaction_type = 'Kostenaufstellung'
         # Check for depot statements (various formats)
-        if any(term in extracted_lower for term in ['depotabschluss', 'jahresabschluss', 'jahresdepotauszug', 'depotauszug', 'ex-post-rep']):
+        elif any(term in extracted_lower for term in ['depotabschluss', 'jahresabschluss', 'jahresdepotauszug', 'depotauszug', 'ex-post-rep']):
             # Determine if annual or quarterly
             if 'jahresabschluss' in extracted_lower or 'jahres' in extracted_lower:
                 transaction_type = 'Depotabschluss-Jahresabschluss'
@@ -879,6 +885,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         categories = {
             'Depotabschluss': [],
             'Orderabrechnung': [],
+            'Kostenaufstellung': [],
             'Sonstige': []
         }
         
@@ -887,6 +894,8 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 categories['Depotabschluss'].append((trans_type, count))
             elif 'Orderabrechnung' in trans_type:
                 categories['Orderabrechnung'].append((trans_type, count))
+            elif 'Kostenaufstellung' in trans_type:
+                categories['Kostenaufstellung'].append((trans_type, count))
             else:
                 categories['Sonstige'].append((trans_type, count))
         
@@ -903,6 +912,12 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             for trans_type, count in categories['Orderabrechnung']:
                 display_type = trans_type.replace('Orderabrechnung-', '')
                 md.append(f"- **{display_type}:** {count}")
+        
+        # Zeige Kostenaufstellung-Kategorien
+        if categories['Kostenaufstellung']:
+            md.append("\n### Kostenaufstellungen (MiFID II)")
+            for trans_type, count in categories['Kostenaufstellung']:
+                md.append(f"- **{trans_type}:** {count}")
         
         # Zeige sonstige Kategorien
         if categories['Sonstige']:
