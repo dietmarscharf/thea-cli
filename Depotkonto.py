@@ -214,9 +214,33 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             
         return result
     
+    def detect_document_type(self, extracted_text: str) -> str:
+        """Erkennt den Dokumenttyp basierend auf Inhalt"""
+        text_lower = extracted_text.lower()
+        
+        # Kosteninformation - diese werden oft fälschlicherweise als Depotabschluss benannt
+        if 'information über kosten' in text_lower or 'kosteninformation' in text_lower:
+            return 'cost_information'
+        
+        # Depotabschluss
+        if 'depotabschluss' in text_lower or 'ex-post' in text_lower:
+            # Prüfe ob es ein echter Depotabschluss mit Bestand ist
+            if 'summe kurswerte' in text_lower or 'depotbestand' in text_lower or 'stück' in text_lower:
+                return 'depot_statement'
+            elif 'kein bestand vorhanden' in text_lower:
+                return 'depot_statement_empty'
+            else:
+                # Zusätzliche Prüfung für versteckte Kosteninformationen
+                if 'kosten' in text_lower and 'nebenkosten' in text_lower:
+                    return 'cost_information'
+                return 'depot_statement'
+        
+        return 'unknown'
+    
     def extract_depot_balance(self, depot_path: Path) -> Dict[str, Any]:
         """Extrahiert Depot-Salden aus Depotabschluss-Dokumenten"""
         depot_statements = []
+        cost_information_docs = []  # Separate Liste für Kosteninformationen
         latest_balance = None
         latest_balance_date = None
         
@@ -228,6 +252,19 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 file_path = data.get('metadata', {}).get('file', {}).get('pdf_path', '')
                 file_name = os.path.basename(file_path)
                 doc_date = self.extract_date_from_filename(file_name)
+                
+                # Erkenne Dokumenttyp
+                doc_type = self.detect_document_type(extracted_text)
+                
+                # Überspringe Kosteninformationen für Depot-Tabelle
+                if doc_type == 'cost_information':
+                    cost_information_docs.append({
+                        'doc_date': doc_date,
+                        'file': file_name,
+                        'pdf_path': file_path,
+                        'type': 'cost_information'
+                    })
+                    continue  # Nicht in Depot-Statements aufnehmen
                 
                 # Extrahiere das tatsächliche Stichtagsdatum (z.B. "per 31.12.2021")
                 balance_date = None
@@ -261,46 +298,75 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 else:
                     # Verbesserte Suche nach Kurswert in Tabellen mit verschiedenen Formatierungen
                     # Spezieller Fall für Tabellenlayout wo "Summe Kurswerte" in einer Spalte und Betrag in anderer ist
-                    if 'Summe Kurswerte' in extracted_text:
-                        # Suche nach allen Zeilen mit "Summe Kurswerte"
-                        for line in extracted_text.split('\n'):
-                            if 'Summe Kurswerte' in line:
-                                # Extrahiere alle Zahlen aus der Zeile
-                                numbers = re.findall(r'[\d]+\.[\d]+,[\d]+', line)
+                    if 'Summe Kurswerte' in extracted_text or 'Summe' in extracted_text:
+                        lines = extracted_text.split('\n')
+                        for i, line in enumerate(lines):
+                            if 'Summe Kurswerte' in line or ('Summe' in line and '|' in line):
+                                # Extrahiere alle Zahlen aus der aktuellen Zeile (deutsche Formatierung mit . als Tausendertrennzeichen)
+                                numbers = re.findall(r'[\d]{1,3}(?:\.[\d]{3})*,[\d]{2}', line)
+                                # Nimm den größten Wert (der Depotbestand, nicht die Stückzahl)
+                                largest_value = 0
                                 for num in numbers:
                                     # Konvertiere deutsches in Python-Format
                                     balance_str = num.replace('.', '').replace(',', '.')
                                     try:
                                         test_balance = float(balance_str)
-                                        # Nimm den größten Wert (wahrscheinlich der Gesamtwert)
-                                        if test_balance > 100:  # Mindestens 100 EUR um Gebühren zu ignorieren
-                                            closing_balance = test_balance
-                                            break
+                                        # Nimm den größten Wert, der mindestens 5000 EUR ist
+                                        # (um kleine Stückzahlen zu vermeiden, aber erlaubt kleinere Depots)
+                                        if test_balance > largest_value and test_balance > 5000:
+                                            largest_value = test_balance
                                     except ValueError:
                                         pass
+                                
+                                # Wenn kein Wert in der gleichen Zeile gefunden, prüfe die nächste Zeile (multi-row table format)
+                                if largest_value == 0 and i + 1 < len(lines):
+                                    next_line = lines[i + 1]
+                                    # Suche nach Werten in der nächsten Zeile (für multi-row tables)
+                                    numbers_next = re.findall(r'[\d]{1,3}(?:\.[\d]{3})*,[\d]{2}', next_line)
+                                    for num in numbers_next:
+                                        balance_str = num.replace('.', '').replace(',', '.')
+                                        try:
+                                            test_balance = float(balance_str)
+                                            # Akzeptiere auch kleinere Werte in multi-row format (min 1000 EUR)
+                                            if test_balance > largest_value and test_balance > 1000:
+                                                largest_value = test_balance
+                                        except ValueError:
+                                            pass
+                                
+                                if largest_value > 0:
+                                    closing_balance = largest_value
+                                    break
                                 if closing_balance and closing_balance > 0:
                                     break
                     
                     # Fallback auf Pattern-Matching
                     if closing_balance is None:
                         kurswert_patterns = [
-                            r'Summe\s+Kurswerte\s*([+-]?[\d.,]+)',
                             r'Summe\s+Kurswerte\s*\|\s*([+-]?[\d.,]+)',  # Mit Tabellen-Separator
+                            r'Summe\s+([+-]?[\d.,]+)',  # Summe gefolgt von Zahl
+                            r'([+-]?[\d.,]+)\s*\|\s*$',  # Zahl am Ende einer Tabellenzeile
+                            r'Summe\s+Kurswerte\s*([+-]?[\d.,]+)',
                             r'Kurswert\s+in\s+EUR[^\d]*([+-]?[\d.,]+)',  # Kurswert in EUR
                             r'Kurswert.*?([+-]?[\d.,]+)\s*(?:EUR|€)',  # Kurswert mit Betrag
                         ]
                         
                         for pattern in kurswert_patterns:
-                            match = re.search(pattern, extracted_text, re.IGNORECASE)
-                            if match:
-                                balance_str = match.group(1).replace('.', '').replace(',', '.')
-                                try:
-                                    test_balance = float(balance_str)
-                                    if test_balance > 100:  # Mindestens 100 EUR
-                                        closing_balance = test_balance
-                                        break
-                                except ValueError:
-                                    pass
+                            # Suche nach allen Matches, nicht nur dem ersten
+                            matches = re.findall(pattern, extracted_text, re.IGNORECASE)
+                            if matches:
+                                largest_value = 0
+                                for match_str in matches:
+                                    balance_str = match_str.replace('.', '').replace(',', '.')
+                                    try:
+                                        test_balance = float(balance_str)
+                                        # Nimm den größten Wert über 5000 EUR
+                                        if test_balance > largest_value and test_balance > 5000:
+                                            largest_value = test_balance
+                                    except ValueError:
+                                        pass
+                                if largest_value > 0:
+                                    closing_balance = largest_value
+                                    break
                     
                     # Fallback auf andere Balance-Muster
                     if closing_balance is None:
@@ -328,17 +394,73 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 
                 # Extrahiere Stückzahl und ISIN wenn Bestand vorhanden
                 if closing_balance and closing_balance > 0:
-                    # Suche nach Stück in Tabellenformat (mit | Trennzeichen)
-                    shares_patterns = [
-                        r'\|\s*Stück\s*\|\s*(\d+)',  # | Stück | 950
-                        r'Stück\s+\|\s+(\d+)',        # Stück | 950
-                        r'Stück\s+(\d+)',             # Stück 950
-                    ]
-                    for pattern in shares_patterns:
-                        shares_match = re.search(pattern, extracted_text)
-                        if shares_match:
-                            shares = int(shares_match.group(1))
-                            break
+                    # Spezialbehandlung für vertikales Layout (Stück auf eigener Zeile)
+                    if 'Stück' in extracted_text and shares is None:
+                        # Suche nach "Stück" und dann die nächste Zahl
+                        lines = extracted_text.split('\n')
+                        for i, line in enumerate(lines):
+                            if 'Stück' in line:
+                                # Schaue in den nächsten 5 Zeilen nach einer Zahl
+                                for j in range(i+1, min(i+6, len(lines))):
+                                    # Deutsche Zahlenformatierung: 1.300 = 1300
+                                    number_match = re.search(r'^\s*([\d.]+)\s*$', lines[j])
+                                    if number_match:
+                                        number_str = number_match.group(1).replace('.', '')
+                                        try:
+                                            test_shares = int(number_str)
+                                            if 100 <= test_shares <= 10000:  # Plausible Range
+                                                shares = test_shares
+                                                break
+                                        except ValueError:
+                                            pass
+                                if shares:
+                                    break
+                    
+                    # Fallback auf andere Patterns wenn noch keine Stückzahl gefunden
+                    if shares is None:
+                        shares_patterns = [
+                            # Markdown Tabellen mit | Trennzeichen und deutscher Zahlenformatierung
+                            r'\|\s*Stück\s*\|\s*([\d.,]+)',  # | Stück | 1.300 oder | Stück | 1,300
+                            # Standard Tabellen mit | Trennzeichen
+                            r'\|\s*Stück\s*\|\s*(\d+)',  # | Stück | 950
+                            r'Stück\s+\|\s+([\d.,]+)',   # Stück | 1.300
+                            r'Stück\s+\|\s+(\d+)',        # Stück | 950
+                            
+                            # Tabellen ohne Trennzeichen
+                            r'Stück\s+(\d+)(?:\s|$)',     # Stück 950
+                            r'(\d+)\s+Stück',              # 950 Stück
+                            
+                            # In Zeilen mit TESLA
+                            r'TESLA[^\n]*?(\d{2,4})\s+Stück',
+                            r'TESLA[^\n]*?Stück\s+(\d{2,4})',
+                            
+                            # Mit ISIN - removed to avoid capturing dates
+                            # r'US88160R1014[^\n]*?(\d{3,4})\s+',
+                            r'US88160R1014[^\n]*?Stück\s+(\d{2,4})',
+                            
+                            # Spezielle Formate
+                            r'Bestand:\s*(\d+)\s+Stück',
+                            r'Anzahl:\s*(\d+)',
+                            r'Position[^\n]*?(\d{3,4})\s+Stück',
+                        ]
+                        
+                        for pattern in shares_patterns:
+                            matches = re.findall(pattern, extracted_text)
+                            if matches:
+                                # Bei mehreren Matches, nimm den größten plausiblen Wert
+                                for match in matches:
+                                    # Handle German number formatting (1.300 = 1300)
+                                    number_str = match.replace('.', '').replace(',', '')
+                                    try:
+                                        test_shares = int(number_str)
+                                        # Exclude year-like numbers (2020-2030) and use plausible share range
+                                        if 10 <= test_shares <= 10000 and not (2020 <= test_shares <= 2030):
+                                            shares = test_shares
+                                            break
+                                    except ValueError:
+                                        pass
+                                if shares:
+                                    break
                     
                     # Extrahiere ISIN
                     isin_match = re.search(r'([A-Z]{2}[A-Z0-9]{10})', extracted_text)
@@ -378,10 +500,15 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         quarterly_statements = [s for s in depot_statements if s['type'] == 'quarterly']
         quarterly_statements.sort(key=lambda x: x['balance_date'] if x['balance_date'] else '0000-00-00')
         
+        # Log wenn Kosteninformationen gefunden wurden
+        if cost_information_docs:
+            print(f"  Info: {len(cost_information_docs)} Kosteninformations-Dokumente gefunden (werden nicht in Depot-Tabelle aufgenommen)")
+        
         return {
             'statements': depot_statements,
             'annual_statements': annual_statements,
             'quarterly_statements': quarterly_statements,
+            'cost_information_docs': cost_information_docs,  # Füge Kosteninformationen separat hinzu
             'latest_balance': latest_balance,
             'latest_balance_date': latest_balance_date
         }
@@ -462,46 +589,33 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         if analysis.get('depot_statements'):
             md.append(f"\n## Depotabschluss-Übersicht\n")
             
-            # Jahresabschlüsse
-            if analysis.get('annual_statements'):
-                md.append("### Jahresabschlüsse")
-                md.append("| Stichtag | Dokumentdatum | Stück | ISIN | Depotbestand (EUR) | Dokument |")
-                md.append("|----------|---------------|-------|------|-------------------|----------|")
-                
-                for statement in analysis['annual_statements']:
-                    # Konvertiere Daten ins deutsche Format
-                    doc_date = format_date_german(statement['doc_date'] if statement.get('doc_date') else 'N/A')
-                    balance_date = format_date_german(statement['balance_date'] if statement.get('balance_date') else 'N/A')
-                    
-                    # Formatiere Stück und ISIN
-                    shares_str = str(statement['shares']) if statement.get('shares') else '-'
-                    isin_str = statement['isin'] if statement.get('isin') else '-'
-                    
-                    # Formatiere Depotbestand mit deutschem Tausendertrennzeichen
-                    if statement.get('closing_balance') is not None:
-                        closing = f"{statement['closing_balance']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
-                    else:
-                        closing = 'N/A'
-                    
-                    # Kürze den Dateinamen für die Anzeige
-                    file_name = statement['file']
-                    if len(file_name) > 40:
-                        display_name = file_name[:37] + '...'
-                    else:
-                        display_name = file_name
-                    # Erstelle Link zum Dokument
-                    doc_link = f"[{display_name}](docs/{analysis['depot_info']['folder']}/{file_name})"
-                    md.append(f"| {balance_date} | {doc_date} | {shares_str} | {isin_str} | {closing} | {doc_link} |")
-                
-                md.append(f"\n*{len(analysis['annual_statements'])} Jahresabschlüsse gefunden*\n")
+            # Kombiniere Jahres- und Quartalsabschlüsse
+            all_statements = []
             
-            # Quartalsabschlüsse
-            if analysis.get('quarterly_statements'):
-                md.append("### Quartalsabschlüsse")
-                md.append("| Stichtag | Dokumentdatum | Stück | ISIN | Depotbestand (EUR) | Dokument |")
-                md.append("|----------|---------------|-------|------|-------------------|----------|")
+            # Füge Jahresabschlüsse hinzu mit Typ-Markierung
+            for statement in analysis.get('annual_statements', []):
+                statement_copy = statement.copy()
+                statement_copy['type_display'] = 'Jahresabschluss'
+                all_statements.append(statement_copy)
+            
+            # Füge Quartalsabschlüsse hinzu mit Typ-Markierung
+            for statement in analysis.get('quarterly_statements', []):
+                statement_copy = statement.copy()
+                statement_copy['type_display'] = 'Quartalsabschluss'
+                all_statements.append(statement_copy)
+            
+            # Sortiere alle Statements chronologisch nach Stichtag
+            all_statements.sort(key=lambda x: x['balance_date'] if x['balance_date'] else '0000-00-00')
+            
+            if all_statements:
+                md.append("### Alle Depotabschlüsse (chronologisch)")
+                md.append("| Typ | Stichtag | Dokumentdatum | Stück | ISIN | Depotbestand (EUR) | Dokument |")
+                md.append("|-----|----------|---------------|-------|------|-------------------|----------|")
                 
-                for statement in analysis['quarterly_statements']:
+                for statement in all_statements:
+                    # Bestimme Typ-Anzeige
+                    type_display = statement['type_display']
+                    
                     # Konvertiere Daten ins deutsche Format
                     doc_date = format_date_german(statement['doc_date'] if statement.get('doc_date') else 'N/A')
                     balance_date = format_date_german(statement['balance_date'] if statement.get('balance_date') else 'N/A')
@@ -524,9 +638,12 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                         display_name = file_name
                     # Erstelle Link zum Dokument
                     doc_link = f"[{display_name}](docs/{analysis['depot_info']['folder']}/{file_name})"
-                    md.append(f"| {balance_date} | {doc_date} | {shares_str} | {isin_str} | {closing} | {doc_link} |")
+                    md.append(f"| {type_display} | {balance_date} | {doc_date} | {shares_str} | {isin_str} | {closing} | {doc_link} |")
                 
-                md.append(f"\n*{len(analysis['quarterly_statements'])} Quartalsabschlüsse gefunden*\n")
+                # Zusammenfassung
+                annual_count = len(analysis.get('annual_statements', []))
+                quarterly_count = len(analysis.get('quarterly_statements', []))
+                md.append(f"\n*Gesamt: {annual_count} Jahresabschlüsse und {quarterly_count} Quartalsabschlüsse*\n")
             
             # Gesamtzusammenfassung
             if analysis.get('latest_balance'):
