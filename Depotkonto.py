@@ -513,6 +513,122 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             'latest_balance_date': latest_balance_date
         }
     
+    def extract_cost_information(self, depot_path: Path) -> Dict[str, List[Dict]]:
+        """Extrahiert detaillierte Kosteninformationen aus MiFID II Dokumenten"""
+        cost_data_by_year = {}
+        
+        # Finde alle Kosteninformations-Dokumente
+        for thea_file in depot_path.glob("*Depotabschluss*.thea_extract"):
+            data = self.load_thea_extract(thea_file)
+            if data:
+                extracted_text = data.get('response', {}).get('json', {}).get('extracted_text', '')
+                file_path = data.get('metadata', {}).get('file', {}).get('pdf_path', '')
+                file_name = os.path.basename(file_path)
+                
+                # Prüfe ob es ein Kosteninformations-Dokument ist
+                if 'information über kosten' in extracted_text.lower() or 'kosteninformation' in extracted_text.lower():
+                    # Extrahiere das Jahr aus dem Text
+                    year_match = re.search(r'für das Jahr (\d{4})', extracted_text)
+                    if year_match:
+                        year = year_match.group(1)
+                        
+                        cost_info = {
+                            'year': year,
+                            'doc_date': self.extract_date_from_filename(file_name),
+                            'file': file_name,
+                            'total_costs': None,
+                            'total_costs_net': None,
+                            'total_costs_vat': None,
+                            'service_costs_once': None,
+                            'service_costs_ongoing': None,
+                            'depot_fees': None,
+                            'depot_fees_net': None,
+                            'depot_fees_vat': None,
+                            'product_costs': None,
+                            'trading_volume': None,
+                            'avg_depot_value': None,
+                            'cost_percentage_volume': None,
+                            'cost_percentage_depot': None,
+                            'vat_rate': 19  # Standard USt-Satz in Deutschland
+                        }
+                        
+                        # Extrahiere Dienstleistungskosten (Service/Trading costs)
+                        # Handle both formats: with pipe separator and without
+                        service_patterns = [
+                            r'Dienstleistungskosten\s*\|\s*([\d.,]+)\s*€',  # With pipe separator
+                            r'Dienstleistungskosten[^\d]+([\d.,]+)\s*€'     # General pattern
+                        ]
+                        for pattern in service_patterns:
+                            service_match = re.search(pattern, extracted_text)
+                            if service_match:
+                                cost_info['service_costs'] = float(service_match.group(1).replace('.', '').replace(',', '.'))
+                                break
+                        else:
+                            cost_info['service_costs'] = 0.0
+                        
+                        # Extrahiere Übergreifende Kosten (Depotentgelte)
+                        depot_fees = re.search(r'Übergreifende Kosten[^\d]+([\d.,]+)\s*€', extracted_text)
+                        if depot_fees:
+                            cost_info['depot_fees'] = float(depot_fees.group(1).replace('.', '').replace(',', '.'))
+                        else:
+                            cost_info['depot_fees'] = 0.0
+                        
+                        # Berechne korrekte Gesamtkosten (Service + Depot)
+                        cost_info['total_costs'] = cost_info['service_costs'] + cost_info['depot_fees']
+                        
+                        # Falls keine separaten Kosten gefunden, suche nach Gesamtkosten in der rechten Spalte
+                        if cost_info['total_costs'] == 0:
+                            # Suche nach dem Pattern "| Gesamtkosten | ... | XXX,XX € |" (rechteste Spalte)
+                            total_pattern = r'\|\s*Gesamtkosten\s*\|(?:[^|]*\|){4}\s*([\d.,]+)\s*€'
+                            total_match = re.search(total_pattern, extracted_text)
+                            if total_match:
+                                cost_info['total_costs'] = float(total_match.group(1).replace('.', '').replace(',', '.'))
+                        
+                        # Extrahiere Umsatzvolumen
+                        volume = re.search(r'Umsatzvolumen[^\d]+([\d.,]+)\s*Euro', extracted_text)
+                        if volume:
+                            cost_info['trading_volume'] = float(volume.group(1).replace('.', '').replace(',', '.'))
+                        
+                        # Extrahiere durchschnittlichen Depotbestand
+                        avg_depot = re.search(r'Durchschnittsdepotbestand[^\d]+([\d.,]+)\s*Euro', extracted_text)
+                        if avg_depot:
+                            cost_info['avg_depot_value'] = float(avg_depot.group(1).replace('.', '').replace(',', '.'))
+                        
+                        # Berechne USt-Anteile (die Kosten sind Bruttobeträge inkl. 19% USt)
+                        if cost_info['service_costs']:
+                            # Nettobetrag = Bruttobetrag / 1.19
+                            cost_info['service_costs_net'] = round(cost_info['service_costs'] / 1.19, 2)
+                            # USt = Brutto - Netto
+                            cost_info['service_costs_vat'] = round(cost_info['service_costs'] - cost_info['service_costs_net'], 2)
+                        else:
+                            cost_info['service_costs_net'] = 0.0
+                            cost_info['service_costs_vat'] = 0.0
+                        
+                        if cost_info['depot_fees']:
+                            # Nettobetrag = Bruttobetrag / 1.19
+                            cost_info['depot_fees_net'] = round(cost_info['depot_fees'] / 1.19, 2)
+                            # USt = Brutto - Netto  
+                            cost_info['depot_fees_vat'] = round(cost_info['depot_fees'] - cost_info['depot_fees_net'], 2)
+                        else:
+                            cost_info['depot_fees_net'] = 0.0
+                            cost_info['depot_fees_vat'] = 0.0
+                        
+                        # Berechne Gesamt-Netto und Gesamt-USt
+                        if cost_info['total_costs']:
+                            cost_info['total_costs_net'] = round(cost_info['total_costs'] / 1.19, 2)
+                            cost_info['total_costs_vat'] = round(cost_info['total_costs'] - cost_info['total_costs_net'], 2)
+                        
+                        # Berechne Kostenquoten
+                        if cost_info['total_costs'] and cost_info['trading_volume'] and cost_info['trading_volume'] > 0:
+                            cost_info['cost_percentage_volume'] = round(cost_info['total_costs'] / cost_info['trading_volume'] * 100, 2)
+                        
+                        if cost_info['total_costs'] and cost_info['avg_depot_value'] and cost_info['avg_depot_value'] > 0:
+                            cost_info['cost_percentage_depot'] = round(cost_info['total_costs'] / cost_info['avg_depot_value'] * 100, 2)
+                        
+                        cost_data_by_year[year] = cost_info
+        
+        return cost_data_by_year
+    
     def analyze_depot(self, depot_name: str) -> Dict[str, Any]:
         """Analysiert alle Dateien eines Depots"""
         depot_info = self.depots[depot_name]
@@ -548,6 +664,9 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         # Extrahiere Depot-Salden
         balance_info = self.extract_depot_balance(depot_path)
         
+        # Extrahiere Kosteninformationen
+        cost_info = self.extract_cost_information(depot_path)
+        
         return {
             'depot_name': depot_name,
             'depot_number': depot_info['depot_number'],
@@ -563,7 +682,8 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             'annual_statements': balance_info['annual_statements'],
             'quarterly_statements': balance_info['quarterly_statements'],
             'latest_balance': balance_info['latest_balance'],
-            'latest_balance_date': balance_info['latest_balance_date']
+            'latest_balance_date': balance_info['latest_balance_date'],
+            'cost_information': cost_info  # Füge Kosteninformationen hinzu
         }
     
     def generate_markdown(self, analysis: Dict[str, Any]) -> str:
@@ -659,11 +779,100 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 last_date_german = format_date_german(last_date)
                 md.append(f"*Gesamtzeitraum: {first_date_german} bis {last_date_german}*")
         
-        # Abschnitt 3: Dokumententabelle (MOVED AFTER DEPOT OVERVIEW)
+        # Abschnitt 3: Jährliche Kostenanalyse (MiFID II)
+        if analysis.get('cost_information'):
+            md.append(f"\n## Jährliche Kostenanalyse (MiFID II)\n")
+            md.append("Gesetzlich vorgeschriebene Kostenaufstellung gemäß Art. 50 der Verordnung (EU) 2017/565:")
+            md.append("\n| Jahr | Dokumentdatum | Dienstleistungskosten (netto) | Depotentgelte (netto) | Zwischensumme (netto) | USt (19%) | Gesamtkosten (brutto) | Umsatzvolumen | Ø Depotbestand | Kostenquote | Dokument |")
+            md.append("|------|---------------|------------------------------|----------------------|---------------------|-----------|----------------------|---------------|----------------|-------------|----------|")
+            
+            # Sortiere nach Jahr
+            years = sorted(analysis['cost_information'].keys())
+            
+            for year in years:
+                cost_data = analysis['cost_information'][year]
+                
+                # Formatiere Beträge deutsch
+                service_costs_net = f"{cost_data['service_costs_net']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') if cost_data.get('service_costs_net') else '-'
+                depot_fees_net = f"{cost_data['depot_fees_net']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') if cost_data.get('depot_fees_net') else '-'
+                subtotal_net = f"{cost_data['total_costs_net']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') if cost_data.get('total_costs_net') else '-'
+                total_costs = f"{cost_data['total_costs']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') if cost_data.get('total_costs') else '-'
+                total_vat = f"{cost_data['total_costs_vat']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') if cost_data.get('total_costs_vat') else '-'
+                volume = f"{cost_data['trading_volume']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') if cost_data.get('trading_volume') else '-'
+                avg_depot = f"{cost_data['avg_depot_value']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') if cost_data.get('avg_depot_value') else '-'
+                
+                # Kostenquote
+                if cost_data.get('cost_percentage_depot'):
+                    cost_quote = f"{cost_data['cost_percentage_depot']:.2f}%"
+                else:
+                    cost_quote = '-'
+                
+                # Formatiere Dokumentdatum
+                doc_date = format_date_german(cost_data.get('doc_date', ''))
+                
+                # Erstelle Dokumentlink
+                file_name = cost_data.get('file', '')
+                if len(file_name) > 40:
+                    display_name = file_name[:37] + "..."
+                else:
+                    display_name = file_name
+                doc_link = f"[{display_name}](docs/{analysis['depot_info']['folder']}/{file_name})"
+                
+                md.append(f"| {year} | {doc_date} | {service_costs_net} € | {depot_fees_net} € | {subtotal_net} € | {total_vat} € | {total_costs} € | {volume} € | {avg_depot} € | {cost_quote} | {doc_link} |")
+            
+            # Zusammenfassung der Kosten
+            if len(years) > 0:
+                # Berechne Summen
+                total_all_costs = sum(c['total_costs'] for c in analysis['cost_information'].values() if c.get('total_costs'))
+                total_all_volume = sum(c['trading_volume'] for c in analysis['cost_information'].values() if c.get('trading_volume'))
+                
+                if total_all_costs > 0:
+                    total_str = f"{total_all_costs:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+                    md.append(f"\n**Gesamtkosten {years[0]}-{years[-1]}: {total_str} €**")
+                
+                if total_all_volume > 0:
+                    volume_str = f"{total_all_volume:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+                    md.append(f"*Gesamtes Handelsvolumen: {volume_str} €*")
+                
+                # Durchschnittliche Kostenquote
+                quotes = [c['cost_percentage_depot'] for c in analysis['cost_information'].values() if c.get('cost_percentage_depot')]
+                if quotes:
+                    avg_quote = sum(quotes) / len(quotes)
+                    md.append(f"*Durchschnittliche jährliche Kostenquote: {avg_quote:.2f}%*")
+                
+                # Umfassende Erläuterungen zur Kostenstruktur
+                md.append("\n### Erläuterungen zur Kostenberechnung:")
+                md.append("\n**Kostenzusammensetzung:**")
+                md.append("- **Dienstleistungskosten:** Beinhalten alle Kosten für Wertpapiergeschäfte (Kauf/Verkauf), Ordergebühren und sonstige Transaktionskosten")
+                md.append("- **Depotentgelte:** Jährliche Verwahrungsgebühren für die Führung des Depotkontos (übergreifende Kosten)")
+                md.append("- **Zwischensumme (netto):** Summe aus Dienstleistungskosten und Depotentgelten ohne Umsatzsteuer")
+                md.append("- **USt (19%):** Gesetzliche Umsatzsteuer auf alle Kosten (sowohl Dienstleistungs- als auch Depotentgelte)")
+                md.append("- **Gesamtkosten (brutto):** Vollständige Kosten inklusive 19% Umsatzsteuer")
+                
+                md.append("\n**Wichtige Hinweise:**")
+                md.append("- ✓ Die Depotentgelte sind **in den Gesamtkosten enthalten** (Dienstleistungskosten + Depotentgelte = Gesamtkosten)")
+                md.append("- ✓ Alle Beträge in den verlinkten Dokumenten sind **Bruttobeträge** (bereits inkl. 19% USt)")
+                md.append("- ✓ Die Nettobeträge werden berechnet: Netto = Brutto ÷ 1,19")
+                md.append("- ✓ Die USt wird berechnet: USt = Brutto - Netto")
+                
+                md.append("\n**Berechnungsbeispiel 2021:**")
+                if '2021' in analysis['cost_information']:
+                    cost_2021 = analysis['cost_information']['2021']
+                    service_gross = cost_2021.get('service_costs', 0)
+                    depot_gross = cost_2021.get('depot_fees', 0)
+                    total_gross = cost_2021.get('total_costs', 0)
+                    
+                    md.append(f"- Dienstleistungskosten (brutto): {service_gross:.2f} € ÷ 1,19 = {service_gross/1.19:.2f} € (netto)")
+                    md.append(f"- Depotentgelte (brutto): {depot_gross:.2f} € ÷ 1,19 = {depot_gross/1.19:.2f} € (netto)")
+                    md.append(f"- **Gesamtkosten: {service_gross:.2f} € + {depot_gross:.2f} € = {total_gross:.2f} € (brutto)**")
+                
+                md.append("\n*Diese Aufstellung entspricht den gesetzlichen Anforderungen gemäß Art. 50 der Verordnung (EU) 2017/565 (MiFID II).*")
+        
+        # Abschnitt 4: Dokumententabelle (MOVED AFTER COST OVERVIEW)
         doc_table_lines = self.generate_document_table(analysis['depot_path'], analysis['depot_info'])
         md.extend(doc_table_lines)
         
-        # Abschnitt 4: Transaktionsstatistik
+        # Abschnitt 5: Transaktionsstatistik
         md.append(f"\n## Transaktionsstatistik\n")
         
         # Gruppiere nach Hauptkategorie für bessere Übersicht
@@ -712,7 +921,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             unknown_count = analysis['statistics']['Unbekannt']
             md.append(f"\n⚠️ **Warnung: {unknown_count} Dokumente ohne Typ-Erkennung**")
         
-        # Abschnitt 4: Wertpapiere nach ISIN
+        # Abschnitt 6: Wertpapiere nach ISIN
         if analysis['isin_groups']:
             md.append(f"\n## Wertpapiere (nach ISIN)\n")
             for isin, trans_list in analysis['isin_groups'].items():
@@ -733,7 +942,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 if kauf_summe > 0:
                     md.append(f"- **Kaufsumme:** {kauf_summe:,.2f} EUR")
         
-        # Abschnitt 5: Detaillierter Transaktionsverlauf
+        # Abschnitt 7: Detaillierter Transaktionsverlauf
         md.append(f"\n## Transaktionsverlauf (Detailliert)\n")
         md.append("| Datum | Typ | ISIN | Stück | Kurs/Aktie | Brutto (EUR) | Gebühren | Gewinn/Verlust | Netto (EUR) | Dokument |")
         md.append("|-------|-----|------|-------|------------|--------------|----------|----------------|-------------|----------|")
@@ -834,7 +1043,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         if unknown_count > 0:
             md.append(f"⚠️ **{unknown_count} unbekannte Dokumente**")
         
-        # Abschnitt 6: Zeitliche Verteilung
+        # Abschnitt 8: Zeitliche Verteilung
         md.append(f"\n## Zeitliche Verteilung\n")
         
         # Nutze die gemeinsame Funktion
