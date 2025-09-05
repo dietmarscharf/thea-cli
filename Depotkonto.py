@@ -13,19 +13,6 @@ from collections import defaultdict
 from Konten import BaseKontoAnalyzer, calculate_monthly_aggregates
 
 
-def format_date_german(date_str: str) -> str:
-    """Konvertiert ISO-Datum (YYYY-MM-DD) in deutsches Format (DD.MM.YYYY)"""
-    if not date_str or date_str == 'N/A':
-        return 'N/A'
-    try:
-        parts = date_str.split('-')
-        if len(parts) == 3:
-            return f"{parts[2]}.{parts[1]}.{parts[0]}"
-    except:
-        pass
-    return date_str
-
-
 class DepotkontoAnalyzer(BaseKontoAnalyzer):
     def __init__(self):
         super().__init__()
@@ -89,20 +76,58 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         if kurswert_match:
             details['gross_amount'] = float(kurswert_match.group(1).replace('.', '').replace(',', '.'))
         
-        # Extrahiere Provision/Gebühren
-        provision_match = re.search(r'Provision\s+([\d.,]+)[\s-]*EUR', text)
-        if provision_match:
-            details['fees'] = float(provision_match.group(1).replace('.', '').replace(',', '.'))
+        # Extrahiere Provision/Gebühren mit erweiterten Patterns
+        fee_patterns = [
+            r'Provision\s+([\d.,]+)[\s-]*EUR',
+            r'Handelsplatzgebühr\s+([\d.,]+)[\s-]*EUR',
+            r'Maklercourtage\s+([\d.,]+)[\s-]*EUR',
+            r'Fremdspesen\s+([\d.,]+)[\s-]*EUR',
+            r'Börsengebühr\s+([\d.,]+)[\s-]*EUR',
+            r'Gebühren\s+gesamt\s+([\d.,]+)[\s-]*EUR',
+            r'Transaktionsentgelt\s+([\d.,]+)[\s-]*EUR',
+            r'Orderprovision\s+([\d.,]+)[\s-]*EUR',
+            # Mit Pipe-Separator
+            r'Provision\s*\|\s*([\d.,]+)\s*€',
+            r'Gebühren\s*\|\s*([\d.,]+)\s*€',
+            r'Handelsplatzgebühr\s*\|\s*([\d.,]+)\s*€',
+            # Allgemeinere Patterns
+            r'Gebühren[^\d]+([\d.,]+)\s*(?:EUR|€)',
+            r'Entgelte[^\d]+([\d.,]+)\s*(?:EUR|€)'
+        ]
         
-        # Extrahiere Veräußerungsgewinn/Verlust
-        gewinn_match = re.search(r'Veräußerungsgewinn\s+([-]?[\d.,]+)\s*EUR', text)
-        if gewinn_match:
-            details['profit_loss'] = float(gewinn_match.group(1).replace('.', '').replace(',', '.'))
-        else:
-            # Alternativ: Veräußerungsverlust
-            verlust_match = re.search(r'Veräußerungsverlust\s+([-]?[\d.,]+)\s*EUR', text)
-            if verlust_match:
-                details['profit_loss'] = -float(verlust_match.group(1).replace('.', '').replace(',', '.'))
+        for pattern in fee_patterns:
+            fee_match = re.search(pattern, text)
+            if fee_match:
+                details['fees'] = float(fee_match.group(1).replace('.', '').replace(',', '.'))
+                break
+        
+        # Extrahiere Veräußerungsgewinn/Verlust mit erweiterten Patterns
+        profit_loss_patterns = [
+            # Standard Patterns
+            (r'Veräußerungsgewinn\s+([-]?[\d.,]+)\s*EUR', 1.0),  # Positiv
+            (r'Veräußerungsverlust\s+([-]?[\d.,]+)\s*EUR', -1.0), # Negativ
+            # Alternative Begriffe
+            (r'Gewinn\s+aus\s+Verkauf\s+([-]?[\d.,]+)\s*EUR', 1.0),
+            (r'Verlust\s+aus\s+Verkauf\s+([-]?[\d.,]+)\s*EUR', -1.0),
+            (r'Realisierter\s+Gewinn\s+([-]?[\d.,]+)\s*EUR', 1.0),
+            (r'Realisierter\s+Verlust\s+([-]?[\d.,]+)\s*EUR', -1.0),
+            # Mit Pipe-Separator
+            (r'Veräußerungsgewinn\s*\|\s*([-]?[\d.,]+)\s*€', 1.0),
+            (r'Veräußerungsverlust\s*\|\s*([-]?[\d.,]+)\s*€', -1.0),
+            # Spezielle Formate (Betrag in Klammern = negativ)
+            (r'Veräußerungsergebnis\s+\(([\d.,]+)\)\s*EUR', -1.0),  # In Klammern = Verlust
+            (r'Veräußerungsergebnis\s+([\d.,]+)\s*EUR', 1.0),       # Ohne Klammern = Gewinn
+            # Allgemeinere Patterns
+            (r'Gewinn/Verlust\s+([-]?[\d.,]+)\s*(?:EUR|€)', 1.0),
+            (r'Ergebnis\s+([-]?[\d.,]+)\s*(?:EUR|€)', 1.0)
+        ]
+        
+        for pattern, multiplier in profit_loss_patterns:
+            match = re.search(pattern, text)
+            if match:
+                value = float(match.group(1).replace('.', '').replace(',', '.'))
+                details['profit_loss'] = value * multiplier
+                break
         
         # Extrahiere Ausmachender Betrag (Netto)
         ausmachend_match = re.search(r'Ausmachender Betrag\s+([\d.,]+)\s*EUR', text)
@@ -707,7 +732,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             total_pdf_files=analysis['total_pdf_files'],
             total_thea_files=analysis['total_thea_files'],
             latest_saldo=analysis.get('latest_balance'),
-            latest_saldo_date=format_date_german(analysis.get('latest_balance_date')) if analysis.get('latest_balance_date') else None
+            latest_saldo_date=self.format_date_german(analysis.get('latest_balance_date')) if analysis.get('latest_balance_date') else None
         )
         md.extend(header_lines)
         
@@ -743,8 +768,8 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     type_display = statement['type_display']
                     
                     # Konvertiere Daten ins deutsche Format
-                    doc_date = format_date_german(statement['doc_date'] if statement.get('doc_date') else 'N/A')
-                    balance_date = format_date_german(statement['balance_date'] if statement.get('balance_date') else 'N/A')
+                    doc_date = self.format_date_german(statement['doc_date'] if statement.get('doc_date') else 'N/A')
+                    balance_date = self.format_date_german(statement['balance_date'] if statement.get('balance_date') else 'N/A')
                     
                     # Formatiere Stück und ISIN
                     shares_str = str(statement['shares']) if statement.get('shares') else '-'
@@ -752,7 +777,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     
                     # Formatiere Depotbestand mit deutschem Tausendertrennzeichen
                     if statement.get('closing_balance') is not None:
-                        closing = f"{statement['closing_balance']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+                        closing = self.format_number_german(statement['closing_balance'], 2)
                     else:
                         closing = 'N/A'
                     
@@ -773,16 +798,16 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             
             # Gesamtzusammenfassung
             if analysis.get('latest_balance'):
-                latest_date = format_date_german(analysis.get('latest_balance_date', 'N/A'))
-                latest_balance_str = f"{analysis['latest_balance']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+                latest_date = self.format_date_german(analysis.get('latest_balance_date', 'N/A'))
+                latest_balance_str = self.format_number_german(analysis['latest_balance'], 2)
                 md.append(f"\n**Letzter bekannter Depotbestand: {latest_balance_str} EUR** (Stand: {latest_date})")
             
             total_statements = len(analysis.get('depot_statements', []))
             if total_statements > 0:
                 first_date = min(s['balance_date'] for s in analysis['depot_statements'] if s.get('balance_date'))
                 last_date = max(s['balance_date'] for s in analysis['depot_statements'] if s.get('balance_date'))
-                first_date_german = format_date_german(first_date)
-                last_date_german = format_date_german(last_date)
+                first_date_german = self.format_date_german(first_date)
+                last_date_german = self.format_date_german(last_date)
                 md.append(f"*Gesamtzeitraum: {first_date_german} bis {last_date_german}*")
         
         # Abschnitt 3: Jährliche Kostenanalyse (MiFID II)
@@ -799,22 +824,22 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 cost_data = analysis['cost_information'][year]
                 
                 # Formatiere Beträge deutsch
-                service_costs_net = f"{cost_data['service_costs_net']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') if cost_data.get('service_costs_net') else '-'
-                depot_fees_net = f"{cost_data['depot_fees_net']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') if cost_data.get('depot_fees_net') else '-'
-                subtotal_net = f"{cost_data['total_costs_net']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') if cost_data.get('total_costs_net') else '-'
-                total_costs = f"{cost_data['total_costs']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') if cost_data.get('total_costs') else '-'
-                total_vat = f"{cost_data['total_costs_vat']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') if cost_data.get('total_costs_vat') else '-'
-                volume = f"{cost_data['trading_volume']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') if cost_data.get('trading_volume') else '-'
-                avg_depot = f"{cost_data['avg_depot_value']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') if cost_data.get('avg_depot_value') else '-'
+                service_costs_net = self.format_number_german(cost_data['service_costs_net'], 2) if cost_data.get('service_costs_net') else '-'
+                depot_fees_net = self.format_number_german(cost_data['depot_fees_net'], 2) if cost_data.get('depot_fees_net') else '-'
+                subtotal_net = self.format_number_german(cost_data['total_costs_net'], 2) if cost_data.get('total_costs_net') else '-'
+                total_costs = self.format_number_german(cost_data['total_costs'], 2) if cost_data.get('total_costs') else '-'
+                total_vat = self.format_number_german(cost_data['total_costs_vat'], 2) if cost_data.get('total_costs_vat') else '-'
+                volume = self.format_number_german(cost_data['trading_volume'], 2) if cost_data.get('trading_volume') else '-'
+                avg_depot = self.format_number_german(cost_data['avg_depot_value'], 2) if cost_data.get('avg_depot_value') else '-'
                 
-                # Kostenquote
+                # Kostenquote (ohne %-Zeichen, da es im Header steht)
                 if cost_data.get('cost_percentage_depot'):
-                    cost_quote = f"{cost_data['cost_percentage_depot']:.2f}%"
+                    cost_quote = self.format_number_german(cost_data['cost_percentage_depot'], 2)
                 else:
                     cost_quote = '-'
                 
                 # Formatiere Dokumentdatum
-                doc_date = format_date_german(cost_data.get('doc_date', ''))
+                doc_date = self.format_date_german(cost_data.get('doc_date', ''))
                 
                 # Erstelle Dokumentlink
                 file_name = cost_data.get('file', '')
@@ -824,7 +849,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     display_name = file_name
                 doc_link = f"[{display_name}](docs/{analysis['depot_info']['folder']}/{file_name})"
                 
-                md.append(f"| {year} | {doc_date} | {service_costs_net} € | {depot_fees_net} € | {subtotal_net} € | {total_vat} € | {total_costs} € | {volume} € | {avg_depot} € | {cost_quote} | {doc_link} |")
+                md.append(f"| {year} | {doc_date} | {service_costs_net} | {depot_fees_net} | {subtotal_net} | {total_vat} | {total_costs} | {volume} | {avg_depot} | {cost_quote} | {doc_link} |")
             
             # Zusammenfassung der Kosten
             if len(years) > 0:
@@ -833,11 +858,11 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 total_all_volume = sum(c['trading_volume'] for c in analysis['cost_information'].values() if c.get('trading_volume'))
                 
                 if total_all_costs > 0:
-                    total_str = f"{total_all_costs:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+                    total_str = self.format_number_german(total_all_costs, 2)
                     md.append(f"\n**Gesamtkosten {years[0]}-{years[-1]}: {total_str} €**")
                 
                 if total_all_volume > 0:
-                    volume_str = f"{total_all_volume:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+                    volume_str = self.format_number_german(total_all_volume, 2)
                     md.append(f"*Gesamtes Handelsvolumen: {volume_str} €*")
                 
                 # Durchschnittliche Kostenquote
@@ -963,7 +988,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         md.append("|-------|-----|------|-------|------------|--------------|----------|----------------|-------------|----------|")
         
         for trans in analysis['transactions']:
-            date = format_date_german(trans['date'] if trans['date'] else 'N/A')
+            date = self.format_date_german(trans['date'] if trans['date'] else 'N/A')
             trans_type = trans['type']
             
             # Kürze den Transaktionstyp für bessere Lesbarkeit
@@ -974,6 +999,24 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             else:
                 display_type = trans_type
             
+            # Bestimme Farbmarkierung für Verkäufe
+            row_style = ""
+            if 'Verkauf' in trans_type:
+                if trans.get('profit_loss') is not None:
+                    if trans['profit_loss'] > 0:
+                        # Gewinn - dunkelgrün
+                        row_style = ' style="background-color: #d4edda;"'
+                    elif trans['profit_loss'] == 0:
+                        # Kein Gewinn/Verlust - auch grün
+                        row_style = ' style="background-color: #d4edda;"'
+                    else:
+                        # Verlust - rot
+                        row_style = ' style="background-color: #f8d7da;"'
+            
+            # Formatiere Typ mit Farbmarkierung
+            if row_style:
+                display_type = f'<span{row_style}>{display_type}</span>'
+            
             isin = trans['isin'] if trans['isin'] else 'N/A'
             
             # Handelsdaten formatieren
@@ -982,34 +1025,43 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             # Kurs/Aktie - bei mehreren Kursen zeige Spanne
             if trans.get('execution_price_min') and trans.get('execution_price_max'):
                 # Teilausführungen mit mehreren Kursen
-                price_str = f"{trans['execution_price_min']:.2f}-{trans['execution_price_max']:.2f} (⌀{trans['execution_price_avg']:.2f})"
+                price_str = f"{self.format_number_german(trans['execution_price_min'], 2)}-{self.format_number_german(trans['execution_price_max'], 2)} (⌀{self.format_number_german(trans['execution_price_avg'], 2)})"
             elif trans.get('execution_price'):
-                price_str = f"{trans['execution_price']:.2f}"
+                price_str = self.format_number_german(trans['execution_price'], 2)
             elif trans.get('limit_price'):
-                price_str = f"Limit: {trans['limit_price']:.2f}"
+                price_str = f"Limit: {self.format_number_german(trans['limit_price'], 2)}"
             else:
                 price_str = '-'
             
             # Brutto
-            gross = f"{trans['gross_amount']:,.2f}" if trans.get('gross_amount') else '-'
+            gross = self.format_number_german(trans['gross_amount'], 2) if trans.get('gross_amount') else '-'
             
-            # Gebühren
-            fees = f"-{trans['fees']:.2f}" if trans.get('fees') else '-'
+            # Gebühren mit USt-Hinweis
+            if trans.get('fees'):
+                # Berechne USt (19% sind in den Gebühren enthalten)
+                fees_gross = trans['fees']
+                fees_net = fees_gross / 1.19
+                fees_vat = fees_gross - fees_net
+                fees = f"-{self.format_number_german(fees_gross, 2)} (inkl. {self.format_number_german(fees_vat, 2)} USt)"
+            else:
+                fees = '-'
             
-            # Gewinn/Verlust
-            if trans.get('profit_loss'):
+            # Gewinn/Verlust mit Farbmarkierung
+            if trans.get('profit_loss') is not None:
                 if trans['profit_loss'] > 0:
-                    profit_loss = f"+{trans['profit_loss']:,.2f}"
+                    profit_loss = f'<span style="color: green; font-weight: bold;">{self.format_number_german(trans["profit_loss"], 2, show_sign=True)}</span>'
+                elif trans['profit_loss'] == 0:
+                    profit_loss = f'<span style="color: green;">0,00</span>'
                 else:
-                    profit_loss = f"{trans['profit_loss']:,.2f}"
+                    profit_loss = f'<span style="color: red; font-weight: bold;">{self.format_number_german(trans["profit_loss"], 2)}</span>'
             else:
                 profit_loss = '-'
             
             # Netto (oder Fallback auf max_amount)
             if trans.get('net_amount'):
-                net = f"{trans['net_amount']:,.2f}"
+                net = self.format_number_german(trans['net_amount'], 2)
             elif trans.get('max_amount') and trans.get('max_amount') > 0:
-                net = f"{trans['max_amount']:,.2f}"
+                net = self.format_number_german(trans['max_amount'], 2)
             else:
                 net = 'N/A'
             
