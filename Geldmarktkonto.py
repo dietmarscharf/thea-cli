@@ -178,11 +178,13 @@ class GeldmarktkontoAnalyzer(BaseKontoAnalyzer):
                 latest_zinssatz = trans['aktueller_zinssatz']
                 break
         
-        # Finde aktuellsten Saldo
+        # Finde aktuellsten Saldo und Datum
         latest_saldo = None
+        latest_saldo_date = None
         for trans in reversed(transactions):
             if trans['saldo']:
                 latest_saldo = trans['saldo']
+                latest_saldo_date = trans['date']
                 break
         
         return {
@@ -199,6 +201,7 @@ class GeldmarktkontoAnalyzer(BaseKontoAnalyzer):
             'total_zinsertraege': total_zinsertraege,
             'latest_zinssatz': latest_zinssatz,
             'latest_saldo': latest_saldo,
+            'latest_saldo_date': latest_saldo_date,
             'account_path': account_path,
             'account_info': account_info
         }
@@ -218,6 +221,7 @@ class GeldmarktkontoAnalyzer(BaseKontoAnalyzer):
             total_pdf_files=analysis['total_pdf_files'],
             total_thea_files=analysis['total_thea_files'],
             latest_saldo=analysis['latest_saldo'],
+            latest_saldo_date=analysis.get('latest_saldo_date'),
             latest_zinssatz=analysis['latest_zinssatz']
         )
         md.extend(header_lines)
@@ -254,6 +258,13 @@ class GeldmarktkontoAnalyzer(BaseKontoAnalyzer):
                 count = data['count']
                 
                 md.append(f"| {month} | {eingaenge} | {ausgaenge} | {zinsertraege} | {saldo} | {zinssatz} | {count} |")
+            
+            # Zusammenfassung
+            months = list(analysis['monthly_data'].keys())
+            if months:
+                first_month = min(months)
+                last_month = max(months)
+                md.append(f"\n*Gesamt: {len(months)} Monate ({first_month} bis {last_month})*")
         
         # Abschnitt 6: Zinsanalyse
         zins_transactions = [t for t in analysis['transactions'] if t['zinsertrag'] and t['zinsertrag'] > 0]
@@ -269,6 +280,10 @@ class GeldmarktkontoAnalyzer(BaseKontoAnalyzer):
                 desc = trans['description_german']
                 
                 md.append(f"| {date} | {zinsertrag} | {zinssatz} | {desc} |")
+            
+            # Zusammenfassung
+            total_zinsertrag = sum(t['zinsertrag'] for t in zins_transactions)
+            md.append(f"\n*Gesamt: {len(zins_transactions)} Zinsbuchungen, Gesamtertrag: {total_zinsertrag:,.2f} EUR*")
         
         # Abschnitt 7: Jahresübersicht
         yearly_data = calculate_yearly_aggregates(analysis['transactions'])
@@ -296,6 +311,14 @@ class GeldmarktkontoAnalyzer(BaseKontoAnalyzer):
                 count = data['count']
                 
                 md.append(f"| {year} | {eingaenge} | {ausgaenge} | {zinsertraege} | {netto_str} | {count} |")
+            
+            # Zusammenfassung
+            years = list(yearly_data.keys())
+            if years:
+                first_year = min(years)
+                last_year = max(years)
+                total_docs = sum(data['count'] for data in yearly_data.values())
+                md.append(f"\n*Gesamt: {len(years)} Jahre ({first_year}-{last_year}), {total_docs} Dokumente*")
         
         # Abschnitt 8: Letzte Dokumente
         md.append(f"\n## Letzte Dokumente (max. 20)\n")
@@ -310,6 +333,14 @@ class GeldmarktkontoAnalyzer(BaseKontoAnalyzer):
             desc = trans['description_german']
             
             md.append(f"| {date} | {trans_type} | {saldo} | {zinssatz} | {desc} |")
+        
+        # Zusammenfassung
+        shown = min(20, len(analysis['transactions']))
+        total = len(analysis['transactions'])
+        if shown < total:
+            md.append(f"\n*Zeige die letzten {shown} von {total} Dokumenten*")
+        else:
+            md.append(f"\n*Gesamt: {total} Dokumente*")
         
         return '\n'.join(md)
     

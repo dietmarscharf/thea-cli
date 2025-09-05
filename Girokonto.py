@@ -4,6 +4,7 @@ Girokonto.py - Analyse und Markdown-Generierung für Girokonten
 Verarbeitet BLUEITS-Girokonto-200750750 und Ramteid-Girokonto-21377502
 """
 
+import os
 import re
 from pathlib import Path
 from typing import Dict, List, Any
@@ -86,6 +87,33 @@ class GirokontoAnalyzer(BaseKontoAnalyzer):
             'anzahl_bewegungen': len(amounts)
         }
     
+    def extract_latest_balance(self, account_path: Path) -> Dict[str, Any]:
+        """Extrahiert den letzten Kontosaldo aus Kontoauszügen"""
+        latest_saldo = None
+        latest_saldo_date = None
+        
+        # Finde alle Kontoauszug-Dateien
+        for thea_file in account_path.glob("*Kontoauszug*.thea_extract"):
+            data = self.load_thea_extract(thea_file)
+            if data:
+                extracted_text = data.get('response', {}).get('json', {}).get('extracted_text', '')
+                file_path = data.get('metadata', {}).get('file', {}).get('pdf_path', '')
+                date_str = self.extract_date_from_filename(os.path.basename(file_path))
+                
+                # Extrahiere Saldo
+                saldo = self.extract_balance_from_text(extracted_text)
+                
+                if saldo is not None and date_str:
+                    # Aktualisiere letzten Saldo wenn neuer
+                    if not latest_saldo_date or date_str > latest_saldo_date:
+                        latest_saldo = saldo
+                        latest_saldo_date = date_str
+        
+        return {
+            'latest_saldo': latest_saldo,
+            'latest_saldo_date': latest_saldo_date
+        }
+    
     def analyze_account(self, account_name: str) -> Dict[str, Any]:
         """Analysiert alle Dateien eines Girokontos"""
         account_info = self.accounts[account_name]
@@ -129,6 +157,9 @@ class GirokontoAnalyzer(BaseKontoAnalyzer):
         total_eingaenge = sum(t['eingaenge'] for t in transactions)
         total_ausgaenge = sum(t['ausgaenge'] for t in transactions)
         
+        # Extrahiere letzten Saldo
+        balance_info = self.extract_latest_balance(account_path)
+        
         return {
             'account_name': account_name,
             'account_number': account_info['account_number'],
@@ -141,7 +172,9 @@ class GirokontoAnalyzer(BaseKontoAnalyzer):
             'total_eingaenge': total_eingaenge,
             'total_ausgaenge': total_ausgaenge,
             'account_path': account_path,
-            'account_info': account_info
+            'account_info': account_info,
+            'latest_saldo': balance_info['latest_saldo'],
+            'latest_saldo_date': balance_info['latest_saldo_date']
         }
     
     def generate_markdown(self, analysis: Dict[str, Any]) -> str:
@@ -157,7 +190,9 @@ class GirokontoAnalyzer(BaseKontoAnalyzer):
             account_type="Girokonto",
             account_number=analysis['account_number'],
             total_pdf_files=analysis['total_pdf_files'],
-            total_thea_files=analysis['total_thea_files']
+            total_thea_files=analysis['total_thea_files'],
+            latest_saldo=analysis.get('latest_saldo'),
+            latest_saldo_date=analysis.get('latest_saldo_date')
         )
         md.extend(header_lines)
         
@@ -191,6 +226,13 @@ class GirokontoAnalyzer(BaseKontoAnalyzer):
                 
                 saldo_str = f"{saldo:,.2f}" if saldo else "N/A"
                 md.append(f"| {month} | {eingaenge:,.2f} | {ausgaenge:,.2f} | {saldo_str} | {count} |")
+            
+            # Zusammenfassung
+            months = list(analysis['monthly_data'].keys())
+            if months:
+                first_month = min(months)
+                last_month = max(months)
+                md.append(f"\n*Gesamt: {len(months)} Monate ({first_month} bis {last_month})*")
         
         # Abschnitt 6: Dokumentenübersicht
         md.append(f"\n## Dokumentenanalyse\n")
@@ -205,6 +247,9 @@ class GirokontoAnalyzer(BaseKontoAnalyzer):
             desc = trans['description_german']
             
             md.append(f"| {date} | {trans_type} | {bewegungen} | {saldo} | {desc} |")
+        
+        # Zusammenfassung
+        md.append(f"\n*Gesamt: {len(analysis['transactions'])} analysierte Dokumente*")
         
         # Abschnitt 7: Jahresübersicht
         yearly_data = calculate_yearly_aggregates(analysis['transactions'])
@@ -221,6 +266,14 @@ class GirokontoAnalyzer(BaseKontoAnalyzer):
                 count = data['count']
                 
                 md.append(f"| {year} | {eingaenge:,.2f} | {ausgaenge:,.2f} | {differenz:,.2f} | {count} |")
+            
+            # Zusammenfassung
+            years = list(yearly_data.keys())
+            if years:
+                first_year = min(years)
+                last_year = max(years)
+                total_docs = sum(data['count'] for data in yearly_data.values())
+                md.append(f"\n*Gesamt: {len(years)} Jahre ({first_year}-{last_year}), {total_docs} Dokumente*")
         
         return '\n'.join(md)
     
