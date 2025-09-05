@@ -14,7 +14,8 @@
       "Bash(git diff-index:*)",
       "Bash(for dir in docs/*/)",
       "Bash(do echo \"$dir:\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(git diff:*)"
     ],
     "deny": [],
     "ask": []
