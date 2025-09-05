@@ -7,14 +7,14 @@
 - **Kontonummer:** 21504006
 - **PDF-Dokumente:** 43 Dateien
 - **Davon analysiert:** 43 (100.0%)
-- **Letzter Saldo:** 4.09 EUR
-- **Aktueller Zinssatz:** 0.40%
-- **Zuletzt aktualisiert:** 2025-09-05 16:35:59
+- **Letzter Saldo:** 4,09 EUR
+- **Aktueller Zinssatz:** 0,40%
+- **Zuletzt aktualisiert:** 06.09.2025 01:27:42
 
 ## Dokumentenübersicht
 
-| Datum | Dokumentname | Dokumenttyp |
-|-------|--------------|-------------|
+| Dokumentdatum | Dokumentname | Dokumenttyp |
+|---------------|--------------|-------------|
 | N/A | [Konto_0021504006-Auszug_2022_0003.pdf](docs/Ramteid-Geldmarktkonto-21504006/Konto_0021504006-Auszug_2022_0003.pdf) | Kontoauszug |
 | N/A | [Konto_0021504006-Auszug_2022_0004.pdf](docs/Ramteid-Geldmarktkonto-21504006/Konto_0021504006-Auszug_2022_0004.pdf) | Kontoauszug |
 | N/A | [Konto_0021504006-Auszug_2022_0005.pdf](docs/Ramteid-Geldmarktkonto-21504006/Konto_0021504006-Auszug_2022_0005.pdf) | Kontoauszug |
@@ -65,10 +65,10 @@
 
 ## Finanzdaten Gesamt
 
-- **Gesamteingänge:** 0.00 EUR
-- **Gesamtausgänge:** 0.00 EUR
-- **Zinserträge gesamt:** 0.50 EUR
-- **Netto-Zufluss:** 0.00 EUR
+- **Gesamteingänge:** 0,00 EUR
+- **Gesamtausgänge:** 0,00 EUR
+- **Zinserträge gesamt:** 0,50 EUR
+- **Netto-Zufluss:** 0,00 EUR
 
 
 ## Dokumenttypen
@@ -77,17 +77,17 @@
 
 ## Zinsanalyse
 
-| Datum | Zinsertrag (EUR) | Zinssatz (%) | Beschreibung |
-|-------|------------------|--------------|--------------|
-| N/A | 0.50 | N/A |  |
+| Dokumentdatum | Zinsertrag (EUR) | Zinssatz (%) | Beschreibung |
+|---------------|------------------|--------------|--------------|
+| N/A | 0,50 | N/A |  |
 
-*Gesamt: 1 Zinsbuchungen, Gesamtertrag: 0.50 EUR*
+*Gesamt: 1 Zinsbuchungen, Gesamtertrag: 0,50 EUR*
 
 ## Letzte Dokumente (max. 20)
 
-| Datum | Typ | Saldo (EUR) | Zinssatz | Beschreibung |
-|-------|-----|-------------|----------|--------------|
-| N/A | Kontoauszug | 4.09 | N/A |  |
+| Dokumentdatum | Typ | Saldo (EUR) | Zinssatz (%) | Beschreibung |
+|---------------|-----|-------------|--------------|--------------|
+| N/A | Kontoauszug | 4,09 | N/A |  |
 | N/A | Kontoauszug | N/A | N/A | Kontoauszug Geldkonto Sparkasse |
 | N/A | Kontoauszug | N/A | N/A | Kontoauszug Geldkonto Sparkasse |
 | N/A | Kontoauszug | N/A | N/A | Bankkonto Kontoauszug Sparkasse |

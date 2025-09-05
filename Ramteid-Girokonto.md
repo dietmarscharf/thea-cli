@@ -7,12 +7,12 @@
 - **Kontonummer:** 21377502
 - **PDF-Dokumente:** 59 Dateien
 - **Davon analysiert:** 59 (100.0%)
-- **Zuletzt aktualisiert:** 2025-09-05 16:35:55
+- **Zuletzt aktualisiert:** 06.09.2025 01:27:42
 
 ## Dokumentenübersicht
 
-| Datum | Dokumentname | Dokumenttyp |
-|-------|--------------|-------------|
+| Dokumentdatum | Dokumentname | Dokumenttyp |
+|---------------|--------------|-------------|
 | N/A | [Konto_0021377502-Auszug_2022_0004.pdf](docs/Ramteid-Girokonto-21377502/Konto_0021377502-Auszug_2022_0004.pdf) | Kontoauszug |
 | N/A | [Konto_0021377502-Auszug_2022_0005.pdf](docs/Ramteid-Girokonto-21377502/Konto_0021377502-Auszug_2022_0005.pdf) | Kontoauszug |
 | N/A | [Konto_0021377502-Auszug_2022_0006.pdf](docs/Ramteid-Girokonto-21377502/Konto_0021377502-Auszug_2022_0006.pdf) | Kontoauszug |
@@ -79,9 +79,9 @@
 
 ## Kontobewegungen Gesamt
 
-- **Gesamteingänge:** 2,818.69 EUR
-- **Gesamtausgänge:** 2,818.69 EUR
-- **Differenz:** 0.00 EUR
+- **Gesamteingänge:** 2.818,69 EUR
+- **Gesamtausgänge:** 2.818,69 EUR
+- **Differenz:** 0,00 EUR
 
 
 ## Dokumenttypen
@@ -90,8 +90,8 @@
 
 ## Dokumentenanalyse
 
-| Datum | Typ | Bewegungen | Saldo (EUR) | Beschreibung |
-|-------|-----|------------|-------------|--------------|
+| Dokumentdatum | Typ | Bewegungen | Saldo (EUR) | Beschreibung |
+|---------------|-----|------------|-------------|--------------|
 | N/A | Kontoauszug | 0 | N/A |  |
 | N/A | Kontoauszug | 0 | N/A |  |
 | N/A | Kontoauszug | 0 | N/A |  |

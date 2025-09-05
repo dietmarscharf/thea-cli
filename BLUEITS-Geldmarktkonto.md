@@ -7,13 +7,13 @@
 - **Kontonummer:** 21503990
 - **PDF-Dokumente:** 55 Dateien
 - **Davon analysiert:** 55 (100.0%)
-- **Letzter Saldo:** 7.33 EUR
-- **Zuletzt aktualisiert:** 2025-09-05 16:35:59
+- **Letzter Saldo:** 7,33 EUR
+- **Zuletzt aktualisiert:** 06.09.2025 01:27:42
 
 ## Dokumentenübersicht
 
-| Datum | Dokumentname | Dokumenttyp |
-|-------|--------------|-------------|
+| Dokumentdatum | Dokumentname | Dokumenttyp |
+|---------------|--------------|-------------|
 | N/A | [Konto_0021503990-Auszug_2022_0003.pdf](docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0003.pdf) | Kontoauszug |
 | N/A | [Konto_0021503990-Auszug_2022_0004.pdf](docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0004.pdf) | Kontoauszug |
 | N/A | [Konto_0021503990-Auszug_2022_0005.pdf](docs/BLUEITS-Geldmarktkonto-21503990/Konto_0021503990-Auszug_2022_0005.pdf) | Kontoauszug |
@@ -76,10 +76,10 @@
 
 ## Finanzdaten Gesamt
 
-- **Gesamteingänge:** 468.12 EUR
-- **Gesamtausgänge:** 0.00 EUR
-- **Zinserträge gesamt:** 0.00 EUR
-- **Netto-Zufluss:** 468.12 EUR
+- **Gesamteingänge:** 468,12 EUR
+- **Gesamtausgänge:** 0,00 EUR
+- **Zinserträge gesamt:** 0,00 EUR
+- **Netto-Zufluss:** 468,12 EUR
 
 
 ## Dokumenttypen
@@ -88,12 +88,12 @@
 
 ## Letzte Dokumente (max. 20)
 
-| Datum | Typ | Saldo (EUR) | Zinssatz | Beschreibung |
-|-------|-----|-------------|----------|--------------|
-| N/A | Kontoauszug | 15.46 | N/A | Kontoauszug Sparkasse BLUEITS |
+| Dokumentdatum | Typ | Saldo (EUR) | Zinssatz (%) | Beschreibung |
+|---------------|-----|-------------|--------------|--------------|
+| N/A | Kontoauszug | 15,46 | N/A | Kontoauszug Sparkasse BLUEITS |
 | N/A | Kontoauszug | N/A | N/A | Kontoauszug Geldmarkt Sparkasse |
 | N/A | Kontoauszug | N/A | N/A | Bankkonto Auszug aktuell |
-| N/A | Kontoauszug | 7.33 | N/A |  |
+| N/A | Kontoauszug | 7,33 | N/A |  |
 | N/A | Kontoauszug | N/A | N/A | Kontoauszug Geldkonto Sparkasse |
 | N/A | Kontoauszug | N/A | N/A |  |
 | N/A | Kontoauszug | N/A | N/A |  |
