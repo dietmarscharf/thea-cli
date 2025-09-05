@@ -37,12 +37,55 @@ class BaseKontoAnalyzer:
         if not date_str or date_str == 'N/A' or date_str == '0000-00-00':
             return 'N/A'
         try:
-            parts = date_str.split('-')
-            if len(parts) == 3:
-                return f"{parts[2]}.{parts[1]}.{parts[0]}"
+            # Behandle ISO-Datum (YYYY-MM-DD)
+            if '-' in date_str:
+                parts = date_str.split('-')
+                if len(parts) == 3:
+                    return f"{parts[2]}.{parts[1]}.{parts[0]}"
+            # Bereits im deutschen Format
+            elif '.' in date_str:
+                return date_str
         except:
             pass
         return date_str
+    
+    def format_number_german(self, value: float, decimals: int = 2, show_sign: bool = False) -> str:
+        """
+        Formatiert Zahlen im deutschen Format mit Punkt als Tausendertrennzeichen
+        und Komma als Dezimaltrennzeichen
+        
+        Args:
+            value: Die zu formatierende Zahl
+            decimals: Anzahl der Dezimalstellen (Standard: 2)
+            show_sign: Zeigt + für positive Zahlen (Standard: False)
+        
+        Returns:
+            Formatierte Zahl als String (z.B. "1.234,56")
+        """
+        if value is None:
+            return 'N/A'
+        
+        try:
+            # Formatiere mit der gewünschten Anzahl Dezimalstellen
+            if decimals == 0:
+                formatted = f"{value:,.0f}"
+            elif decimals == 1:
+                formatted = f"{value:,.1f}"
+            elif decimals == 2:
+                formatted = f"{value:,.2f}"
+            else:
+                formatted = f"{value:,.{decimals}f}"
+            
+            # Ersetze Komma mit X, Punkt mit Komma, X mit Punkt (für deutsches Format)
+            formatted = formatted.replace(',', 'X').replace('.', ',').replace('X', '.')
+            
+            # Füge + für positive Zahlen hinzu, wenn gewünscht
+            if show_sign and value > 0:
+                formatted = '+' + formatted
+                
+            return formatted
+        except:
+            return 'N/A'
         
     def load_thea_extract(self, file_path: Path) -> Dict[str, Any]:
         """Lädt eine .thea_extract Datei und gibt die geparsten Daten zurück"""
@@ -306,20 +349,25 @@ class BaseKontoAnalyzer:
         latest_saldo_date = kwargs.get('latest_saldo_date')
         
         if latest_saldo is not None:
+            saldo_formatted = self.format_number_german(latest_saldo, 2)
             if account_type == "Depotkonto":
-                saldo_text = f"- **Letzter Depotbestand:** {latest_saldo:,.2f} EUR"
+                saldo_text = f"- **Letzter Depotbestand:** {saldo_formatted} EUR"
             else:
-                saldo_text = f"- **Letzter Saldo:** {latest_saldo:,.2f} EUR"
+                saldo_text = f"- **Letzter Saldo:** {saldo_formatted} EUR"
             
             if latest_saldo_date:
-                saldo_text += f" (vom {latest_saldo_date})"
+                date_formatted = self.format_date_german(latest_saldo_date)
+                saldo_text += f" (vom {date_formatted})"
             md.append(saldo_text)
         
         # Zinssatz für Geldmarktkonto
         if 'latest_zinssatz' in kwargs and kwargs['latest_zinssatz'] is not None:
-            md.append(f"- **Aktueller Zinssatz:** {kwargs['latest_zinssatz']:.2f}%")
+            zinssatz_formatted = self.format_number_german(kwargs['latest_zinssatz'], 2)
+            md.append(f"- **Aktueller Zinssatz:** {zinssatz_formatted}%")
             
-        md.append(f"- **Zuletzt aktualisiert:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        # Formatiere das aktuelle Datum im deutschen Format
+        current_date = datetime.now().strftime('%d.%m.%Y %H:%M:%S')
+        md.append(f"- **Zuletzt aktualisiert:** {current_date}")
         
         return md
     
