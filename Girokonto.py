@@ -202,9 +202,12 @@ class GirokontoAnalyzer(BaseKontoAnalyzer):
         
         # Abschnitt 3: Kontobewegungen Gesamt
         md.append(f"\n## Kontobewegungen Gesamt\n")
-        md.append(f"- **Gesamteingänge:** {analysis['total_eingaenge']:,.2f} EUR")
-        md.append(f"- **Gesamtausgänge:** {analysis['total_ausgaenge']:,.2f} EUR")
-        md.append(f"- **Differenz:** {(analysis['total_eingaenge'] - analysis['total_ausgaenge']):,.2f} EUR\n")
+        eingaenge_str = self.format_number_german(analysis['total_eingaenge'], 2)
+        ausgaenge_str = self.format_number_german(analysis['total_ausgaenge'], 2)
+        differenz_str = self.format_number_german(analysis['total_eingaenge'] - analysis['total_ausgaenge'], 2)
+        md.append(f"- **Gesamteingänge:** {eingaenge_str} EUR")
+        md.append(f"- **Gesamtausgänge:** {ausgaenge_str} EUR")
+        md.append(f"- **Differenz:** {differenz_str} EUR\n")
         
         # Abschnitt 4: Dokumenttypen
         md.append(f"\n## Dokumenttypen\n")
@@ -224,8 +227,10 @@ class GirokontoAnalyzer(BaseKontoAnalyzer):
                 saldo = data.get('saldo', 0)
                 count = data['count']
                 
-                saldo_str = f"{saldo:,.2f}" if saldo else "N/A"
-                md.append(f"| {month} | {eingaenge:,.2f} | {ausgaenge:,.2f} | {saldo_str} | {count} |")
+                eingaenge_str = self.format_number_german(eingaenge, 2)
+                ausgaenge_str = self.format_number_german(ausgaenge, 2)
+                saldo_str = self.format_number_german(saldo, 2) if saldo else "N/A"
+                md.append(f"| {month} | {eingaenge_str} | {ausgaenge_str} | {saldo_str} | {count} |")
             
             # Zusammenfassung
             months = list(analysis['monthly_data'].keys())
@@ -236,14 +241,14 @@ class GirokontoAnalyzer(BaseKontoAnalyzer):
         
         # Abschnitt 6: Dokumentenübersicht
         md.append(f"\n## Dokumentenanalyse\n")
-        md.append("| Datum | Typ | Bewegungen | Saldo (EUR) | Beschreibung |")
-        md.append("|-------|-----|------------|-------------|--------------|")
+        md.append("| Dokumentdatum | Typ | Bewegungen | Saldo (EUR) | Beschreibung |")
+        md.append("|---------------|-----|------------|-------------|--------------|")
         
         for trans in analysis['transactions']:
-            date = trans['date'] if trans['date'] else 'N/A'
+            date = self.format_date_german(trans['date']) if trans['date'] else 'N/A'
             trans_type = trans['type']
             bewegungen = trans['anzahl_bewegungen']
-            saldo = f"{trans['saldo']:,.2f}" if trans['saldo'] else 'N/A'
+            saldo = self.format_number_german(trans['saldo'], 2) if trans['saldo'] else 'N/A'
             desc = trans['description_german']
             
             md.append(f"| {date} | {trans_type} | {bewegungen} | {saldo} | {desc} |")
@@ -265,7 +270,10 @@ class GirokontoAnalyzer(BaseKontoAnalyzer):
                 differenz = eingaenge - ausgaenge
                 count = data['count']
                 
-                md.append(f"| {year} | {eingaenge:,.2f} | {ausgaenge:,.2f} | {differenz:,.2f} | {count} |")
+                eingaenge_str = self.format_number_german(eingaenge, 2)
+                ausgaenge_str = self.format_number_german(ausgaenge, 2)
+                differenz_str = self.format_number_german(differenz, 2)
+                md.append(f"| {year} | {eingaenge_str} | {ausgaenge_str} | {differenz_str} | {count} |")
             
             # Zusammenfassung
             years = list(yearly_data.keys())

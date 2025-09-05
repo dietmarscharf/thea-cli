@@ -232,10 +232,14 @@ class GeldmarktkontoAnalyzer(BaseKontoAnalyzer):
         
         # Abschnitt 3: Finanzdaten Gesamt
         md.append(f"\n## Finanzdaten Gesamt\n")
-        md.append(f"- **Gesamteingänge:** {analysis['total_eingaenge']:,.2f} EUR")
-        md.append(f"- **Gesamtausgänge:** {analysis['total_ausgaenge']:,.2f} EUR")
-        md.append(f"- **Zinserträge gesamt:** {analysis['total_zinsertraege']:,.2f} EUR")
-        md.append(f"- **Netto-Zufluss:** {(analysis['total_eingaenge'] - analysis['total_ausgaenge']):,.2f} EUR\n")
+        eingaenge_str = self.format_number_german(analysis['total_eingaenge'], 2)
+        ausgaenge_str = self.format_number_german(analysis['total_ausgaenge'], 2)
+        zinsertraege_str = self.format_number_german(analysis['total_zinsertraege'], 2)
+        netto_str = self.format_number_german(analysis['total_eingaenge'] - analysis['total_ausgaenge'], 2)
+        md.append(f"- **Gesamteingänge:** {eingaenge_str} EUR")
+        md.append(f"- **Gesamtausgänge:** {ausgaenge_str} EUR")
+        md.append(f"- **Zinserträge gesamt:** {zinsertraege_str} EUR")
+        md.append(f"- **Netto-Zufluss:** {netto_str} EUR\n")
         
         # Abschnitt 4: Dokumenttypen
         md.append(f"\n## Dokumenttypen\n")
@@ -245,16 +249,16 @@ class GeldmarktkontoAnalyzer(BaseKontoAnalyzer):
         # Abschnitt 5: Monatliche Übersicht
         if analysis['monthly_data']:
             md.append(f"\n## Monatliche Übersicht\n")
-            md.append("| Monat | Eingänge | Ausgänge | Zinserträge | Saldo | Zinssatz | Docs |")
-            md.append("|-------|----------|----------|-------------|-------|----------|------|")
+            md.append("| Monat | Eingänge (EUR) | Ausgänge (EUR) | Zinserträge (EUR) | Saldo (EUR) | Zinssatz (%) | Docs |")
+            md.append("|-------|----------------|----------------|-------------------|-------------|--------------|------|")
             
             for month in sorted(analysis['monthly_data'].keys()):
                 data = analysis['monthly_data'][month]
-                eingaenge = f"{data['eingaenge']:,.2f}" if data['eingaenge'] > 0 else "-"
-                ausgaenge = f"{data['ausgaenge']:,.2f}" if data['ausgaenge'] > 0 else "-"
-                zinsertraege = f"{data['zinsertraege']:,.2f}" if data['zinsertraege'] > 0 else "-"
-                saldo = f"{data['saldo']:,.2f}" if data['saldo'] else "-"
-                zinssatz = f"{data['zinssatz']:.2f}%" if data['zinssatz'] else "-"
+                eingaenge = self.format_number_german(data['eingaenge'], 2) if data['eingaenge'] > 0 else "-"
+                ausgaenge = self.format_number_german(data['ausgaenge'], 2) if data['ausgaenge'] > 0 else "-"
+                zinsertraege = self.format_number_german(data['zinsertraege'], 2) if data['zinsertraege'] > 0 else "-"
+                saldo = self.format_number_german(data['saldo'], 2) if data['saldo'] else "-"
+                zinssatz = self.format_number_german(data['zinssatz'], 2) if data['zinssatz'] else "-"
                 count = data['count']
                 
                 md.append(f"| {month} | {eingaenge} | {ausgaenge} | {zinsertraege} | {saldo} | {zinssatz} | {count} |")
@@ -270,20 +274,21 @@ class GeldmarktkontoAnalyzer(BaseKontoAnalyzer):
         zins_transactions = [t for t in analysis['transactions'] if t['zinsertrag'] and t['zinsertrag'] > 0]
         if zins_transactions:
             md.append(f"\n## Zinsanalyse\n")
-            md.append("| Datum | Zinsertrag (EUR) | Zinssatz (%) | Beschreibung |")
-            md.append("|-------|------------------|--------------|--------------|")
+            md.append("| Dokumentdatum | Zinsertrag (EUR) | Zinssatz (%) | Beschreibung |")
+            md.append("|---------------|------------------|--------------|--------------|")
             
             for trans in zins_transactions:
-                date = trans['date'] if trans['date'] else 'N/A'
-                zinsertrag = f"{trans['zinsertrag']:,.2f}"
-                zinssatz = f"{trans['aktueller_zinssatz']:.2f}" if trans['aktueller_zinssatz'] else "N/A"
+                date = self.format_date_german(trans['date']) if trans['date'] else 'N/A'
+                zinsertrag = self.format_number_german(trans['zinsertrag'], 2)
+                zinssatz = self.format_number_german(trans['aktueller_zinssatz'], 2) if trans['aktueller_zinssatz'] else "N/A"
                 desc = trans['description_german']
                 
                 md.append(f"| {date} | {zinsertrag} | {zinssatz} | {desc} |")
             
             # Zusammenfassung
             total_zinsertrag = sum(t['zinsertrag'] for t in zins_transactions)
-            md.append(f"\n*Gesamt: {len(zins_transactions)} Zinsbuchungen, Gesamtertrag: {total_zinsertrag:,.2f} EUR*")
+            total_zins_str = self.format_number_german(total_zinsertrag, 2)
+            md.append(f"\n*Gesamt: {len(zins_transactions)} Zinsbuchungen, Gesamtertrag: {total_zins_str} EUR*")
         
         # Abschnitt 7: Jahresübersicht
         yearly_data = calculate_yearly_aggregates(analysis['transactions'])
@@ -298,16 +303,16 @@ class GeldmarktkontoAnalyzer(BaseKontoAnalyzer):
         
         if yearly_data:
             md.append(f"\n## Jahresübersicht\n")
-            md.append("| Jahr | Eingänge | Ausgänge | Zinserträge | Netto | Dokumente |")
-            md.append("|------|----------|----------|-------------|-------|-----------|")
+            md.append("| Jahr | Eingänge (EUR) | Ausgänge (EUR) | Zinserträge (EUR) | Netto (EUR) | Dokumente |")
+            md.append("|------|----------------|----------------|-------------------|-------------|-----------|")
             
             for year in sorted(yearly_data.keys()):
                 data = yearly_data[year]
-                eingaenge = f"{data['eingaenge']:,.2f}" if data['eingaenge'] > 0 else "-"
-                ausgaenge = f"{data['ausgaenge']:,.2f}" if data['ausgaenge'] > 0 else "-"
-                zinsertraege = f"{data.get('zinsertraege', 0):,.2f}" if data.get('zinsertraege', 0) > 0 else "-"
+                eingaenge = self.format_number_german(data['eingaenge'], 2) if data['eingaenge'] > 0 else "-"
+                ausgaenge = self.format_number_german(data['ausgaenge'], 2) if data['ausgaenge'] > 0 else "-"
+                zinsertraege = self.format_number_german(data.get('zinsertraege', 0), 2) if data.get('zinsertraege', 0) > 0 else "-"
                 netto = data['eingaenge'] - data['ausgaenge'] + data.get('zinsertraege', 0)
-                netto_str = f"{netto:,.2f}"
+                netto_str = self.format_number_german(netto, 2)
                 count = data['count']
                 
                 md.append(f"| {year} | {eingaenge} | {ausgaenge} | {zinsertraege} | {netto_str} | {count} |")
@@ -322,14 +327,14 @@ class GeldmarktkontoAnalyzer(BaseKontoAnalyzer):
         
         # Abschnitt 8: Letzte Dokumente
         md.append(f"\n## Letzte Dokumente (max. 20)\n")
-        md.append("| Datum | Typ | Saldo (EUR) | Zinssatz | Beschreibung |")
-        md.append("|-------|-----|-------------|----------|--------------|")
+        md.append("| Dokumentdatum | Typ | Saldo (EUR) | Zinssatz (%) | Beschreibung |")
+        md.append("|---------------|-----|-------------|--------------|--------------|")
         
         for trans in analysis['transactions'][-20:]:
-            date = trans['date'] if trans['date'] else 'N/A'
+            date = self.format_date_german(trans['date']) if trans['date'] else 'N/A'
             trans_type = trans['type']
-            saldo = f"{trans['saldo']:,.2f}" if trans['saldo'] else 'N/A'
-            zinssatz = f"{trans['aktueller_zinssatz']:.2f}%" if trans['aktueller_zinssatz'] else 'N/A'
+            saldo = self.format_number_german(trans['saldo'], 2) if trans['saldo'] else 'N/A'
+            zinssatz = self.format_number_german(trans['aktueller_zinssatz'], 2) if trans['aktueller_zinssatz'] else 'N/A'
             desc = trans['description_german']
             
             md.append(f"| {date} | {trans_type} | {saldo} | {zinssatz} | {desc} |")
@@ -356,9 +361,11 @@ class GeldmarktkontoAnalyzer(BaseKontoAnalyzer):
                 
                 self.save_markdown(markdown_content, output_file)
                 self.print_summary(output_file, analysis)
-                print(f"  - Zinserträge gesamt: {analysis['total_zinsertraege']:,.2f} EUR")
+                zins_str = self.format_number_german(analysis['total_zinsertraege'], 2)
+                print(f"  - Zinserträge gesamt: {zins_str} EUR")
                 if analysis['latest_zinssatz']:
-                    print(f"  - Aktueller Zinssatz: {analysis['latest_zinssatz']:.2f}%")
+                    zinssatz_str = self.format_number_german(analysis['latest_zinssatz'], 2)
+                    print(f"  - Aktueller Zinssatz: {zinssatz_str}%")
             else:
                 print(f"✗ Fehler bei der Analyse von {account_name}")
 
