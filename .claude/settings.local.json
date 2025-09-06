@@ -15,7 +15,8 @@
       "Bash(for dir in docs/*/)",
       "Bash(do echo \"$dir:\")",
       "Bash(done)",
-      "Bash(git diff:*)"
+      "Bash(git diff:*)",
+      "Bash(git rev-parse:*)"
     ],
     "deny": [],
     "ask": []
