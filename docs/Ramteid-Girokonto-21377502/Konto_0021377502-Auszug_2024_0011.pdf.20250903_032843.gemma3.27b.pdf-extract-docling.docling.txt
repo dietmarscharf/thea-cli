@@ -1,0 +1,106 @@
+Sparkasse Amberg-Sulzbach
+
+<!-- image -->
+
+Firma Ramteid GmbH Auf den Hochäckern 5 92224 Amberg
+
+## Kontoauszug 11/2024
+
+## Girokonto 21377502, DE51 7525 0000 0021 3775 02
+
+1. Dezember 2024 Seite 1 von 3
+
+| Datum                                                                                                                                                  | Erläuterung                                                                                                                                                                                                                       | Betrag EUR   |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| Kontostand am 31.10.2024, Auszug Nr. 10                                                                                                                | Kontostand am 31.10.2024, Auszug Nr. 10                                                                                                                                                                                           | 9.497,42     |
+| 04.11.2024 Überweisung-beleglos / Wert: 01.11.2024 Frahcs GmbH RNr. 321072 RDat. 01.11.2024 KNr. 1 0001 DATUM 01.11.2024, 19.56 UHR 4430646327-0000001 | 04.11.2024 Überweisung-beleglos / Wert: 01.11.2024 Frahcs GmbH RNr. 321072 RDat. 01.11.2024 KNr. 1 0001 DATUM 01.11.2024, 19.56 UHR 4430646327-0000001                                                                            | -1.200,00    |
+| 04.11.2024 Entgeltabrechnung / Wert: 01.11.2024 siehe Anlage Nr. 1                                                                                     | 04.11.2024 Entgeltabrechnung / Wert: 01.11.2024 siehe Anlage Nr. 1                                                                                                                                                                | -29,05       |
+| 04.11.2024 Gutschriftseingang BLUEITS GmbH RNr. 221050                                                                                                 | RDat. 01.11.2024                                                                                                                                                                                                                  | 14.280,00    |
+| 05.11.2024 Überweisung-beleglos Ramteid GmbH Übertrag von Girokonto bei der SPK AS DATUM 05.11.2024, 09.04 UHR                                         | auf Flatex Depotkonto                                                                                                                                                                                                             | -12.500,00   |
+| 13.11.2024 Lastschriftseinzug PayPal Europe S.a.r.l.                                                                                                   | et Cie S.C.A 1038173897092/. Bambulab GmbH, Ihr Einkauf                                                                                                                                                                           | -1.257,00    |
+| 15.11.2024 Lastschriftseinzug                                                                                                                          | 15.11.2024 Lastschriftseinzug                                                                                                                                                                                                     | -463,58      |
+| 26.11.2024                                                                                                                                             | Finanzamt Amberg Finanzkasse Finanzkasse Amberg STEUERNR 201/118/70110 LOHNST OKT.24 463,58EUR 201/118/70110-----L1211202400063176 Überweisung-beleglos Dietmar Scharf Geschaeftsfuehrergehalt Ramteid 11/ 2024 DATUM 26.11.2024, | -1.536,42    |
+| 09.24 UHR 4433124554-0000002 26.11.2024 Überweisung-beleglos                                                                                           | Janine Rechenberg Aushilfslohn Ramteid 11/2024 DATUM 26.11.2024, 09.24 UHR                                                                                                                                                        | -538,00      |
+| 26.11.2024 Überweisung-beleglos Noah Rechenberg Aushilfslohn Ramteid 11/2024 DATUM 26.11.2024, 4433124554-0000004                                      | 26.11.2024 Überweisung-beleglos Noah Rechenberg Aushilfslohn Ramteid 11/2024 DATUM 26.11.2024, 4433124554-0000004                                                                                                                 | -192,80      |
+| 26.11.2024                                                                                                                                             | Überweisung-beleglos Dietmar Norbert Scharf RNr. 51147 Zoll, Rueckerstattung fu er Auslage DATUM 26.11.2024, 09.24 UHR 4433124554-0000001                                                                                         | -93,70       |
+| 26.11.2024 Lastschriftseinzug KFM Beratung GmbH GL-ID: DE69KFM00002603953 2024004511/12.11 . 24 Deb: 10658 4431996771-0000045                          | Mandat: 1 06580000001 ReNr:                                                                                                                                                                                                       | -86,32       |
+
+<!-- image -->
+
+Kontoauszug 11/2024
+
+## Girokonto 21377502, DE51 7525 0000 0021 3775 02,  Ramteid GmbH
+
+Seite 2 von 3
+
+| Datum                                                                                                 | Erläuterung                                                                                           | Betrag EUR   |
+|-------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|--------------|
+| 26.11.2024 Lastschriftseinzug KFM Beratung GmbH GL-ID: DE69KFM00002603953 Mandat: 1 06580000001 ReNr: | 26.11.2024 Lastschriftseinzug KFM Beratung GmbH GL-ID: DE69KFM00002603953 Mandat: 1 06580000001 ReNr: | -66,62       |
+| 26.11.2024 Gutschriftseingang Knappschaft-Bahn-See                                                    | 26.11.2024 Gutschriftseingang Knappschaft-Bahn-See                                                    | 43,04        |
+| 27.11.2024 Lastschriftseinzug Knappschaft-Bahn-See                                                    | 27.11.2024 Lastschriftseinzug Knappschaft-Bahn-See                                                    | -238,93      |
+| 28.11.2024 Rückbuchung-Gutschr RAMTEID GMBH SVWZ+ RÜCKÜBERWEISUNG                                     | 28.11.2024 Rückbuchung-Gutschr RAMTEID GMBH SVWZ+ RÜCKÜBERWEISUNG                                     | 93,70        |
+| Kontostand am 29.11.2024 um20:06 Uhr                                                                  | Kontostand am 29.11.2024 um20:06 Uhr                                                                  | 5.711,74     |
+
+Anzahl Anlagen
+
+<!-- image -->
+
+Kontoauszug 11/2024
+
+Girokonto 21377502, DE51 7525 0000 0021 3775 02,  Ramteid GmbH
+
+Seite 3 von 3
+
+Entgeltabschluss:
+
+Anlage     1
+
+Entgelte vom 01.10.2024 bis 31.10.2024                              24,41-
+
+Umsatzbereitstellung        1 x    5,00                5,00-
+
+Kontogrundpreis             1 x   10,95               10,95-
+
+Lastschriftseinzug
+
+Geschäftsvorfälle          5 x    0,75                3,75-
+
+Überweisung-beleglos
+
+Geschäftsvorfälle          8 x    0,12                0,96-
+
+Gutschriftseingang
+
+Geschäftsvorfälle          5 x    0,75                3,75-
+
+--------------
+
+Abrechnung 31.10.2024 vor Steuer                                    24,41-
+
+Umsatzsteuer  19%  auf          24,41-                 USt:          4,64-
+
+--------------
+
+Abrechnung 31.10.2024                                               29,05-
+
+Rechnungsnummer: 20241031-BY083-00012224298
+
+Bitte beachten Sie die Hinweise zum Kontoauszug.
+
+## Hinweise zum Kontoauszug:
+
+Sehr geehrte Kundin, sehr geehrter Kunde, bitte prüfen Sie die Buchungen und Berechnungen in diesem Kontoauszug. Eventuelle Rückfragen besprechen Sie bitte mit Ihrem Kundenberater.
+
+- l Der angegebene Kontostand berücksichtigt nicht die Wertstellung der einzelnen Buchungen. Dies bedeutet, dass der genannte Betrag nicht dem für die Zinsrechnung maßgeblichen Kontostand entsprechen muss und bei Verfügungen möglicherweise Zinsen für die Inanspruchnahme einer eingeräumten oder geduldeten Kontoüberziehung anfallen können.
+- l Einwendungen gegen den Kontoauszug richten Sie bitte unverzüglich an unsere Revisionsabteilung. Unsere Anschrift(en) entnehmen Sie bitte unserem Preis- und Leistungsverzeichnis.
+- l Rechnungsabschlüsse gelten als genehmigt, sofern Sie innerhalb von sechs Wochen nach Zugang keine Einwendungen erheben. Einwendungen gegen Rechnungsabschlüsse müssen der Sparkasse zugehen. Zur Fristwahrung genügt die rechtzeitige Absendung (Nr. 7 Abs. 3 unserer Allgemeinen Geschäftsbedingungen).
+- l Schecks und andere Einzugspapiere sind erst dann eingelöst, wenn sie nicht bis zum Ablauf des übernächsten Bankarbeitstages storniert oder korrigiert werden. Diese Papiere sind auch eingelöst, wenn die Sparkasse ihren Einlösungswillen schon vorher Dritten gegenüber erkennbar bekundet hat (z. B. durch Bezahltmeldung). Für Lastschriften gelten die Einlösungsregeln in den hierfür vereinbarten besonderen Bedingungen.
+- l Gutschriften aus eingereichten Schecks, Lastschriften und anderen Einzugspapieren erfolgen unter dem Vorbehalt der Einlösung.
+- l Sparkontoauszüge heften Sie bitte in Ihr Loseblatt-Sparkassenbuch ein.
+- l Guthaben sind als Einlagen nach Maßgabe des Einlagensicherungsgesetzes entschädigungsfähig. Nähere Informationen können dem "Informationsbogen für den Einleger" entnommen werden.
+- l Dieser Kontoauszug gilt im Zusammenhang mit den zugrunde liegenden Verträgen laut angegebener Kontonummer als Rechnung im Sinne des UStG.
+- l Dieser Brief wurde maschinell erstellt und ist ohne Unterschrift gültig.
+
+Unsere für den Geschäftsverkehr mit Ihnen geltenden Allgemeinen Geschäftsbedingungen und besonderen Bedingungen stellen wir Ihnen auf Wunsch gern zur Verfügung.
+
+Mit freundlichen Grüßen Ihre Sparkasse

@@ -1,0 +1,95 @@
+Sparkasse Amberg-Sulzbach
+
+<!-- image -->
+
+Firma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg
+
+## Kontoauszug 6/2023
+
+## Geldmarktkonto 21503990
+
+Datum
+
+Erläuterung
+
+1. Juli 2023 Seite 1 von 3
+
+Betrag EUR
+
+|            | Kontostand am 31.05.2023, Auszug Nr. 5                                                                                                                                          | 50.099,04   |
+|------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
+| 01.06.2023 | Überweisung/Übertrag / Wert: 30.05.2023 DURCHLFD.SPERRBETRAEGE LIMITENTGELT DEPOT 7274079 3306077100WKN A1CX3T                                                                  | -3,50       |
+| 01.06.2023 | Gutschriftseingang DURCHLFD.SPERRBETRAEGE DEPOT 7274079 4316182500 WKNA1CX3T VERKAUF                                                                                            | 14.985,00   |
+| 05.06.2023 | Gutschriftseingang DURCHLFD.SPERRBETRAEGE DEPOT 7274079 3306077100 WKNA1CX3T                                                                                                    | 14.953,20   |
+| 07.06.2023 | Gutschriftseingang DURCHLFD.SPERRBETRAEGE DEPOT 7274079 3422788100 WKNA1CX3T                                                                                                    | 26.761,82   |
+| 09.06.2023 | Gutschriftseingang BLUEITS GMBH                                                                                                                                                 | 18.500,00   |
+| 12.06.2023 | Gutschriftseingang / Wert: 09.06.2023 SPK AMBERG-SULZ DEPOT 7274079 WERTP. ABRECHN. 09.06.23 000004414374700 WKNA1CX3T GESCH.ART VV TESLA INC. DL -,001 US88160R1014            | 15.678,45   |
+| 12.06.2023 | Gutschriftseingang / Wert: 09.06.2023 SPK AMBERG-SULZ DEPOT 7274079 WERTP. ABRECHN. 08.06.23 000004413324800 WKNA1CX3T GESCH.ART VV TESLA INC. DL -,001 US88160R1014            | 16.392,00   |
+| 14.06.2023 | Gutschriftseingang BLUEITS GMBH                                                                                                                                                 | 28.000,00   |
+| 14.06.2023 | Gutschriftseingang DURCHLFD.SPERRBETRAEGE DEPOT 7274079 WERTPAPIER ABRECHNUNG 3586710900 WKNA1CX3T                                                                              | 57.470,80   |
+| 15.06.2023 | Wertpapierabrechnung / Wert: 16.06.2023 Depot 0007274079 Wertp.Abrechn. 14.06.2023 000003621845000 WKNA1CX3T Gesch.Art KV Stück 1000,0000 TESLA INC. DL -,001 ISIN US88160R1014 | -239.823,75 |
+| 15.06.2023 | Gutschriftseingang / Wert: 14.06.2023 DURCHLFD.SPERRBETRAEGE DEPOT 7274079 WERTPAPIER ABRECHN. 13.06.2023 4440124300 WKNA1CX3T                                                  | 32.554,38   |
+| 16.06.2023 | Überweisung/Übertrag BLUEITS GmbH Kontoübertrag                                                                                                                                 | -100.000,00 |
+| 16.06.2023 | Gutschriftseingang / Wert: 15.06.2023 DURCHLFD.SPERRBETRAEGE DEPOT 7274079 WERTP.ABRECHNUNG 4447436200 14.06.2023 WKNA1CX3T                                                     | 114.708,78  |
+
+<!-- image -->
+
+Kontoauszug 6/2023
+
+## Geldmarktkonto 21503990,   BLUEITS GmbH
+
+Seite 2 von 3
+
+| Datum                                                                                                                                             | Erläuterung                                                                                                                                                                                                          | Betrag EUR   |
+|---------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| 21.06.2023 Überweisung/Übertrag / Wert: 19.06.2023 DURCHLFD.SPERRBETRAEGE DEPOT 7274079 WERTP.ABRECHN. 19.06.23 3680758900 WKNA1CX3T LIMITENTGELT | 21.06.2023 Überweisung/Übertrag / Wert: 19.06.2023 DURCHLFD.SPERRBETRAEGE DEPOT 7274079 WERTP.ABRECHN. 19.06.23 3680758900 WKNA1CX3T LIMITENTGELT                                                                    | -3,50        |
+| 22.06.2023 Wertpapierabrechnung / Wert: 23.06.2023 Depot 0007274079 Wertp.Abrechn. 21.06.2023                                                     | 000004506773700 WKNA1CX3T                                                                                                                                                                                            | -48.555,18   |
+| 22.06.2023                                                                                                                                        | Gesch.Art KV Stück 200,0000 TESLA INC. DL -,001 ISIN US88160R1014 Gutschriftseingang DURCHLFD.SPERRBETRAEGE DEPOT 7274079 WERTP.ABRECHN. 20.06.2023 3680758900 WKNA1CX3T                                             | 19.868,61    |
+| 22.06.2023                                                                                                                                        | Gutschriftseingang BLUEITS GMBH Übertrag auf Geldmarktkonto                                                                                                                                                          | 46.000,00    |
+| 23.06.2023 Wertpapierabrechnung / Wert: 26.06.2023 Depot 0007274079 Wertp.Abrechn. 22.06.2023                                                     | 000003769249901 WKNA1CX3T                                                                                                                                                                                            | -44.322,80   |
+| 23.06.2023 Wertpapierabrechnung / Wert: 26.06.2023 Depot 0007274079 Wertp.Abrechn. 22.06.2023                                                     | 23.06.2023 Wertpapierabrechnung / Wert: 26.06.2023 Depot 0007274079 Wertp.Abrechn. 22.06.2023                                                                                                                        | -2.334,50    |
+| 23.06.2023                                                                                                                                        | 000003769249900 WKNA1CX3T Gesch.Art KV Stück 10,0000 TESLA INC. DL -,001 ISIN US88160R1014 Überweisung/Übertrag / Wert: 21.06.2023 DURCHLFD.SPERRBETRAEGE DEPOT 7274079 4502574700 LIMITENTGELT 21.06.2023 WKNA1CX3T | -3,50        |
+| 23.06.2023 Gutschriftseingang DURCHLFD.SPERRBETRAEGE 21.06.2023 WKNA1CX3T                                                                         | DEPOT 7274079 3755493000 WERTP.ABRECHN.                                                                                                                                                                              | 20.125,36    |
+| 26.06.2023                                                                                                                                        | Überweisung/Übertrag / Wert: 22.06.2023 DURCHLFD.SPERRBETRAEGE DEPOT 7274079 WERTP.ABRECHN. 22.06.23 3775637900 WKNA1CX3T LIMITENTGELT                                                                               | -3,50        |
+| 26.06.2023 Überweisung/Übertrag / Wert: 22.06.2023 DURCHLFD.SPERRBETRAEGE DEPOT 7274079 WERTP.ABRECHN. 22.06.23 4513847800 WKNA1CX3T LIMITENTGELT | 26.06.2023 Überweisung/Übertrag / Wert: 22.06.2023 DURCHLFD.SPERRBETRAEGE DEPOT 7274079 WERTP.ABRECHN. 22.06.23 4513847800 WKNA1CX3T LIMITENTGELT                                                                    | -3,50        |
+| 26.06.2023                                                                                                                                        | Gutschriftseingang BLUEITS GMBH Übertrag von Girokonto auf Geldmark tkonto                                                                                                                                           | 6.000,00     |
+| 27.06.2023 Wertpapierabrechnung / Wert: 28.06.2023 Depot 0007274079 Wertp.Abrechn. 26.06.2023                                                     | 000004528827200 WKNA1CX3T                                                                                                                                                                                            | -46.363,59   |
+|                                                                                                                                                   | Gesch.Art KV Stück 200,0000 TESLA INC. DL -,001 ISIN US88160R1014 Kontostand am 30.06.2023 um20:02 Uhr                                                                                                               | 680,12       |
+
+<!-- image -->
+
+Kontoauszug 6/2023
+
+Geldmarktkonto 21503990,   BLUEITS GmbH
+
+## Kundenmitteilungen:
+
+Geldmarktkonten werden wieder verzinst!
+
+Wir haben gute Nachrichten für Sie.
+
+Ab 1. Juli 2023 werden wir Geldmarktkonten wieder wie folgt verzinsen:
+
+ab 25.000 Euro bis unter 50.000 Euro: 0,20 % p. a. ab 50.000 Euro: 0,40 % p. a.
+
+Ihre Sparkasse Amberg-Sulzbach
+
+## Hinweise zum Kontoauszug:
+
+Sehr geehrte Kundin, sehr geehrter Kunde, bitte prüfen Sie die Buchungen und Berechnungen in diesem Kontoauszug. Eventuelle Rückfragen besprechen Sie bitte mit Ihrem Kundenberater.
+
+- l Der angegebene Kontostand berücksichtigt nicht die Wertstellung der einzelnen Buchungen. Dies bedeutet, dass der genannte Betrag nicht dem für die Zinsrechnung maßgeblichen Kontostand entsprechen muss und bei Verfügungen möglicherweise Zinsen für die Inanspruchnahme einer eingeräumten oder geduldeten Kontoüberziehung anfallen können.
+- l Einwendungen gegen den Kontoauszug richten Sie bitte unverzüglich an unsere Revisionsabteilung. Unsere Anschrift(en) entnehmen Sie bitte unserem Preis- und Leistungsverzeichnis.
+- l Rechnungsabschlüsse gelten als genehmigt, sofern Sie innerhalb von sechs Wochen nach Zugang keine Einwendungen erheben. Einwendungen gegen Rechnungsabschlüsse müssen der Sparkasse zugehen. Zur Fristwahrung genügt die rechtzeitige Absendung (Nr. 7 Abs. 3 unserer Allgemeinen Geschäftsbedingungen).
+- l Schecks und andere Einzugspapiere sind erst dann eingelöst, wenn sie nicht bis zum Ablauf des übernächsten Bankarbeitstages storniert oder korrigiert werden. Diese Papiere sind auch eingelöst, wenn die Sparkasse ihren Einlösungswillen schon vorher Dritten gegenüber erkennbar bekundet hat (z. B. durch Bezahltmeldung). Für Lastschriften gelten die Einlösungsregeln in den hierfür vereinbarten besonderen Bedingungen.
+- l Gutschriften aus eingereichten Schecks, Lastschriften und anderen Einzugspapieren erfolgen unter dem Vorbehalt der Einlösung.
+- l Sparkontoauszüge heften Sie bitte in Ihr Loseblatt-Sparkassenbuch ein.
+- l Guthaben sind als Einlagen nach Maßgabe des Einlagensicherungsgesetzes entschädigungsfähig. Nähere Informationen können dem "Informationsbogen für den Einleger" entnommen werden.
+- l Dieser Kontoauszug gilt im Zusammenhang mit den zugrunde liegenden Verträgen laut angegebener Kontonummer als Rechnung im Sinne des UStG.
+- l Dieser Brief wurde maschinell erstellt und ist ohne Unterschrift gültig.
+
+Unsere für den Geschäftsverkehr mit Ihnen geltenden Allgemeinen Geschäftsbedingungen und besonderen Bedingungen stellen wir Ihnen auf Wunsch gern zur Verfügung.
+
+Mit freundlichen Grüßen Ihre Sparkasse
+
+Seite 3 von 3
