@@ -20,14 +20,24 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             "BLUEITS": {
                 "folder": "BLUEITS-Depotkonto-7274079",
                 "depot_number": "7274079",
-                "output_file": "BLUEITS-Depotkonto.md",
-                "company_name": "BLUEITS GmbH"
+                "output_file": "BLUEITS-Depotkonto.html",
+                "company_name": "BLUEITS GmbH",
+                "fiscal_year": {
+                    "type": "april_march",
+                    "description": "April bis März",
+                    "example": "Geschäftsjahr 2023 = 01.04.2023 - 31.03.2024"
+                }
             },
             "Ramteid": {
                 "folder": "Ramteid-Depotkonto-7274087",
                 "depot_number": "7274087",
-                "output_file": "Ramteid-Depotkonto.md",
-                "company_name": "Ramteid GmbH"
+                "output_file": "Ramteid-Depotkonto.html",
+                "company_name": "Ramteid GmbH",
+                "fiscal_year": {
+                    "type": "calendar",
+                    "description": "Kalenderjahr",
+                    "example": "Geschäftsjahr 2023 = 01.01.2023 - 31.12.2023"
+                }
             }
         }
     
@@ -69,6 +79,51 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         # Andere Länder-ISINs (FR, GB, etc.) sind üblicherweise Aktien
         return True
     
+    def get_fiscal_year(self, date_str: str, fiscal_type: str) -> str:
+        """
+        Bestimmt das Geschäftsjahr basierend auf Datum und Geschäftsjahr-Typ.
+        
+        Args:
+            date_str: Datum im Format YYYY-MM-DD oder als String
+            fiscal_type: 'april_march' oder 'calendar'
+            
+        Returns:
+            Geschäftsjahr als String, z.B. 'FY2024'
+        """
+        import datetime
+        
+        if not date_str:
+            return 'FY0000'
+        
+        # Parse date if it's a string
+        if isinstance(date_str, str):
+            try:
+                # Try parsing YYYY-MM-DD format
+                if '-' in date_str:
+                    date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%d')
+                # Try parsing DD.MM.YYYY format
+                elif '.' in date_str:
+                    date_obj = datetime.datetime.strptime(date_str, '%d.%m.%Y')
+                else:
+                    return 'FY0000'
+            except:
+                return 'FY0000'
+        else:
+            date_obj = date_str
+        
+        year = date_obj.year
+        month = date_obj.month
+        
+        if fiscal_type == 'april_march':
+            # April-März: Wenn Monat >= 4 (April), dann gehört es zum GJ des nächsten Jahres
+            # z.B. 15.05.2024 -> FY2025 (GJ April 2024 - März 2025)
+            if month >= 4:
+                return f'FY{year + 1}'
+            else:
+                return f'FY{year}'
+        else:  # calendar year
+            return f'FY{year}'
+    
     def extract_trading_details(self, text: str) -> Dict[str, Any]:
         """
         Extrahiert detaillierte Handelsinformationen aus Orderabrechnungen.
@@ -91,9 +146,12 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             'limit_price': None,
             'gross_amount': None,
             'fees': None,
+            'is_vat_free': False,    # Flag für umsatzsteuerfreie Gebühren
             'profit_loss': None,
             'net_amount': None,
-            'execution_date': None  # Neu: Explizites Ausführungsdatum
+            'execution_date': None,  # Schlusstag/Handelstag (Ausführungsdatum)
+            'value_date': None,      # Valuta/Wertstellung (Settlement)
+            'booking_date': None     # Buchungsdatum (falls abweichend)
         }
         
         # Extrahiere Stückzahl (mit Unterstützung für deutsche Tausendertrennzeichen)
@@ -186,6 +244,21 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         # Verwende die höchste gefundene Gebühr (wahrscheinlich die Summe)
         if fees_found:
             details['fees'] = max(fees_found)
+        
+        # Check if fees are VAT-free
+        vat_free_patterns = [
+            r'umsatzsteuerbefreite\s+Finanzdienstleistung',
+            r'umsatzsteuerfrei',
+            r'ohne\s+Umsatzsteuer',
+            r'Sofern\s+keine\s+Umsatzsteuer\s+ausgewiesen',
+            r'Börsenplatzentgelt',  # Always VAT-free
+            r'Maklercourtage'       # Always VAT-free
+        ]
+        
+        for pattern in vat_free_patterns:
+            if re.search(pattern, text, re.IGNORECASE):
+                details['is_vat_free'] = True
+                break
         
         # Extrahiere Veräußerungsgewinn/Verlust mit erweiterten Patterns
         # Spezialbehandlung für vertikales Layout (Sparkasse-Format)
@@ -366,10 +439,9 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 if not details.get('fees') or details['fees'] < details['gross_amount'] * 0.5:
                     print(f"  ⚠️  Warnung: Unplausibler Ausmachender Betrag: {details['net_amount']} bei Kurswert {details['gross_amount']}")
         
-        # Extrahiere Stichtag/Valuta/Ausführungsdatum
-        stichtag_patterns = [
-            # Valuta oder Schlusstag
-            r'Valuta\s*[:\s]\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
+        # Extrahiere Schlusstag/Handelstag (Ausführungsdatum)
+        execution_patterns = [
+            r'Schlusstag/-Zeit\s+(\d{1,2})\.(\d{1,2})\.(\d{4})',  # Mit Zeit
             r'Schlusstag\s*[:\s]\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
             r'Schlusstag\s+(\d{1,2})\.(\d{1,2})\.(\d{4})',
             r'Ausführungstag\s*[:\s]\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
@@ -377,25 +449,68 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             r'Geschäftstag\s*[:\s]\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
             r'Handelstag\s*[:\s]\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
             # Mit Pipe-Separator
-            r'Valuta\s*\|\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
             r'Schlusstag\s*\|\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
             r'Geschäftstag\s*\|\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
-            # Datum in Tabellen
-            r'\|\s*(\d{1,2})\.(\d{1,2})\.(\d{4})\s*\|.*(?:Valuta|Schlusstag)',
-            # Stichtag für Depotabschlüsse
-            r'Stichtag\s*[:\s]\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
-            r'per\s+(\d{1,2})\.(\d{1,2})\.(\d{4})',
-            r'Stand\s*[:\s]\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
-            # Fallback: Erstes Datum nach bestimmten Keywords
-            r'(?:Kauf|Verkauf|Order)\s+vom\s+(\d{1,2})\.(\d{1,2})\.(\d{4})'
+            # In Tabellen
+            r'Ausführ\.-tag[^|]*\|\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
         ]
         
-        for pattern in stichtag_patterns:
+        for pattern in execution_patterns:
             match = re.search(pattern, text)
             if match:
                 day, month, year = match.groups()
-                details['stichtag'] = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
+                details['execution_date'] = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
                 break
+        
+        # Extrahiere Valuta/Wertstellung (Settlement-Datum)
+        valuta_patterns = [
+            r'mit\s+Valuta\s+(\d{1,2})\.(\d{1,2})\.(\d{4})',  # "mit Valuta DD.MM.YYYY"
+            r'Valuta\s*[:\s]\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
+            r'Valuta\s+(\d{1,2})\.(\d{1,2})\.(\d{4})',
+            r'Wertstellung\s*[:\s]\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
+            # Mit Pipe-Separator
+            r'Valuta\s*\|\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
+            r'Wertstellung\s*\|\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
+        ]
+        
+        for pattern in valuta_patterns:
+            match = re.search(pattern, text)
+            if match:
+                day, month, year = match.groups()
+                details['value_date'] = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
+                break
+        
+        # Extrahiere Buchungsdatum (falls explizit angegeben)
+        booking_patterns = [
+            r'Buchungsdatum\s*[:\s]\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
+            r'Buchung\s+am\s+(\d{1,2})\.(\d{1,2})\.(\d{4})',
+            r'gebucht\s+am\s+(\d{1,2})\.(\d{1,2})\.(\d{4})',
+        ]
+        
+        for pattern in booking_patterns:
+            match = re.search(pattern, text)
+            if match:
+                day, month, year = match.groups()
+                details['booking_date'] = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
+                break
+        
+        # Fallback für Stichtag (für Kompatibilität und Depotabschlüsse)
+        if not details['execution_date']:
+            stichtag_patterns = [
+                r'Stichtag\s*[:\s]\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
+                r'per\s+(\d{1,2})\.(\d{1,2})\.(\d{4})',
+                r'Stand\s*[:\s]\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
+            ]
+            
+            for pattern in stichtag_patterns:
+                match = re.search(pattern, text)
+                if match:
+                    day, month, year = match.groups()
+                    details['stichtag'] = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
+                    break
+        else:
+            # Für Rückwärtskompatibilität: setze stichtag = execution_date
+            details['stichtag'] = details['execution_date']
         
         return details
     
@@ -554,6 +669,66 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 return 'depot_statement'
         
         return 'unknown'
+    
+    def parse_docling_table(self, docling_path: Path) -> Dict[str, Any]:
+        """Extrahiert Tabellendaten aus docling.txt Dateien"""
+        result = {
+            'isin': None,
+            'shares': None,
+            'kurswert': None,
+            'has_table': False
+        }
+        
+        if not docling_path.exists():
+            return result
+            
+        try:
+            with open(docling_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                
+            # Check for markdown table
+            if '|' in content and 'Stück' in content:
+                result['has_table'] = True
+                lines = content.split('\n')
+                
+                for i, line in enumerate(lines):
+                    # Look for table row with "Stück" and a number
+                    if 'Stück' in line and '|' in line:
+                        # Try to extract shares from same line
+                        shares_match = re.search(r'Stück\s*\|\s*([\d.]+)', line)
+                        if shares_match:
+                            shares_str = shares_match.group(1).replace('.', '')
+                            try:
+                                result['shares'] = int(shares_str)
+                            except ValueError:
+                                pass
+                        
+                        # Look for ISIN in next line
+                        if i + 1 < len(lines):
+                            next_line = lines[i + 1]
+                            isin_match = re.search(r'([A-Z]{2}[A-Z0-9]{10})', next_line)
+                            if isin_match:
+                                result['isin'] = isin_match.group(1)
+                            
+                            # Extract Kurswert
+                            kurswert_match = re.search(r'([\d]{1,3}(?:\.[\d]{3})*,[\d]{2})', next_line)
+                            if kurswert_match:
+                                kurswert_str = kurswert_match.group(1).replace('.', '').replace(',', '.')
+                                try:
+                                    result['kurswert'] = float(kurswert_str)
+                                except ValueError:
+                                    pass
+                
+                # Alternative: Look for ISIN pattern anywhere in content
+                if not result['isin']:
+                    isin_match = re.search(r'([A-Z]{2}[A-Z0-9]{10})', content)
+                    if isin_match:
+                        result['isin'] = isin_match.group(1)
+                
+        except Exception as e:
+            print(f"Error parsing docling file {docling_path}: {e}")
+            
+        return result
     
     def extract_depot_balance(self, depot_path: Path) -> Dict[str, Any]:
         """Extrahiert Depot-Salden aus Depotabschluss-Dokumenten"""
@@ -789,6 +964,33 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     if isin == 'US88160R1014':
                         security_name = 'TESLA INC'
                 
+                # Fallback: If no ISIN/shares found in THEA extract, try docling.txt
+                # Also try if closing_balance is 0 but it's not explicitly "kein Bestand vorhanden"
+                has_no_holdings = re.search(r'kein\s+Bestand\s+vorhanden', extracted_text, re.IGNORECASE)
+                if (not isin or not shares) and not has_no_holdings:
+                    # Try to find corresponding docling.txt file
+                    pdf_base = file_path.replace('.pdf', '')
+                    docling_pattern = f"{pdf_base}*.docling.txt"
+                    docling_files = list(depot_path.glob(os.path.basename(docling_pattern)))
+                    
+                    if docling_files:
+                        # Use the first matching docling file
+                        docling_data = self.parse_docling_table(docling_files[0])
+                        
+                        if docling_data['has_table']:
+                            if not isin and docling_data['isin']:
+                                isin = docling_data['isin']
+                                print(f"  Found ISIN {isin} from docling table")
+                            
+                            if not shares and docling_data['shares']:
+                                shares = docling_data['shares']
+                                print(f"  Found {shares} shares from docling table")
+                            
+                            # Update closing balance if found in table
+                            if docling_data['kurswert'] and docling_data['kurswert'] > 0:
+                                closing_balance = docling_data['kurswert']
+                                print(f"  Found Kurswert {closing_balance:.2f} EUR from docling table")
+                
                 depot_statements.append({
                     'doc_date': doc_date,
                     'balance_date': balance_date if balance_date else doc_date,
@@ -1021,11 +1223,50 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     if not transaction.get('gross_amount') and not transaction.get('net_amount'):
                         data_quality['missing_amounts'] += 1
         
-        # Sortiere Transaktionen nach Datum
-        transactions.sort(key=lambda x: x['date'] if x['date'] else '0000-00-00')
+        # Sortiere Transaktionen mit spezieller Behandlung für Depotabschlüsse
+        def get_sort_date(trans):
+            # Für Depotabschlüsse: Verwende stichtag (das ist der Bilanzstichtag)
+            if 'Depotabschluss' in trans.get('type', ''):
+                return trans.get('stichtag') or trans.get('date') or '0000-00-00'
+            # Für andere Transaktionen: execution_date mit Fallbacks
+            return (trans.get('execution_date') or 
+                    trans.get('value_date') or 
+                    trans.get('date') or 
+                    '0000-00-00')
+        
+        def get_sort_priority(trans):
+            # Depotabschlüsse kommen bei gleichem Datum zuletzt (Priorität 1)
+            if 'Depotabschluss' in trans.get('type', ''):
+                return 1
+            # Normale Transaktionen haben Priorität 0
+            return 0
+        
+        transactions.sort(key=lambda x: (get_sort_date(x), get_sort_priority(x)))
         
         # Extrahiere Depot-Salden
         balance_info = self.extract_depot_balance(depot_path)
+        
+        # Erstelle Lookup-Dictionary für Depotabschlüsse nach Dateiname
+        depot_statement_lookup = {}
+        for stmt in balance_info.get('statements', []):
+            file_key = os.path.basename(stmt['file'])
+            depot_statement_lookup[file_key] = {
+                'isin': stmt.get('isin'),
+                'shares': stmt.get('shares'),
+                'balance': stmt.get('closing_balance')
+            }
+        
+        # Reichere Transaktionen mit Depotabschluss-Daten an
+        for trans in transactions:
+            if 'Depotabschluss' in trans.get('type', ''):
+                file_key = trans.get('original_file', '')
+                if file_key in depot_statement_lookup:
+                    depot_data = depot_statement_lookup[file_key]
+                    # Übernehme ISIN und Stückzahl aus Depotabschluss
+                    if depot_data['isin'] and not trans.get('isin'):
+                        trans['isin'] = depot_data['isin']
+                    if depot_data['shares'] is not None:
+                        trans['shares'] = depot_data['shares']
         
         # Extrahiere Kosteninformationen
         cost_info = self.extract_cost_information(depot_path)
@@ -1055,6 +1296,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             'depot_name': depot_name,
             'depot_number': depot_info['depot_number'],
             'company_name': depot_info['company_name'],
+            'fiscal_year': depot_info.get('fiscal_year', {}),  # Füge Geschäftsjahr-Info hinzu
             'total_pdf_files': len(pdf_files),
             'total_thea_files': len(thea_files),
             'transactions': transactions,
@@ -1071,90 +1313,515 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             'data_quality': data_quality  # Füge Datenqualitäts-Statistiken hinzu
         }
     
-    def generate_markdown(self, analysis: Dict[str, Any]) -> str:
-        """Generiert Markdown-Bericht aus der Analyse"""
+    def _create_error_html(self) -> str:
+        """Erstellt eine Fehler-HTML-Seite"""
+        return """<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fehler bei der Analyse</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        .error { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="error">
+        <h1>Fehler bei der Analyse</h1>
+        <p>Keine Daten verfügbar.</p>
+    </div>
+</body>
+</html>"""
+    
+    def _create_html_header(self, analysis: Dict[str, Any]) -> str:
+        """Erstellt den HTML-Header mit umfassendem CSS"""
+        company_name = analysis['company_name']
+        depot_number = analysis['depot_number']
+        
+        return f"""<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{company_name} - Depotkonto {depot_number}</title>
+    <style>
+        /* Grundlegende Styles */
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: white;
+            color: #333;
+            line-height: 1.6;
+            width: 100%;
+        }}
+        
+        /* Überschriften */
+        h1 {{
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding: 20px 10px 10px 10px;
+            margin: 0 0 30px 0;
+        }}
+        
+        h2 {{
+            color: #34495e;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+            padding: 0 10px 8px 10px;
+        }}
+        
+        h3 {{
+            color: #7f8c8d;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            padding: 0 10px;
+        }}
+        
+        p {{
+            padding: 0 10px;
+        }}
+        
+        ul, ol {{
+            padding-left: 30px;
+            padding-right: 10px;
+        }}
+        
+        /* Info-Box für Kontoübersicht */
+        .info-box {{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 0;
+            margin: 0 0 30px 0;
+        }}
+        
+        .info-box .info-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }}
+        
+        .info-box .info-item {{
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 4px;
+        }}
+        
+        .info-box .info-label {{
+            font-size: 0.85em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }}
+        
+        .info-box .info-value {{
+            font-size: 1.2em;
+            font-weight: bold;
+        }}
+        
+        /* Tabellen */
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }}
+        
+        th {{
+            background: #34495e;
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 500;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }}
+        
+        td {{
+            padding: 10px 8px;
+            border-bottom: 1px solid #ecf0f1;
+        }}
+        
+        /* Fee block visual separation */
+        .fee-block-start {{
+            border-left: 2px solid #2c3e50 !important;
+        }}
+        
+        .fee-block-end {{
+            border-right: 2px solid #2c3e50 !important;
+        }}
+        
+        td.fee-block-start {{
+            border-left: 2px solid #dee2e6 !important;
+        }}
+        
+        td.fee-block-end {{
+            border-right: 2px solid #dee2e6 !important;
+        }}
+        
+        /* Type column visual separation */
+        .type-column {{
+            border-left: 2px solid #2c3e50 !important;
+            border-right: 2px solid #2c3e50 !important;
+        }}
+        
+        td.type-column {{
+            border-left: 1px solid #dee2e6 !important;
+            border-right: 1px solid #dee2e6 !important;
+        }}
+        
+        /* Type column borders for colored rows */
+        .depot-statement-row td.type-column,
+        .profit-row td.type-column,
+        .loss-row td.type-column {{
+            border-left: 2px solid rgba(255,255,255,0.5) !important;
+            border-right: 2px solid rgba(255,255,255,0.5) !important;
+        }}
+        
+        tr:hover {{
+            background: #f8f9fa;
+        }}
+        
+        /* Alternating row colors for better readability */
+        tbody tr:nth-child(even) {{
+            background-color: #f9f9f9;
+        }}
+        
+        /* Spezielle Zeilen-Styles für Transaktionen */
+        .profit-row {{
+            background-color: #28a745 !important;  /* Grün für Gewinn */
+            color: white !important;
+        }}
+        
+        .profit-row td {{
+            color: white !important;
+        }}
+        
+        .loss-row {{
+            background-color: #dc3545 !important;  /* Rot für Verlust */
+            color: white !important;
+        }}
+        
+        .loss-row td {{
+            color: white !important;
+        }}
+        
+        .depot-statement-row {{
+            background-color: #6c757d !important;  /* Mittleres Grau für normale Depotabschlüsse */
+            color: white !important;
+        }}
+        
+        .depot-statement-row td {{
+            color: white !important;
+        }}
+        
+        .depot-statement-row a {{
+            color: #64b5f6 !important;
+        }}
+        
+        .depot-statement-year-end {{
+            background-color: #000000 !important;  /* Schwarz für Jahresende */
+            color: white !important;
+        }}
+        
+        .depot-statement-year-end td {{
+            color: white !important;
+        }}
+        
+        .depot-statement-year-end a {{
+            color: #64b5f6 !important;
+        }}
+        
+        .misc-row {{
+            color: #6c757d !important;
+        }}
+        
+        .misc-row td {{
+            color: #6c757d !important;
+        }}
+        
+        .neutral-row {{
+            background-color: #e9ecef !important;
+        }}
+        
+        /* Links */
+        a {{
+            color: #3498db;
+            text-decoration: none;
+        }}
+        
+        a:hover {{
+            text-decoration: underline;
+        }}
+        
+        .profit-row a, .loss-row a {{
+            color: white !important;
+            text-decoration: underline;
+        }}
+        
+        /* Zahlen-Formatierung */
+        .number {{
+            text-align: right;
+            font-family: "Courier New", monospace;
+        }}
+        
+        .positive {{
+            color: #27ae60;
+            font-weight: bold;
+        }}
+        
+        .negative {{
+            color: #e74c3c;
+            font-weight: bold;
+        }}
+        
+        /* Statistik-Boxen */
+        .stats-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }}
+        
+        .stat-card {{
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }}
+        
+        .stat-card h4 {{
+            margin: 0 0 10px 0;
+            color: #34495e;
+        }}
+        
+        .stat-card ul {{
+            margin: 5px 0;
+            padding-left: 20px;
+        }}
+        
+        /* Warnungen */
+        .warning {{
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }}
+        
+        .warning strong {{
+            color: #856404;
+        }}
+        
+        /* Erläuterungen */
+        .explanation-box {{
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }}
+        
+        .explanation-box h4 {{
+            margin-top: 0;
+            color: #1565c0;
+        }}
+        
+        /* Footer */
+        .footer {{
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }}
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {{
+            table {{
+                font-size: 12px;
+            }}
+            
+            th, td {{
+                padding: 6px 4px;
+            }}
+            
+            .info-grid {{
+                grid-template-columns: 1fr;
+            }}
+        }}
+        
+        /* Print styles */
+        @media print {{
+            body {{
+                background: white;
+            }}
+            
+            .page-break {{
+                page-break-after: always;
+            }}
+        }}
+    </style>
+</head>
+<body>
+"""
+    
+    def _create_html_footer(self) -> str:
+        """Erstellt den HTML-Footer"""
+        from datetime import datetime
+        current_date = datetime.now().strftime("%d.%m.%Y %H:%M")
+        
+        return f"""
+    <div class="footer">
+        <p>Erstellt am {current_date} mit THEA Document Analysis System</p>
+        <p>© 2024 - Automated Financial Document Processing</p>
+    </div>
+</body>
+</html>"""
+
+    def generate_html(self, analysis: Dict[str, Any]) -> str:
+        """Generiert vollständigen HTML-Bericht aus der Analyse"""
         if not analysis:
-            return "# Fehler bei der Analyse\n\nKeine Daten verfügbar."
-            
-        md = []
+            return self._create_error_html()
         
-        # Abschnitt 1: Firmen- und Kontoübersicht
-        header_lines = self.generate_header_section(
-            company_name=analysis['company_name'],
-            account_type="Depotkonto",
-            account_number=analysis['depot_number'],
-            total_pdf_files=analysis['total_pdf_files'],
-            total_thea_files=analysis['total_thea_files'],
-            latest_saldo=analysis.get('latest_balance'),
-            latest_saldo_date=self.format_date_german(analysis.get('latest_balance_date')) if analysis.get('latest_balance_date') else None
-        )
-        md.extend(header_lines)
+        # Start HTML document
+        html = self._create_html_header(analysis)
         
-        # Abschnitt 2: Depotabschluss-Übersicht (MOVED BEFORE DOCUMENT TABLE)
+        # Main heading and info box
+        html += f"""
+    <h1>{analysis['company_name']} - Depotkonto {analysis['depot_number']}</h1>
+    
+    <div class="info-box">
+        <h2 style="color: white; border: none; margin: 0;">Kontoübersicht</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Kontoinhaber</div>
+                <div class="info-value">{analysis['company_name']}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Depotnummer</div>
+                <div class="info-value">{analysis['depot_number']}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">PDF-Dokumente</div>
+                <div class="info-value">{analysis['total_pdf_files']}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">THEA-Analysen</div>
+                <div class="info-value">{analysis['total_thea_files']}</div>
+            </div>"""
+        
+        # Füge Geschäftsjahr-Information hinzu
+        if analysis.get('fiscal_year'):
+            fiscal_year = analysis['fiscal_year']
+            html += f"""
+            <div class="info-item">
+                <div class="info-label">Geschäftsjahr</div>
+                <div class="info-value">{fiscal_year.get('description', 'Nicht definiert')}</div>
+            </div>"""
+        
+        if analysis.get('latest_balance'):
+            latest_balance_str = self.format_number_german(analysis['latest_balance'], 2)
+            latest_date = self.format_date_german(analysis.get('latest_balance_date'))
+            html += f"""
+            <div class="info-item">
+                <div class="info-label">Letzter Depotbestand</div>
+                <div class="info-value">{latest_balance_str} EUR</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Stand</div>
+                <div class="info-value">{latest_date}</div>
+            </div>"""
+        
+        html += """
+        </div>
+    </div>
+"""
+        
+        # SECTION 1: Depotabschluss-Übersicht (Depot Statement Overview)
         if analysis.get('depot_statements'):
-            md.append(f"\n## Depotabschluss-Übersicht\n")
+            html += "<h2>Depotabschluss-Übersicht</h2>"
             
-            # Kombiniere Jahres- und Quartalsabschlüsse
+            # Combine annual and quarterly statements
             all_statements = []
             
-            # Füge Jahresabschlüsse hinzu mit Typ-Markierung
             for statement in analysis.get('annual_statements', []):
                 statement_copy = statement.copy()
                 statement_copy['type_display'] = 'Jahresabschluss'
                 all_statements.append(statement_copy)
             
-            # Füge Quartalsabschlüsse hinzu mit Typ-Markierung
             for statement in analysis.get('quarterly_statements', []):
                 statement_copy = statement.copy()
                 statement_copy['type_display'] = 'Quartalsabschluss'
                 all_statements.append(statement_copy)
             
-            # Sortiere alle Statements chronologisch nach Stichtag
+            # Sort by balance date
             all_statements.sort(key=lambda x: x['balance_date'] if x['balance_date'] else '0000-00-00')
             
             if all_statements:
-                md.append("### Alle Depotabschlüsse (chronologisch)")
-                md.append("| Typ | Stichtag | Dokumentdatum | Stück | ISIN | Depotbestand (EUR) | Dokument |")
-                md.append("|-----|----------|---------------|-------|------|-------------------|----------|")
-                
+                html += """
+    <h3>Alle Depotabschlüsse (chronologisch)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Typ</th>
+                <th>Stichtag</th>
+                <th>Dokumentdatum</th>
+                <th>Stück</th>
+                <th>ISIN</th>
+                <th>Depotbestand (EUR)</th>
+                <th>Dokument</th>
+            </tr>
+        </thead>
+        <tbody>
+"""
                 for statement in all_statements:
-                    # Bestimme Typ-Anzeige
                     type_display = statement['type_display']
-                    
-                    # Konvertiere Daten ins deutsche Format
-                    doc_date = self.format_date_german(statement['doc_date'] if statement.get('doc_date') else 'N/A')
-                    balance_date = self.format_date_german(statement['balance_date'] if statement.get('balance_date') else 'N/A')
-                    
-                    # Formatiere Stück und ISIN
+                    doc_date = self.format_date_german(statement.get('doc_date', 'N/A'))
+                    balance_date = self.format_date_german(statement.get('balance_date', 'N/A'))
                     shares_str = str(statement['shares']) if statement.get('shares') else '-'
-                    isin_str = statement['isin'] if statement.get('isin') else '-'
+                    isin_str = statement.get('isin', '-')
                     
-                    # Formatiere Depotbestand mit deutschem Tausendertrennzeichen
                     if statement.get('closing_balance') is not None:
                         closing = self.format_number_german(statement['closing_balance'], 2)
                     else:
                         closing = 'N/A'
                     
-                    # Kürze den Dateinamen für die Anzeige
                     file_name = statement['file']
-                    if len(file_name) > 40:
-                        display_name = file_name[:37] + '...'
-                    else:
-                        display_name = file_name
-                    # Erstelle Link zum Dokument
-                    doc_link = f"[{display_name}](docs/{analysis['depot_info']['folder']}/{file_name})"
-                    md.append(f"| {type_display} | {balance_date} | {doc_date} | {shares_str} | {isin_str} | {closing} | {doc_link} |")
+                    display_name = file_name[:37] + '...' if len(file_name) > 40 else file_name
+                    doc_link = f'<a href="docs/{analysis["depot_info"]["folder"]}/{file_name}">{display_name}</a>'
+                    
+                    html += f"""
+            <tr>
+                <td>{type_display}</td>
+                <td>{balance_date}</td>
+                <td>{doc_date}</td>
+                <td class="number">{shares_str}</td>
+                <td>{isin_str}</td>
+                <td class="number">{closing}</td>
+                <td>{doc_link}</td>
+            </tr>"""
                 
-                # Zusammenfassung
+                html += """
+        </tbody>
+    </table>
+"""
+                # Summary
                 annual_count = len(analysis.get('annual_statements', []))
                 quarterly_count = len(analysis.get('quarterly_statements', []))
-                md.append(f"\n*Gesamt: {annual_count} Jahresabschlüsse und {quarterly_count} Quartalsabschlüsse*\n")
+                html += f'<p><em>Gesamt: {annual_count} Jahresabschlüsse und {quarterly_count} Quartalsabschlüsse</em></p>'
             
-            # Gesamtzusammenfassung
+            # Overall summary
             if analysis.get('latest_balance'):
                 latest_date = self.format_date_german(analysis.get('latest_balance_date', 'N/A'))
                 latest_balance_str = self.format_number_german(analysis['latest_balance'], 2)
-                md.append(f"\n**Letzter bekannter Depotbestand: {latest_balance_str} EUR** (Stand: {latest_date})")
+                html += f'<p><strong>Letzter bekannter Depotbestand: {latest_balance_str} EUR</strong> (Stand: {latest_date})</p>'
             
             total_statements = len(analysis.get('depot_statements', []))
             if total_statements > 0:
@@ -1162,455 +1829,611 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 last_date = max(s['balance_date'] for s in analysis['depot_statements'] if s.get('balance_date'))
                 first_date_german = self.format_date_german(first_date)
                 last_date_german = self.format_date_german(last_date)
-                md.append(f"*Gesamtzeitraum: {first_date_german} bis {last_date_german}*")
+                html += f'<p><em>Gesamtzeitraum: {first_date_german} bis {last_date_german}</em></p>'
         
-        # Abschnitt 3: Jährliche Kostenanalyse (MiFID II)
+        # SECTION 2: Jährliche Kostenanalyse (MiFID II)
         if analysis.get('cost_information'):
-            md.append(f"\n## Jährliche Kostenanalyse (MiFID II)\n")
-            md.append("Gesetzlich vorgeschriebene Kostenaufstellung gemäß Art. 50 der Verordnung (EU) 2017/565:")
-            md.append("\n| Jahr | Dokumentdatum | Dienstleistungskosten (netto) | Depotentgelte (netto) | Zwischensumme (netto) | USt (19%) | Gesamtkosten (brutto) | Umsatzvolumen | Ø Depotbestand | Kostenquote | Dokument |")
-            md.append("|------|---------------|------------------------------|----------------------|---------------------|-----------|----------------------|---------------|----------------|-------------|----------|")
-            
-            # Sortiere nach Jahr
+            html += """
+    <h2>Jährliche Kostenanalyse (MiFID II)</h2>
+    <p>Gesetzlich vorgeschriebene Kostenaufstellung gemäß Art. 50 der Verordnung (EU) 2017/565:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Jahr</th>
+                <th>Dokumentdatum</th>
+                <th>Dienstleistungskosten (netto)</th>
+                <th>Depotentgelte (netto)</th>
+                <th>Zwischensumme (netto)</th>
+                <th>USt (19%)</th>
+                <th>Gesamtkosten (brutto)</th>
+                <th>Umsatzvolumen</th>
+                <th>Ø Depotbestand</th>
+                <th>Kostenquote</th>
+                <th>Dokument</th>
+            </tr>
+        </thead>
+        <tbody>
+"""
+            # Sort by year
             years = sorted(analysis['cost_information'].keys())
             
             for year in years:
                 cost_data = analysis['cost_information'][year]
                 
-                # Formatiere Beträge deutsch
-                service_costs_net = self.format_number_german(cost_data['service_costs_net'], 2) if cost_data.get('service_costs_net') else '-'
-                depot_fees_net = self.format_number_german(cost_data['depot_fees_net'], 2) if cost_data.get('depot_fees_net') else '-'
-                subtotal_net = self.format_number_german(cost_data['total_costs_net'], 2) if cost_data.get('total_costs_net') else '-'
-                total_costs = self.format_number_german(cost_data['total_costs'], 2) if cost_data.get('total_costs') else '-'
-                total_vat = self.format_number_german(cost_data['total_costs_vat'], 2) if cost_data.get('total_costs_vat') else '-'
-                volume = self.format_number_german(cost_data['trading_volume'], 2) if cost_data.get('trading_volume') else '-'
-                avg_depot = self.format_number_german(cost_data['avg_depot_value'], 2) if cost_data.get('avg_depot_value') else '-'
+                # Format amounts in German style
+                service_costs_net = self.format_number_german(cost_data.get('service_costs_net', 0), 2)
+                depot_fees_net = self.format_number_german(cost_data.get('depot_fees_net', 0), 2)
+                subtotal_net = self.format_number_german(cost_data.get('total_costs_net', 0), 2)
+                total_costs = self.format_number_german(cost_data.get('total_costs', 0), 2)
+                total_vat = self.format_number_german(cost_data.get('total_costs_vat', 0), 2)
+                volume = self.format_number_german(cost_data.get('trading_volume', 0), 2) if cost_data.get('trading_volume') else '-'
+                avg_depot = self.format_number_german(cost_data.get('avg_depot_value', 0), 2) if cost_data.get('avg_depot_value') else '-'
                 
-                # Kostenquote (ohne %-Zeichen, da es im Header steht)
+                # Cost percentage
                 if cost_data.get('cost_percentage_depot'):
-                    cost_quote = self.format_number_german(cost_data['cost_percentage_depot'], 2)
+                    cost_quote = self.format_number_german(cost_data['cost_percentage_depot'], 2) + '%'
                 else:
                     cost_quote = '-'
                 
-                # Formatiere Dokumentdatum
+                # Format document date
                 doc_date = self.format_date_german(cost_data.get('doc_date', ''))
                 
-                # Erstelle Dokumentlink
+                # Create document link
                 file_name = cost_data.get('file', '')
-                if len(file_name) > 40:
-                    display_name = file_name[:37] + "..."
-                else:
-                    display_name = file_name
-                doc_link = f"[{display_name}](docs/{analysis['depot_info']['folder']}/{file_name})"
+                display_name = file_name[:37] + "..." if len(file_name) > 40 else file_name
+                doc_link = f'<a href="docs/{analysis["depot_info"]["folder"]}/{file_name}">{display_name}</a>'
                 
-                md.append(f"| {year} | {doc_date} | {service_costs_net} | {depot_fees_net} | {subtotal_net} | {total_vat} | {total_costs} | {volume} | {avg_depot} | {cost_quote} | {doc_link} |")
+                html += f"""
+            <tr>
+                <td>{year}</td>
+                <td>{doc_date}</td>
+                <td class="number">{service_costs_net}</td>
+                <td class="number">{depot_fees_net}</td>
+                <td class="number">{subtotal_net}</td>
+                <td class="number">{total_vat}</td>
+                <td class="number"><strong>{total_costs}</strong></td>
+                <td class="number">{volume}</td>
+                <td class="number">{avg_depot}</td>
+                <td class="number">{cost_quote}</td>
+                <td>{doc_link}</td>
+            </tr>"""
             
-            # Zusammenfassung der Kosten
+            html += """
+        </tbody>
+    </table>
+"""
+            # Cost summary
             if len(years) > 0:
-                # Berechne Summen
-                total_all_costs = sum(c['total_costs'] for c in analysis['cost_information'].values() if c.get('total_costs'))
-                total_all_volume = sum(c['trading_volume'] for c in analysis['cost_information'].values() if c.get('trading_volume'))
+                total_all_costs = sum(c.get('total_costs', 0) for c in analysis['cost_information'].values())
+                total_all_volume = sum(c.get('trading_volume', 0) for c in analysis['cost_information'].values() if c.get('trading_volume'))
                 
                 if total_all_costs > 0:
                     total_str = self.format_number_german(total_all_costs, 2)
-                    md.append(f"\n**Gesamtkosten {years[0]}-{years[-1]}: {total_str} €**")
+                    html += f'<p><strong>Gesamtkosten {years[0]}-{years[-1]}: {total_str} €</strong></p>'
                 
                 if total_all_volume > 0:
                     volume_str = self.format_number_german(total_all_volume, 2)
-                    md.append(f"*Gesamtes Handelsvolumen: {volume_str} €*")
+                    html += f'<p><em>Gesamtes Handelsvolumen: {volume_str} €</em></p>'
                 
-                # Durchschnittliche Kostenquote
-                quotes = [c['cost_percentage_depot'] for c in analysis['cost_information'].values() if c.get('cost_percentage_depot')]
-                if quotes:
-                    avg_quote = sum(quotes) / len(quotes)
-                    md.append(f"*Durchschnittliche jährliche Kostenquote: {avg_quote:.2f}%*")
-                
-                # Umfassende Erläuterungen zur Kostenstruktur
-                md.append("\n### Erläuterungen zur Kostenberechnung:")
-                md.append("\n**Kostenzusammensetzung:**")
-                md.append("- **Dienstleistungskosten:** Beinhalten alle Kosten für Wertpapiergeschäfte (Kauf/Verkauf), Ordergebühren und sonstige Transaktionskosten")
-                md.append("- **Depotentgelte:** Jährliche Verwahrungsgebühren für die Führung des Depotkontos (übergreifende Kosten)")
-                md.append("- **Zwischensumme (netto):** Summe aus Dienstleistungskosten und Depotentgelten ohne Umsatzsteuer")
-                md.append("- **USt (19%):** Gesetzliche Umsatzsteuer auf alle Kosten (sowohl Dienstleistungs- als auch Depotentgelte)")
-                md.append("- **Gesamtkosten (brutto):** Vollständige Kosten inklusive 19% Umsatzsteuer")
-                
-                md.append("\n**Wichtige Hinweise:**")
-                md.append("- ✓ Die Depotentgelte sind **in den Gesamtkosten enthalten** (Dienstleistungskosten + Depotentgelte = Gesamtkosten)")
-                md.append("- ✓ Alle Beträge in den verlinkten Dokumenten sind **Bruttobeträge** (bereits inkl. 19% USt)")
-                md.append("- ✓ Die Nettobeträge werden berechnet: Netto = Brutto ÷ 1,19")
-                md.append("- ✓ Die USt wird berechnet: USt = Brutto - Netto")
-                
-                md.append("\n**Berechnungsbeispiel 2021:**")
-                if '2021' in analysis['cost_information']:
-                    cost_2021 = analysis['cost_information']['2021']
-                    service_gross = cost_2021.get('service_costs', 0)
-                    depot_gross = cost_2021.get('depot_fees', 0)
-                    total_gross = cost_2021.get('total_costs', 0)
-                    
-                    md.append(f"- Dienstleistungskosten (brutto): {service_gross:.2f} € ÷ 1,19 = {service_gross/1.19:.2f} € (netto)")
-                    md.append(f"- Depotentgelte (brutto): {depot_gross:.2f} € ÷ 1,19 = {depot_gross/1.19:.2f} € (netto)")
-                    md.append(f"- **Gesamtkosten: {service_gross:.2f} € + {depot_gross:.2f} € = {total_gross:.2f} € (brutto)**")
-                
-                md.append("\n*Diese Aufstellung entspricht den gesetzlichen Anforderungen gemäß Art. 50 der Verordnung (EU) 2017/565 (MiFID II).*")
+                # Explanations
+                html += """
+    <div class="explanation-box">
+        <h3>Erläuterungen zur Kostenberechnung:</h3>
+        <h4>Kostenzusammensetzung:</h4>
+        <ul>
+            <li><strong>Dienstleistungskosten:</strong> Beinhalten alle Kosten für Wertpapiergeschäfte (Kauf/Verkauf), Ordergebühren und sonstige Transaktionskosten</li>
+            <li><strong>Depotentgelte:</strong> Jährliche Verwahrungsgebühren für die Führung des Depotkontos (übergreifende Kosten)</li>
+            <li><strong>Zwischensumme (netto):</strong> Summe aus Dienstleistungskosten und Depotentgelten ohne Umsatzsteuer</li>
+            <li><strong>USt (19%):</strong> Gesetzliche Umsatzsteuer auf alle Kosten</li>
+            <li><strong>Gesamtkosten (brutto):</strong> Vollständige Kosten inklusive 19% Umsatzsteuer</li>
+        </ul>
+        <h4>Wichtige Hinweise:</h4>
+        <ul>
+            <li>✓ Die Depotentgelte sind <strong>in den Gesamtkosten enthalten</strong></li>
+            <li>✓ Alle Beträge in den verlinkten Dokumenten sind <strong>Bruttobeträge</strong> (bereits inkl. 19% USt)</li>
+            <li>✓ Die Nettobeträge werden berechnet: Netto = Brutto ÷ 1,19</li>
+        </ul>
+        <p><em>Diese Aufstellung entspricht den gesetzlichen Anforderungen gemäß Art. 50 der Verordnung (EU) 2017/565 (MiFID II).</em></p>
+    </div>
+"""
         
-        # Abschnitt 4: Dokumententabelle (MOVED AFTER COST OVERVIEW)
-        doc_table_lines = self.generate_document_table(analysis['depot_path'], analysis['depot_info'])
-        md.extend(doc_table_lines)
-        
-        # Abschnitt 5: Transaktionsstatistik
-        md.append(f"\n## Transaktionsstatistik\n")
-        
-        # Gruppiere nach Hauptkategorie für bessere Übersicht
-        categories = {
-            'Depotabschluss': [],
-            'Orderabrechnung': [],
-            'Kostenaufstellung': [],
-            'Sonstige': []
-        }
-        
-        for trans_type, count in sorted(analysis['statistics'].items()):
-            if 'Depotabschluss' in trans_type:
-                categories['Depotabschluss'].append((trans_type, count))
-            elif 'Orderabrechnung' in trans_type:
-                categories['Orderabrechnung'].append((trans_type, count))
-            elif 'Limit-Order-Vormerkung' in trans_type:
-                categories['Orderabrechnung'].append((trans_type, count))
-            elif 'Kostenaufstellung' in trans_type:
-                categories['Kostenaufstellung'].append((trans_type, count))
-            else:
-                categories['Sonstige'].append((trans_type, count))
-        
-        # Zeige Depotabschluss-Kategorien
-        if categories['Depotabschluss']:
-            md.append("### Depotabschlüsse")
-            for trans_type, count in categories['Depotabschluss']:
-                display_type = trans_type.replace('Depotabschluss-', '')
-                md.append(f"- **{display_type}:** {count}")
-        
-        # Zeige Orderabrechnung-Kategorien
-        if categories['Orderabrechnung']:
-            md.append("\n### Orderabrechnungen")
-            for trans_type, count in categories['Orderabrechnung']:
-                display_type = trans_type.replace('Orderabrechnung-', '')
-                md.append(f"- **{display_type}:** {count}")
-        
-        # Zeige Kostenaufstellung-Kategorien
-        if categories['Kostenaufstellung']:
-            md.append("\n### Kostenaufstellungen (MiFID II)")
-            for trans_type, count in categories['Kostenaufstellung']:
-                md.append(f"- **{trans_type}:** {count}")
-        
-        # Zeige sonstige Kategorien
-        if categories['Sonstige']:
-            md.append("\n### Sonstige")
-            for trans_type, count in categories['Sonstige']:
-                md.append(f"- **{trans_type}:** {count}")
-        
-        # Warnung für fehlgeschlagene Extraktionen
-        failed_count = analysis['statistics'].get('Orderabrechnung-Fehlgeschlagen', 0)
-        if failed_count > 0:
-            md.append(f"\n⚠️ **Warnung: {failed_count} Orderabrechnungen konnten nicht vollständig extrahiert werden**")
-            md.append("Diese Dokumente erfordern manuelle Überprüfung oder erneute Verarbeitung.")
-        
-        # Warnung für unbekannte Transaktionen
-        if 'Unbekannt' in analysis['statistics'] and analysis['statistics']['Unbekannt'] > 0:
-            unknown_count = analysis['statistics']['Unbekannt']
-            md.append(f"\n⚠️ **Warnung: {unknown_count} Dokumente ohne Typ-Erkennung**")
-        
-        # Abschnitt 6: Wertpapiere nach ISIN
-        if analysis['isin_groups']:
-            md.append(f"\n## Wertpapiere (nach ISIN)\n")
-            for isin, trans_list in analysis['isin_groups'].items():
-                # Warnung für Test-ISINs
-                if isin == "DE0001234567":
-                    md.append(f"\n### ⚠️ {isin} (UNGÜLTIGE TEST-ISIN)")
-                    md.append(f"- ⚠️ **WARNUNG: Dies ist eine Test-ISIN und sollte nicht in Produktivdaten vorkommen!**")
+        # SECTION 3: Transaction statistics
+        if analysis.get('statistics'):
+            html += "<h2>Transaktionsstatistik</h2>"
+            html += '<div class="stats-grid">'
+            
+            # Group statistics
+            categories = {
+                'Depotabschluss': [],
+                'Orderabrechnung': [],
+                'Kostenaufstellung': [],
+                'Sonstige': []
+            }
+            
+            for trans_type, count in sorted(analysis['statistics'].items()):
+                if 'Depotabschluss' in trans_type:
+                    categories['Depotabschluss'].append((trans_type, count))
+                elif 'Orderabrechnung' in trans_type:
+                    categories['Orderabrechnung'].append((trans_type, count))
+                elif 'Kostenaufstellung' in trans_type:
+                    categories['Kostenaufstellung'].append((trans_type, count))
                 else:
-                    md.append(f"\n### {isin}")
-                md.append(f"- **Anzahl Transaktionen:** {len(trans_list)}")
+                    categories['Sonstige'].append((trans_type, count))
+            
+            for category, items in categories.items():
+                if items:
+                    html += f'<div class="stat-card"><h4>{category}</h4><ul>'
+                    for trans_type, count in items:
+                        display_type = trans_type.replace(f'{category}-', '')
+                        html += f'<li>{display_type}: {count}</li>'
+                    html += '</ul></div>'
+            
+            html += '</div>'
+        
+        # SECTION 4: Wertpapiere nach ISIN
+        if analysis.get('isin_groups'):
+            html += "<h2>Wertpapiere (nach ISIN)</h2>"
+            for isin, trans_list in analysis['isin_groups'].items():
+                if isin == "DE0001234567":
+                    html += f'<h3>⚠️ {isin} (UNGÜLTIGE TEST-ISIN)</h3>'
+                    html += '<p class="warning">⚠️ <strong>WARNUNG: Dies ist eine Test-ISIN und sollte nicht in Produktivdaten vorkommen!</strong></p>'
+                else:
+                    html += f'<h3>{isin}</h3>'
                 
-                # Berechne Summen
-                verkauf_summe = sum(t['max_amount'] for t in trans_list if t['type'] == 'Verkauf')
-                kauf_summe = sum(t['max_amount'] for t in trans_list if t['type'] == 'Kauf')
+                html += f'<p><strong>Anzahl Transaktionen:</strong> {len(trans_list)}</p>'
+                
+                # Calculate sums
+                verkauf_summe = sum(t['max_amount'] for t in trans_list if t['type'] == 'Verkauf' or 'Verkauf' in t['type'])
+                kauf_summe = sum(t['max_amount'] for t in trans_list if t['type'] == 'Kauf' or 'Kauf' in t['type'])
                 
                 if verkauf_summe > 0:
-                    md.append(f"- **Verkaufssumme:** {verkauf_summe:,.2f} EUR")
+                    html += f'<p><strong>Verkaufssumme:</strong> {self.format_number_german(verkauf_summe, 2)} EUR</p>'
                 if kauf_summe > 0:
-                    md.append(f"- **Kaufsumme:** {kauf_summe:,.2f} EUR")
+                    html += f'<p><strong>Kaufsumme:</strong> {self.format_number_german(kauf_summe, 2)} EUR</p>'
         
-        # Abschnitt 7: Detaillierter Transaktionsverlauf
-        md.append(f"\n## Transaktionsverlauf (Detailliert)\n")
-        
-        # Legende der Spalten
-        md.append("### Legende der Spalten:")
-        md.append("- **Nr.**: Laufende Nummer der Transaktion")
-        md.append("- **Stichtag**: Valuta-/Ausführungsdatum der Transaktion")
-        md.append("- **Dok.datum**: Datum der Dokumenterstellung")
-        md.append("- **G/V Akt.**: Gewinn/Verlust aus Aktienverkäufen (EUR)")
-        md.append("- **Kum. Akt.**: Kumulierter Gewinn/Verlust Aktien (EUR)")
-        md.append("- **G/V N-Akt.**: Gewinn/Verlust aus Nicht-Aktien (Derivate, Zertifikate, strukturierte Produkte) (EUR)")
-        md.append("- **Kum. N-Akt.**: Kumulierter Gewinn/Verlust Nicht-Aktien (EUR)")
-        md.append("- **G/V Ges.**: Gewinn/Verlust Gesamt (EUR)")
-        md.append("- **Kum. Ges.**: Kumulierter Gewinn/Verlust Gesamt (EUR)")
-        md.append("")
-        
-        # Tabellenkopf (verkürzt wegen Platzmangel)
-        md.append("| Nr. | Stichtag | Dok.datum | Typ | ISIN | Stück | Kurs | Kurswert | Geb. | USt | Ausmach. | G/V Akt. | Kum. Akt. | G/V N-Akt. | Kum. N-Akt. | G/V Ges. | Kum. Ges. | Dokument |")
-        md.append("|-----|----------|-----------|-----|------|-------|------|----------|------|-----|----------|----------|-----------|------------|-------------|----------|-----------|----------|")
-        
-        # Variablen für kumulierte Gewinn/Verluste
-        cumulative_stock = 0.0
-        cumulative_non_stock = 0.0
-        cumulative_total = 0.0
-        transaction_number = 0  # Laufende Nummer für Transaktionen
-        
-        for trans in analysis['transactions']:
-            transaction_number += 1  # Erhöhe die laufende Nummer
-            # Extrahiere Stichtag und Dokumentdatum
-            stichtag = self.format_date_german(trans.get('stichtag', trans.get('date', 'N/A')))
-            doc_date = self.format_date_german(trans['date'] if trans['date'] else 'N/A')
-            trans_type = trans['type']
+        # SECTION 5: Enhanced Transaction table with cumulative P&L
+        if analysis.get('transactions'):
+            html += """
+    <h2>Transaktionsverlauf (Detailliert)</h2>
+    
+    <h3>Legende der Spalten:</h3>
+    <ul>
+        <li><strong>Nr.:</strong> Laufende Nummer der Transaktion</li>
+        <li><strong>Transaktion:</strong> Transaktionsdatum/Handelstag (Ausführung)</li>
+        <li><strong>Wertst.:</strong> Wertstellungsdatum/Valuta (Settlement)</li>
+        <li><strong>Dokument:</strong> Dokumenterstellungsdatum</li>
+        <li><strong>Gebühren:</strong> Nettogebühren ohne Umsatzsteuer (EUR)</li>
+        <li><strong>USt %:</strong> Umsatzsteuersatz (0% für umsatzsteuerfreie Gebühren, 19% für normale Gebühren)</li>
+        <li><strong>USt:</strong> Umsatzsteuerbetrag (EUR)</li>
+        <li><strong>Geb. Brutto:</strong> Bruttogebühren inklusive Umsatzsteuer (EUR)</li>
+        <li><strong>Ausmach.:</strong> Ausmachender Betrag = Kurswert + Gebühren Brutto (EUR)</li>
+        <li><strong>Kum. Geb.:</strong> Kumulierte Nettogebühren (EUR)</li>
+        <li><strong>Kum. USt:</strong> Kumulierte Umsatzsteuer (EUR)</li>
+        <li><strong>G/V Akt.:</strong> Gewinn/Verlust aus Aktienverkäufen (EUR)</li>
+        <li><strong>Kum. Akt.:</strong> Kumulierter Gewinn/Verlust Aktien (EUR)</li>
+        <li><strong>G/V N-Akt.:</strong> Gewinn/Verlust aus Nicht-Aktien (Derivate, Zertifikate, strukturierte Produkte) (EUR)</li>
+        <li><strong>Kum. N-Akt.:</strong> Kumulierter Gewinn/Verlust Nicht-Aktien (EUR)</li>
+        <li><strong>G/V Ges.:</strong> Gewinn/Verlust Gesamt (EUR)</li>
+        <li><strong>Kum. Ges.:</strong> Kumulierter Gewinn/Verlust Gesamt (EUR)</li>
+    </ul>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Nr.</th>
+                <th>Transaktion</th>
+                <th>Wertst.</th>
+                <th>Dokument</th>
+                <th class="type-column">Typ</th>
+                <th>ISIN</th>
+                <th>Bestand</th>
+                <th>Veränderung</th>
+                <th>Kurs</th>
+                <th>Kurswert</th>
+                <th class="fee-block-start">Gebühren</th>
+                <th>USt %</th>
+                <th>USt</th>
+                <th>Geb. Brutto</th>
+                <th>Ausmach.</th>
+                <th>Kum. Geb.</th>
+                <th class="fee-block-end">Kum. USt</th>
+                <th>G/V Akt.</th>
+                <th>Kum. Akt.</th>
+                <th>G/V N-Akt.</th>
+                <th>Kum. N-Akt.</th>
+                <th>G/V Ges.</th>
+                <th>Kum. Ges.</th>
+                <th>Dokument</th>
+            </tr>
+        </thead>
+        <tbody>
+"""
             
-            # Kürze den Transaktionstyp für bessere Lesbarkeit
-            if 'Orderabrechnung-' in trans_type:
-                display_type = trans_type.replace('Orderabrechnung-', '')
-            elif 'Limit-Order-Vormerkung' in trans_type:
-                display_type = 'Vormerkung'
-            elif 'Depotabschluss-' in trans_type:
-                display_type = 'Depotabschluss'
-            else:
-                display_type = trans_type
+            # Create depot statement lookup for enrichment
+            depot_statement_lookup = {}
+            for stmt in analysis.get('depot_statements', []):
+                file_key = os.path.basename(stmt['file'])
+                depot_statement_lookup[file_key] = {
+                    'isin': stmt.get('isin'),
+                    'shares': stmt.get('shares'),
+                    'balance': stmt.get('closing_balance')
+                }
             
-            # Bestimme Farbmarkierung für Verkäufe (farbenblind-freundliche Palette)
-            # Ausführungsanzeigen nicht farbcodieren (vorläufige Dokumente)
-            row_style = ""
-            if 'Verkauf' in trans_type and 'Ausführungsanzeige' not in trans_type:
-                if trans.get('profit_loss') is not None:
-                    if trans['profit_loss'] > 0:
-                        # Gewinn - Blau (farbenblind-freundlich)
-                        row_style = ' style="background-color: #0173B2; color: white;"'
-                    elif trans['profit_loss'] == 0:
-                        # Kein Gewinn/Verlust - helles Grau
-                        row_style = ' style="background-color: #e9ecef;"'
+            transaction_number = 0
+            cumulative_stock_pnl = 0.0
+            cumulative_non_stock_pnl = 0.0
+            cumulative_total_pnl = 0.0
+            cumulative_fees_net = 0.0
+            cumulative_fees_vat = 0.0
+            
+            # Track transaction numbers per fiscal year
+            fiscal_year_counters = {}
+            fiscal_type = analysis.get('fiscal_year', {}).get('type', 'calendar')
+            
+            # Track current share balances per ISIN
+            # None = unknown (before first depot statement), number = known balance
+            isin_balances = {}
+            
+            for idx, trans in enumerate(analysis['transactions']):
+                transaction_number += 1
+                
+                # Date formatting
+                value_date = trans.get('value_date')
+                execution_date = trans.get('execution_date')
+                doc_date = trans.get('date')
+                
+                if not value_date:
+                    value_date = execution_date or trans.get('stichtag') or doc_date
+                if not execution_date:
+                    execution_date = trans.get('stichtag') or doc_date
+                
+                trans_type = trans['type']
+                
+                # Determine fiscal year - use stichtag for Depotabschluss
+                if 'Depotabschluss' in trans_type:
+                    fy_date = trans.get('stichtag') or value_date
+                else:
+                    fy_date = value_date
+                fiscal_year = self.get_fiscal_year(fy_date, fiscal_type)
+                
+                # Check if this depot statement marks the end of a fiscal year
+                is_year_end_depot = False
+                if 'Depotabschluss' in trans_type:
+                    # Check if the next transaction has a different fiscal year
+                    if idx + 1 < len(analysis['transactions']):
+                        next_trans = analysis['transactions'][idx + 1]
+                        # Determine FY of next transaction
+                        next_date = next_trans.get('value_date') or next_trans.get('execution_date') or next_trans.get('stichtag') or next_trans.get('date')
+                        if 'Depotabschluss' in next_trans.get('type', ''):
+                            next_fy_date = next_trans.get('stichtag') or next_date
+                        else:
+                            next_fy_date = next_date
+                        next_fiscal_year = self.get_fiscal_year(next_fy_date, fiscal_type) if next_fy_date else fiscal_year
+                        
+                        if next_fiscal_year != fiscal_year:
+                            is_year_end_depot = True
                     else:
-                        # Verlust - Orange (farbenblind-freundlich)
-                        row_style = ' style="background-color: #DE8F05; color: white;"'
-            
-            # Formatiere Typ mit Farbmarkierung
-            if row_style:
-                display_type = f'<span{row_style}>{display_type}</span>'
-            
-            isin = trans['isin'] if trans['isin'] else 'N/A'
-            
-            # Handelsdaten formatieren
-            shares = str(trans.get('shares', '')) if trans.get('shares') else '-'
-            
-            # Kurs - bei mehreren Kursen zeige Durchschnitt
-            if trans.get('execution_price_min') and trans.get('execution_price_max'):
-                # Teilausführungen mit mehreren Kursen - zeige Durchschnitt
-                price_str = self.format_number_german(trans.get('execution_price_avg', 0), 2)
-            elif trans.get('execution_price'):
-                price_str = self.format_number_german(trans['execution_price'], 2)
-            else:
-                price_str = '-'
-            
-            # Kurswert (netto - ohne Gebühren)
-            kurswert_netto = self.format_number_german(trans['gross_amount'], 2) if trans.get('gross_amount') else '-'
-            
-            # Gebühren und USt-Berechnung
-            if trans.get('fees'):
-                # Die Gebühren sind bereits brutto (inkl. 19% USt)
-                fees_gross = trans['fees']
-                fees_net = fees_gross / 1.19
-                fees_vat = fees_gross - fees_net
-                gebühren_netto_str = self.format_number_german(fees_net, 2)
-                ust_str = self.format_number_german(fees_vat, 2)
-            else:
-                gebühren_netto_str = '-'
+                        # Last transaction is always year-end if it's a Depotabschluss
+                        is_year_end_depot = True
+                
+                # Get or initialize counter for this fiscal year
+                if fiscal_year not in fiscal_year_counters:
+                    fiscal_year_counters[fiscal_year] = 0
+                fiscal_year_counters[fiscal_year] += 1
+                
+                # Format transaction number with FY prefix
+                formatted_transaction_number = f"{fiscal_year}-{fiscal_year_counters[fiscal_year]:03d}"
+                
+                value_date_str = self.format_date_german(value_date) if value_date else 'N/A'
+                execution_date_str = self.format_date_german(execution_date) if execution_date else 'N/A'
+                doc_date_str = self.format_date_german(doc_date) if doc_date else 'N/A'
+                
+                # Determine row class based on transaction type
+                row_class = ""
+                if 'Depotabschluss' in trans_type:
+                    # Use different class for year-end depot statements
+                    if is_year_end_depot:
+                        row_class = "depot-statement-year-end"
+                    else:
+                        row_class = "depot-statement-row"
+                    # Enrich with depot statement data
+                    file_key = os.path.basename(trans.get('original_file', ''))
+                    if file_key in depot_statement_lookup:
+                        stmt_data = depot_statement_lookup[file_key]
+                        trans['isin'] = trans.get('isin') or stmt_data.get('isin')
+                        trans['shares'] = trans.get('shares') or stmt_data.get('shares')
+                elif 'Verkauf' in trans_type and 'Ausführungsanzeige' not in trans_type:
+                    if trans.get('profit_loss') is not None:
+                        if trans['profit_loss'] > 0:
+                            row_class = "profit-row"
+                        elif trans['profit_loss'] < 0:
+                            row_class = "loss-row"
+                        else:
+                            row_class = "neutral-row"
+                elif trans_type not in ['Kauf', 'Orderabrechnung-Kauf']:
+                    row_class = "misc-row"
+                
+                # Format display values
+                isin = trans.get('isin', 'N/A')
+                
+                # Format shares display with balance and change columns
+                shares_balance = '?'  # Default: unknown
+                shares_change = '-'
+                
+                # Get current ISIN
+                current_isin = trans.get('isin', 'N/A')
+                
+                # First, show current balance BEFORE this transaction
+                if current_isin in isin_balances and isin_balances[current_isin] is not None and current_isin != 'N/A':
+                    shares_balance = str(isin_balances[current_isin])
+                elif current_isin != 'N/A':
+                    shares_balance = '?'
+                else:
+                    shares_balance = '-'
+                
+                # Now process the transaction and update balance
+                if 'Depotabschluss' in trans_type:
+                    # Depot statement sets the balance
+                    if trans.get('shares') is not None:
+                        # For depot statements, the balance shown IS the new balance
+                        shares_balance = str(trans.get('shares', 0))
+                        isin_balances[current_isin] = trans.get('shares', 0)
+                    elif current_isin == 'None' or current_isin == 'N/A':
+                        # Depotabschluss without ISIN means empty depot - set all known ISINs to 0
+                        shares_balance = '0'
+                        # Set all previously seen ISINs to 0
+                        for known_isin in list(isin_balances.keys()):
+                            if known_isin not in ['None', 'N/A']:
+                                isin_balances[known_isin] = 0
+                    else:
+                        # Specific ISIN depot statement without shares means 0 for that ISIN
+                        shares_balance = '0'
+                        isin_balances[current_isin] = 0
+                    shares_change = '-'
+                    
+                elif 'Kauf' in trans_type or 'Orderabrechnung-Kauf' in trans_type:
+                    # Add shares on purchase (but NOT for Ausführungsanzeige)
+                    if trans.get('shares'):
+                        shares_change = f"+{trans['shares']}"
+                        # Update balance AFTER showing it - but NOT for Ausführungsanzeige
+                        if 'Ausführungsanzeige' not in trans_type:
+                            if current_isin in isin_balances and isin_balances[current_isin] is not None:
+                                isin_balances[current_isin] += trans['shares']
+                        # If balance was unknown, it stays unknown
+                    else:
+                        shares_change = '-'
+                        
+                elif 'Verkauf' in trans_type:
+                    # Subtract shares on sale (but NOT for Ausführungsanzeige)
+                    if trans.get('shares'):
+                        shares_change = f"-{trans['shares']}"
+                        # Update balance AFTER showing it - but NOT for Ausführungsanzeige
+                        if 'Ausführungsanzeige' not in trans_type:
+                            if current_isin in isin_balances and isin_balances[current_isin] is not None:
+                                isin_balances[current_isin] -= trans['shares']
+                        # If balance was unknown, it stays unknown
+                    else:
+                        shares_change = '-'
+                        
+                else:
+                    # Other transactions don't change balance
+                    shares_change = '-'
+                
+                if trans.get('execution_price'):
+                    price_str = self.format_number_german(trans['execution_price'], 2)
+                else:
+                    price_str = '-'
+                
+                kurswert = self.format_number_german(trans['gross_amount'], 2) if trans.get('gross_amount') else '-'
+                
+                # Calculate fees and VAT
+                gebuhren_netto_str = '-'
+                ust_prozent_str = '-'
                 ust_str = '-'
-                fees_gross = 0
-                fees_net = 0
-                fees_vat = 0
-            
-            # Ausmachender Betrag (brutto = Kurswert + Gebühren inkl. USt)
-            if trans.get('net_amount'):
-                ausmachend_brutto = self.format_number_german(trans['net_amount'], 2)
-            elif trans.get('gross_amount'):
-                # Berechne Ausmachend = Kurswert + Gebühren (brutto)
-                ausmachend_val = trans['gross_amount'] + fees_gross
-                ausmachend_brutto = self.format_number_german(ausmachend_val, 2)
-            else:
-                ausmachend_brutto = '-'
-            
-            # Gewinn/Verlust aufgeteilt nach Aktien und Nicht-Aktien
-            gv_aktien_str = '-'
-            kum_aktien_str = '-'
-            gv_non_aktien_str = '-'
-            kum_non_aktien_str = '-'
-            gv_gesamt_str = '-'
-            kum_gesamt_str = '-'
-            
-            if trans.get('profit_loss') is not None:
-                profit_loss_val = trans['profit_loss']
-                is_stock = trans.get('security_type') == 'stock'
+                gebuhren_brutto_str = '-'
+                ausmachend_str = '-'
                 
-                # Aktualisiere kumulierte Werte basierend auf Wertpapiertyp
-                if is_stock:
-                    cumulative_stock += profit_loss_val
-                    # Formatiere Aktien G/V
-                    if profit_loss_val > 0:
-                        gv_aktien_str = f'<span style="color: green; font-weight: bold;">{self.format_number_german(profit_loss_val, 2, show_sign=True)}</span>'
-                    elif profit_loss_val == 0:
-                        gv_aktien_str = f'<span style="color: black;">0,00</span>'
+                if trans.get('fees'):
+                    # Fees are stored as gross (including VAT if applicable)
+                    fees_gross = trans['fees']
+                    
+                    # Check if fees are VAT-free
+                    if trans.get('is_vat_free', False):
+                        # VAT-free: gross = net, no VAT
+                        vat_rate = 0.0
+                        fees_net = fees_gross
+                        fees_vat = 0.0
+                        ust_prozent_str = '0'
                     else:
-                        gv_aktien_str = f'<span style="color: red; font-weight: bold;">{self.format_number_german(profit_loss_val, 2)}</span>'
+                        # Standard fees with 19% VAT
+                        vat_rate = 0.19
+                        fees_net = fees_gross / (1 + vat_rate)
+                        fees_vat = fees_gross - fees_net
+                        ust_prozent_str = '19'
                     
-                    # Formatiere kumulierten Aktien G/V
-                    if cumulative_stock > 0:
-                        kum_aktien_str = f'<span style="color: green; font-weight: bold;">{self.format_number_german(cumulative_stock, 2, show_sign=True)}</span>'
-                    elif cumulative_stock == 0:
-                        kum_aktien_str = f'<span style="color: black;">0,00</span>'
-                    else:
-                        kum_aktien_str = f'<span style="color: red; font-weight: bold;">{self.format_number_german(cumulative_stock, 2)}</span>'
+                    gebuhren_netto_str = self.format_number_german(fees_net, 2)
+                    ust_str = self.format_number_german(fees_vat, 2)
+                    gebuhren_brutto_str = self.format_number_german(fees_gross, 2)
                     
-                    # Nicht-Aktien bleiben leer
-                    gv_non_aktien_str = '-'
-                    kum_non_aktien_str = self.format_number_german(cumulative_non_stock, 2) if cumulative_non_stock != 0 else '-'
-                    
+                    # Add to cumulative
+                    cumulative_fees_net += fees_net
+                    cumulative_fees_vat += fees_vat
                 else:
-                    cumulative_non_stock += profit_loss_val
-                    # Formatiere Nicht-Aktien G/V
-                    if profit_loss_val > 0:
-                        gv_non_aktien_str = f'<span style="color: green; font-weight: bold;">{self.format_number_german(profit_loss_val, 2, show_sign=True)}</span>'
-                    elif profit_loss_val == 0:
-                        gv_non_aktien_str = f'<span style="color: black;">0,00</span>'
-                    else:
-                        gv_non_aktien_str = f'<span style="color: red; font-weight: bold;">{self.format_number_german(profit_loss_val, 2)}</span>'
+                    fees_gross = 0
+                    fees_net = 0
+                    fees_vat = 0
+                
+                # Calculate Ausmachender Betrag
+                if trans.get('net_amount'):
+                    ausmachend_str = self.format_number_german(trans['net_amount'], 2)
+                elif trans.get('gross_amount'):
+                    ausmachend_val = trans['gross_amount'] + fees_gross
+                    ausmachend_str = self.format_number_german(ausmachend_val, 2)
+                
+                # Determine security type (stock vs non-stock)
+                is_stock = False
+                if isin and isin != 'N/A':
+                    is_stock = self.is_stock_isin(isin)
+                
+                # Format cumulative fee values
+                kum_geb_str = self.format_number_german(cumulative_fees_net, 2) if cumulative_fees_net != 0 else '-'
+                kum_ust_str = self.format_number_german(cumulative_fees_vat, 2) if cumulative_fees_vat != 0 else '-'
+                
+                # Initialize all G/V strings
+                gv_aktien_str = '-'
+                kum_aktien_str = '-'
+                gv_non_aktien_str = '-'
+                kum_non_aktien_str = '-'
+                gv_gesamt_str = '-'
+                kum_gesamt_str = '-'
+                
+                # Calculate G/V values if profit/loss exists
+                if trans.get('profit_loss') is not None:
+                    profit_loss_val = trans['profit_loss']
                     
-                    # Formatiere kumulierten Nicht-Aktien G/V
-                    if cumulative_non_stock > 0:
-                        kum_non_aktien_str = f'<span style="color: green; font-weight: bold;">{self.format_number_german(cumulative_non_stock, 2, show_sign=True)}</span>'
-                    elif cumulative_non_stock == 0:
-                        kum_non_aktien_str = f'<span style="color: black;">0,00</span>'
+                    # Update cumulative values based on security type
+                    if is_stock:
+                        cumulative_stock_pnl += profit_loss_val
+                        cumulative_total_pnl += profit_loss_val
+                        
+                        # Format stock G/V
+                        gv_aktien_str = self.format_number_german(profit_loss_val, 2, show_sign=True)
+                        kum_aktien_str = self.format_number_german(cumulative_stock_pnl, 2, show_sign=True)
+                        
+                        # Non-stock remains dash, but show cumulative if exists
+                        if cumulative_non_stock_pnl != 0:
+                            kum_non_aktien_str = self.format_number_german(cumulative_non_stock_pnl, 2, show_sign=True)
                     else:
-                        kum_non_aktien_str = f'<span style="color: red; font-weight: bold;">{self.format_number_german(cumulative_non_stock, 2)}</span>'
+                        cumulative_non_stock_pnl += profit_loss_val
+                        cumulative_total_pnl += profit_loss_val
+                        
+                        # Format non-stock G/V
+                        gv_non_aktien_str = self.format_number_german(profit_loss_val, 2, show_sign=True)
+                        kum_non_aktien_str = self.format_number_german(cumulative_non_stock_pnl, 2, show_sign=True)
+                        
+                        # Stock remains dash, but show cumulative if exists
+                        if cumulative_stock_pnl != 0:
+                            kum_aktien_str = self.format_number_german(cumulative_stock_pnl, 2, show_sign=True)
                     
-                    # Aktien bleiben leer
-                    gv_aktien_str = '-'
-                    kum_aktien_str = self.format_number_german(cumulative_stock, 2) if cumulative_stock != 0 else '-'
-                
-                # Gesamt G/V immer berechnen
-                cumulative_total += profit_loss_val
-                
-                # Formatiere Gesamt G/V
-                if profit_loss_val > 0:
-                    gv_gesamt_str = f'<span style="color: green; font-weight: bold;">{self.format_number_german(profit_loss_val, 2, show_sign=True)}</span>'
-                elif profit_loss_val == 0:
-                    gv_gesamt_str = f'<span style="color: black;">0,00</span>'
+                    # Always show total G/V
+                    gv_gesamt_str = self.format_number_german(profit_loss_val, 2, show_sign=True)
+                    kum_gesamt_str = self.format_number_german(cumulative_total_pnl, 2, show_sign=True)
                 else:
-                    gv_gesamt_str = f'<span style="color: red; font-weight: bold;">{self.format_number_german(profit_loss_val, 2)}</span>'
+                    # No G/V for this transaction, but show cumulative values if they exist
+                    if cumulative_stock_pnl != 0:
+                        kum_aktien_str = self.format_number_german(cumulative_stock_pnl, 2, show_sign=True)
+                    if cumulative_non_stock_pnl != 0:
+                        kum_non_aktien_str = self.format_number_german(cumulative_non_stock_pnl, 2, show_sign=True)
+                    if cumulative_total_pnl != 0:
+                        kum_gesamt_str = self.format_number_german(cumulative_total_pnl, 2, show_sign=True)
                 
-                # Formatiere kumulierten Gesamt G/V
-                if cumulative_total > 0:
-                    kum_gesamt_str = f'<span style="color: green; font-weight: bold;">{self.format_number_german(cumulative_total, 2, show_sign=True)}</span>'
-                elif cumulative_total == 0:
-                    kum_gesamt_str = f'<span style="color: black;">0,00</span>'
+                # Shorten document name
+                doc_name = trans.get('original_file', '')
+                if len(doc_name) > 30:
+                    doc_name = doc_name[:27] + '...'
+                
+                doc_link = f'<a href="docs/{analysis["depot_info"]["folder"]}/{trans.get("original_file", "")}">{doc_name}</a>'
+                
+                # Shorten type display
+                if 'Orderabrechnung-' in trans_type:
+                    display_type = trans_type.replace('Orderabrechnung-', '')
+                elif 'Depotabschluss-' in trans_type:
+                    display_type = 'Depotabschluss'
                 else:
-                    kum_gesamt_str = f'<span style="color: red; font-weight: bold;">{self.format_number_german(cumulative_total, 2)}</span>'
+                    display_type = trans_type
+                
+                html += f"""
+            <tr class="{row_class}">
+                <td>{formatted_transaction_number}</td>
+                <td>{execution_date_str}</td>
+                <td>{value_date_str}</td>
+                <td>{doc_date_str}</td>
+                <td class="type-column">{display_type}</td>
+                <td>{isin}</td>
+                <td class="number">{shares_balance}</td>
+                <td class="number">{shares_change}</td>
+                <td class="number">{price_str}</td>
+                <td class="number">{kurswert}</td>
+                <td class="number fee-block-start">{gebuhren_netto_str}</td>
+                <td class="number">{ust_prozent_str}</td>
+                <td class="number">{ust_str}</td>
+                <td class="number">{gebuhren_brutto_str}</td>
+                <td class="number">{ausmachend_str}</td>
+                <td class="number">{kum_geb_str}</td>
+                <td class="number fee-block-end">{kum_ust_str}</td>
+                <td class="number">{gv_aktien_str}</td>
+                <td class="number">{kum_aktien_str}</td>
+                <td class="number">{gv_non_aktien_str}</td>
+                <td class="number">{kum_non_aktien_str}</td>
+                <td class="number">{gv_gesamt_str}</td>
+                <td class="number">{kum_gesamt_str}</td>
+                <td>{doc_link}</td>
+            </tr>"""
             
-            # Entfernt - wird durch ausmachend_brutto ersetzt
+            html += """
+        </tbody>
+    </table>
+"""
             
-            # Erstelle Link zum PDF-Dokument
-            pdf_file = trans.get('original_file', '')
-            if pdf_file:
-                # Kürze den Dateinamen für die Anzeige, aber behalte die Erweiterung
-                display_name = pdf_file
-                if len(pdf_file) > 40:
-                    display_name = pdf_file[:37] + '...'
-                pdf_link = f"[{display_name}](docs/{analysis['depot_info']['folder']}/{pdf_file})"
-            else:
-                pdf_link = 'N/A'
+            # Performance summary
+            total_sales = sum(1 for t in analysis['transactions'] if 'Verkauf' in t['type'] and t.get('profit_loss') is not None)
+            total_profit = sum(t['profit_loss'] for t in analysis['transactions'] if 'Verkauf' in t['type'] and t.get('profit_loss') is not None and t['profit_loss'] > 0)
+            total_loss = sum(t['profit_loss'] for t in analysis['transactions'] if 'Verkauf' in t['type'] and t.get('profit_loss') is not None and t['profit_loss'] < 0)
             
-            # Markiere Test-ISINs und erstelle Tabellenzeile
-            if isin == "DE0001234567":
-                isin_display = f"⚠️ **{isin}**"
-            else:
-                isin_display = isin
+            if total_sales > 0:
+                html += f"""
+    <h3>Performance-Zusammenfassung:</h3>
+    <ul>
+        <li><strong>Anzahl Verkäufe mit G/V:</strong> {total_sales}</li>
+        <li><strong>Gesamtgewinn:</strong> <span class="positive">{self.format_number_german(total_profit, 2)} EUR</span></li>
+        <li><strong>Gesamtverlust:</strong> <span class="negative">{self.format_number_german(total_loss, 2)} EUR</span></li>
+        <li><strong>Netto G/V Aktien:</strong> <span class="{'positive' if cumulative_stock_pnl > 0 else 'negative'}">{self.format_number_german(cumulative_stock_pnl, 2)} EUR</span></li>
+        <li><strong>Netto G/V Nicht-Aktien:</strong> <span class="{'positive' if cumulative_non_stock_pnl > 0 else 'negative'}">{self.format_number_german(cumulative_non_stock_pnl, 2)} EUR</span></li>
+        <li><strong>Netto G/V Gesamt:</strong> <span class="{'positive' if cumulative_total_pnl > 0 else 'negative'}">{self.format_number_german(cumulative_total_pnl, 2)} EUR</span></li>
+    </ul>
+"""
+        
+        # SECTION 6: Zeitliche Verteilung (Time Distribution)
+        if analysis.get('transactions'):
+            monthly_groups = calculate_monthly_aggregates(analysis['transactions'])
             
-            # Erstelle die detaillierte Tabellenzeile mit allen neuen Spalten
-            md.append(f"| {transaction_number} | {stichtag} | {doc_date} | {display_type} | {isin_display} | {shares} | {price_str} | {kurswert_netto} | {gebühren_netto_str} | {ust_str} | {ausmachend_brutto} | {gv_aktien_str} | {kum_aktien_str} | {gv_non_aktien_str} | {kum_non_aktien_str} | {gv_gesamt_str} | {kum_gesamt_str} | {pdf_link} |")
-        
-        # Zusammenfassung Transaktionsverlauf
-        total_trans = len(analysis['transactions'])
-        
-        # Count different transaction types
-        depotabschluss_count = sum(1 for t in analysis['transactions'] if 'Depotabschluss' in t['type'])
-        orderabrechnung_count = sum(1 for t in analysis['transactions'] if 'Orderabrechnung' in t['type'] or t['type'] == 'Limit-Order-Vormerkung')
-        verkauf_count = sum(1 for t in analysis['transactions'] if t['type'] == 'Verkauf')
-        kauf_count = sum(1 for t in analysis['transactions'] if t['type'] == 'Kauf')
-        unknown_count = sum(1 for t in analysis['transactions'] if t['type'] == 'Unbekannt')
-        failed_count = sum(1 for t in analysis['transactions'] if 'Fehlgeschlagen' in t['type'])
-        
-        md.append(f"\n*Gesamt: {total_trans} Transaktionen*")
-        if depotabschluss_count > 0:
-            md.append(f"*- Depotabschlüsse: {depotabschluss_count}*")
-        if orderabrechnung_count > 0:
-            md.append(f"*- Orderabrechnungen: {orderabrechnung_count}*")
-        if verkauf_count > 0:
-            md.append(f"*- Verkäufe (sonstige): {verkauf_count}*")
-        if kauf_count > 0:
-            md.append(f"*- Käufe (sonstige): {kauf_count}*")
-        if failed_count > 0:
-            md.append(f"⚠️ **{failed_count} fehlgeschlagene Extraktionen**")
-        if unknown_count > 0:
-            md.append(f"⚠️ **{unknown_count} unbekannte Dokumente**")
-        
-        # Performance-Zusammenfassung
-        md.append(f"\n### Performance-Zusammenfassung:")
-        cumulative_stock_str = self.format_number_german(cumulative_stock, 2, show_sign=True)
-        cumulative_non_stock_str = self.format_number_german(cumulative_non_stock, 2, show_sign=True)
-        cumulative_total_str = self.format_number_german(cumulative_total, 2, show_sign=True)
-        
-        md.append(f"- **Aktien Gesamt:** {cumulative_stock_str} EUR (Kumuliert)")
-        md.append(f"- **Nicht-Aktien Gesamt:** {cumulative_non_stock_str} EUR (Kumuliert)")
-        md.append(f"- **Gesamtergebnis:** {cumulative_total_str} EUR")
-        
-        # Steuerliche Hinweise
-        md.append(f"\n### Steuerliche Hinweise:")
-        md.append("- **Aktiengewinne:** Unterliegen der Abgeltungssteuer (25% + SolZ + ggf. KiSt)")
-        md.append("- **Nicht-Aktien (Derivate/Zertifikate):** Verluste nur mit Gewinnen aus Termingeschäften verrechenbar (§ 20 Abs. 6 EStG)")
-        md.append("- **Verlustverrechnungstöpfe:** Aktien- und Derivatverluste werden steuerlich getrennt behandelt")
-        
-        # Farbcodierung-Legende
-        md.append(f"\n### Farbcodierung:")
-        md.append("- 🟢 **Grüne Schrift**: Gewinnbringende Verkäufe")
-        md.append("- 🔴 **Rote Schrift**: Verlustbehaftete Verkäufe")
-        md.append("- **Grüner Hintergrund**: Verkaufstransaktion mit Gewinn")
-        md.append("- **Roter Hintergrund**: Verkaufstransaktion mit Verlust")
-        
-        # Abschnitt 8: Zeitliche Verteilung
-        md.append(f"\n## Zeitliche Verteilung\n")
-        
-        # Nutze die gemeinsame Funktion
-        monthly_groups = calculate_monthly_aggregates(analysis['transactions'])
-        
-        if monthly_groups:
-            md.append("| Monat | Anzahl Transaktionen | Gesamtvolumen (EUR) |")
-            md.append("|-------|---------------------|---------------------|")
-            
-            for month in sorted(monthly_groups.keys()):
-                data = monthly_groups[month]
-                md.append(f"| {month} | {data['count']} | {data['volume']:,.2f} |")
-            
-            # Zusammenfassung
             if monthly_groups:
+                html += """
+    <h2>Zeitliche Verteilung</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Monat</th>
+                <th>Anzahl Transaktionen</th>
+                <th>Gesamtvolumen (EUR)</th>
+            </tr>
+        </thead>
+        <tbody>
+"""
+                for month in sorted(monthly_groups.keys()):
+                    data = monthly_groups[month]
+                    html += f"""
+            <tr>
+                <td>{month}</td>
+                <td class="number">{data['count']}</td>
+                <td class="number">{self.format_number_german(data['volume'], 2)}</td>
+            </tr>"""
+                
+                html += """
+        </tbody>
+    </table>
+"""
+                # Summary
                 months = list(monthly_groups.keys())
                 first_month = min(months)
                 last_month = max(months)
                 total_years = len(set(m[:4] for m in months))
-                md.append(f"\n*Aktivität in {len(months)} Monaten über {total_years} Jahre ({first_month} bis {last_month})*")
+                html += f'<p><em>Aktivität in {len(months)} Monaten über {total_years} Jahre ({first_month} bis {last_month})</em></p>'
         
-        return '\n'.join(md)
+        # Add footer
+        html += self._create_html_footer()
+        
+        return html
     
     def run(self):
         """Hauptfunktion - analysiert beide Depots und generiert Markdown-Dateien"""
@@ -1619,10 +2442,10 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             analysis = self.analyze_depot(depot_name)
             
             if analysis:
-                markdown_content = self.generate_markdown(analysis)
+                html_content = self.generate_html(analysis)
                 output_file = self.depots[depot_name]['output_file']
                 
-                self.save_markdown(markdown_content, output_file)
+                self.save_html(html_content, output_file)
                 self.print_summary(output_file, analysis)
                 print(f"  - {len(analysis['transactions'])} Transaktionen analysiert")
             else:
