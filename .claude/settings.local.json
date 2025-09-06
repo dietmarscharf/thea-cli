@@ -17,7 +17,9 @@
       "Bash(done)",
       "Bash(git diff:*)",
       "Bash(git rev-parse:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(find:*)",
+      "Bash(awk:*)"
     ],
     "deny": [],
     "ask": []
