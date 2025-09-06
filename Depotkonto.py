@@ -415,6 +415,13 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     details['net_amount'] = float(match.group(1).replace('.', '').replace(',', '.'))
                     break
         
+        # Extrahiere Vormerkungsentgelt (für Limit-Order-Vormerkungen)
+        vormerkung_pattern = r'Vormerkungsentgelt\s+von\s+([\d,]+)\s*EUR'
+        vormerkung_match = re.search(vormerkung_pattern, text)
+        if vormerkung_match:
+            details['fees'] = float(vormerkung_match.group(1).replace(',', '.'))
+            details['is_vat_free'] = True  # Vormerkungsentgelt ist ohne USt
+        
         # Fallback: Berechne Gebühren aus Differenz wenn möglich
         if details['gross_amount'] and details['net_amount'] and not details['fees']:
             # Bei Verkauf: Gebühren = Kurswert - Ausmachend
@@ -512,6 +519,40 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             # Für Rückwärtskompatibilität: setze stichtag = execution_date
             details['stichtag'] = details['execution_date']
         
+        # Extrahiere Depotentgelte (für Depotabschlüsse)
+        depot_fee_patterns = [
+            # Standard Format: "netto X,XX Euro + Y% USt Z,ZZ Euro = brutto A,AA Euro"
+            (r'Depotentgelte.*?netto\s+([\d,]+)\s*Euro.*?(\d+)%\s*USt\s+([\d,]+)\s*Euro.*?brutto\s+([\d,]+)\s*Euro', 'full'),
+            # Alternatives Format ohne "Depotentgelte" prefix
+            (r'netto\s+([\d,]+)\s*Euro\s*\+\s*(\d+)%\s*USt\s+([\d,]+)\s*Euro\s*=\s*brutto\s+([\d,]+)\s*Euro', 'full'),
+            # Format mit "Die Depotentgelte ... betragen" (fixed: use .*? instead of [^b]*?)
+            (r'Die\s+Depotentgelte.*?betragen\s+netto\s+([\d,]+)\s+Euro\s+\+\s+(\d+)%\s+USt\s+([\d,]+)\s+Euro\s+=\s+brutto\s+([\d,]+)\s+Euro', 'full'),
+            # Pattern mit mehr Flexibilität für Whitespace
+            (r'betragen\s+netto\s+([\d,]+)\s*Euro\s*\+\s*(\d+)%\s*USt\s+([\d,]+)\s*Euro\s*=\s*brutto\s+([\d,]+)\s*Euro', 'full'),
+            # Nur Bruttobetrag
+            (r'Depotentgelte.*?betragen.*?([\d,]+)\s*Euro', 'gross_only'),
+            # Mit "Die Depotentgelte"
+            (r'Die\s+Depotentgelte.*?betragen.*?brutto\s+([\d,]+)\s*Euro', 'gross_only'),
+        ]
+        
+        for pattern, pattern_type in depot_fee_patterns:
+            match = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
+            if match:
+                if pattern_type == 'full' and len(match.groups()) == 4:
+                    # Vollständige Information mit Netto, USt%, USt-Betrag und Brutto
+                    details['depot_fee_net'] = float(match.group(1).replace(',', '.'))
+                    details['vat_rate'] = int(match.group(2))
+                    details['vat_amount'] = float(match.group(3).replace(',', '.'))
+                    details['fees'] = float(match.group(4).replace(',', '.'))  # Brutto
+                    details['is_depot_fee'] = True
+                    details['is_vat_free'] = False  # Depotentgelte haben USt
+                elif pattern_type == 'gross_only':
+                    # Nur Bruttobetrag
+                    details['fees'] = float(match.group(1).replace(',', '.'))
+                    details['is_depot_fee'] = True
+                    details['is_vat_free'] = False  # Depotentgelte haben normalerweise USt
+                break
+        
         return details
     
     def extract_transaction_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -521,6 +562,27 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             return None
             
         extracted_text = base_data['extracted_text']
+        
+        # Check if THEA extraction failed
+        if not extracted_text or (data.get('response', {}).get('json') is None and data.get('errors')):
+            # THEA extraction failed - create warning entry
+            result = {
+                'extraction_failed': True,
+                'type': '⚠️ EXTRAKTION-FEHLGESCHLAGEN',
+                'doc_date': base_data.get('doc_date'),
+                'file_date': base_data.get('file_date'),
+                'file': base_data.get('file'),
+                'pdf_path': base_data.get('pdf_path'),
+                'date': base_data.get('doc_date'),
+                'isin': None,
+                'shares': None,
+                'purchase_value': None,
+                'fees': None,
+                'total_amount': None,
+                'profit_loss': None,
+                'errors': data.get('errors', [])
+            }
+            return result
         
         # Extrahiere ISIN
         isin_match = re.search(r'([A-Z]{2}[A-Z0-9]{10})', extracted_text)
@@ -547,6 +609,12 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 transaction_type = 'Ausführungsanzeige-Kauf'
             else:
                 transaction_type = 'Ausführungsanzeige'
+        # PRIORITY CHECK: New format from April 2022 onwards - "Wertpapier Abrechnung Verkauf/Kauf"
+        # This must be checked early to ensure correct classification
+        elif 'wertpapier abrechnung verkauf' in extracted_lower:
+            transaction_type = 'Orderabrechnung-Verkauf'
+        elif 'wertpapier abrechnung kauf' in extracted_lower:
+            transaction_type = 'Orderabrechnung-Kauf'
         # Check for capital measures (stock splits, etc.)
         elif ('kapitalmaßnahme' in extracted_lower or 'kapitalmassnahme' in extracted_lower or
             'aktiensplit' in extracted_lower or 'stock split' in extracted_lower or
@@ -623,6 +691,20 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             if 'orderabrechnung' in filename_lower:
                 transaction_type = 'Orderabrechnung-Fehlgeschlagen'
             
+        # Extrahiere Transaktionsreferenznummer (für korrekte Sortierung bei mehreren Transaktionen am selben Tag)
+        transaction_ref = None
+        order_number = None
+        
+        # Suche nach Rechnungsnummer-Pattern (z.B. W02279-0000013797/22)
+        ref_match = re.search(r'(W\d+-\d+/\d+)', extracted_text)
+        if ref_match:
+            transaction_ref = ref_match.group(1)
+        
+        # Suche nach Auftragsnummer-Pattern (z.B. 768384/63.00)
+        order_match = re.search(r'(\d{6}/\d+\.\d+)', extracted_text)
+        if order_match:
+            order_number = order_match.group(1)
+        
         # Bestimme Wertpapiertyp (Aktie oder Nicht-Aktie)
         security_type = 'stock' if self.is_stock_isin(isin) else 'non-stock' if isin else None
         
@@ -633,6 +715,8 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             'period': period,
             'isin': isin,
             'security_type': security_type,  # Neu: Typ des Wertpapiers
+            'transaction_ref': transaction_ref,  # Neu: Transaktionsreferenz für Sortierung
+            'order_number': order_number,  # Neu: Auftragsnummer
             'amounts': amounts,
             'max_amount': max(amounts) if amounts else 0,
             # Neue detaillierte Handelsdaten
@@ -644,6 +728,42 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             result['max_amount'] = trading_details['net_amount']
         elif trading_details.get('gross_amount'):
             result['max_amount'] = trading_details['gross_amount']
+        
+        # DEPRECATED: Fallback für Depotabschluss-Gebühren 
+        # Gebühren werden jetzt über depot_statement_lookup übertragen (siehe Zeilen 1408-1414 und 2311-2317)
+        # Dieser Code wird nicht mehr benötigt, da extract_depot_balance() die Gebühren extrahiert
+        # und sie über depot_statement_lookup an die Transaktionen weitergibt.
+        #
+        # if 'Depotabschluss' in transaction_type and not result.get('fees'):
+        #     import glob
+        #     import os
+        #     original_file = base_data.get('original_file', '')
+        #     if original_file:
+        #         # Suche nach docling.txt Datei
+        #         base_name = original_file.replace('.pdf', '.pdf')
+        #         docling_pattern = f"{base_name}.*docling.txt"
+        #         docling_files = glob.glob(docling_pattern)
+        #         
+        #         if docling_files:
+        #             # Verwende die neueste docling.txt Datei
+        #             docling_file = sorted(docling_files)[-1]
+        #             try:
+        #                 with open(docling_file, 'r', encoding='utf-8') as f:
+        #                     docling_text = f.read()
+        #                 
+        #                 # Versuche Depot-Gebühren aus docling.txt zu extrahieren
+        #                 fee_pattern = r'betragen\s+netto\s+([\d,]+)\s+Euro\s+\+\s+(\d+)%\s+USt\s+([\d,]+)\s+Euro\s+=\s+brutto\s+([\d,]+)\s+Euro'
+        #                 match = re.search(fee_pattern, docling_text, re.DOTALL | re.IGNORECASE)
+        #                 if match:
+        #                     result['depot_fee_net'] = float(match.group(1).replace(',', '.'))
+        #                     result['vat_rate'] = int(match.group(2))
+        #                     result['vat_amount'] = float(match.group(3).replace(',', '.'))
+        #                     result['fees'] = float(match.group(4).replace(',', '.'))
+        #                     result['is_depot_fee'] = True
+        #                     result['is_vat_free'] = False
+        #                     print(f"  Info: Depot-Gebühren aus docling.txt extrahiert: {result['fees']} EUR (brutto)")
+        #             except Exception as e:
+        #                 pass  # Silently ignore errors in fallback
             
         return result
     
@@ -885,6 +1005,39 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 if closing_balance is None:
                     closing_balance = 0.0
                 
+                # Extrahiere Depot-Gebühren (alle Felder)
+                depot_fees = None  # Brutto
+                depot_fee_net = None
+                vat_rate = None
+                vat_amount = None
+                
+                # Versuche zuerst aus extract_trading_details
+                trading_details = self.extract_trading_details(extracted_text)
+                if trading_details.get('fees'):
+                    depot_fees = trading_details['fees']  # Brutto
+                    depot_fee_net = trading_details.get('depot_fee_net')
+                    vat_rate = trading_details.get('vat_rate', 19)
+                    vat_amount = trading_details.get('vat_amount')
+                else:
+                    # Fallback auf docling.txt wenn vorhanden
+                    import glob
+                    if file_path:
+                        docling_pattern = f"{file_path}.*docling.txt"
+                        docling_files = glob.glob(docling_pattern)
+                        if docling_files:
+                            try:
+                                with open(sorted(docling_files)[-1], 'r', encoding='utf-8') as f:
+                                    docling_text = f.read()
+                                fee_pattern = r'betragen\s+netto\s+([\d,]+)\s+Euro\s+\+\s+(\d+)%\s+USt\s+([\d,]+)\s+Euro\s+=\s+brutto\s+([\d,]+)\s+Euro'
+                                match = re.search(fee_pattern, docling_text, re.DOTALL | re.IGNORECASE)
+                                if match:
+                                    depot_fee_net = float(match.group(1).replace(',', '.'))
+                                    vat_rate = int(match.group(2))
+                                    vat_amount = float(match.group(3).replace(',', '.'))
+                                    depot_fees = float(match.group(4).replace(',', '.'))
+                            except:
+                                pass
+                
                 # Extrahiere Stückzahl und ISIN wenn Bestand vorhanden
                 if closing_balance and closing_balance > 0:
                     # Spezialbehandlung für vertikales Layout (Stück auf eigener Zeile)
@@ -1000,7 +1153,11 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     'security_name': security_name,
                     'file': file_name,
                     'type': statement_type,
-                    'pdf_path': file_path
+                    'pdf_path': file_path,
+                    'depot_fees': depot_fees,       # Depot-Gebühren (brutto)
+                    'depot_fee_net': depot_fee_net, # Depot-Gebühren (netto)
+                    'vat_rate': vat_rate,           # USt-Satz
+                    'vat_amount': vat_amount        # USt-Betrag
                 })
                 
                 # Aktualisiere letzten Saldo basierend auf Stichtag
@@ -1234,14 +1391,27 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     trans.get('date') or 
                     '0000-00-00')
         
-        def get_sort_priority(trans):
-            # Depotabschlüsse kommen bei gleichem Datum zuletzt (Priorität 1)
+        def get_sort_key(trans):
+            # 1. Datum (primäre Sortierung)
+            date = get_sort_date(trans)
+            
+            # 2. Hat Referenznummer? (0 = hat Ref, 1 = keine Ref)
+            has_ref = 0 if trans.get('transaction_ref') else 1
+            
+            # 3. Dokumenttyp-Priorität
             if 'Depotabschluss' in trans.get('type', ''):
-                return 1
-            # Normale Transaktionen haben Priorität 0
-            return 0
+                doc_priority = 99  # Immer zuletzt
+            elif has_ref == 0:
+                doc_priority = 0   # Transaktionen mit Ref zuerst
+            else:
+                doc_priority = 50  # Andere Dokumente in der Mitte
+            
+            # 4. Referenznummer für Sortierung (oder hoher Wert wenn keine)
+            ref_order = trans.get('transaction_ref', 'ZZZZZZZZ')
+            
+            return (date, has_ref, doc_priority, ref_order)
         
-        transactions.sort(key=lambda x: (get_sort_date(x), get_sort_priority(x)))
+        transactions.sort(key=get_sort_key)
         
         # Extrahiere Depot-Salden
         balance_info = self.extract_depot_balance(depot_path)
@@ -1253,7 +1423,11 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             depot_statement_lookup[file_key] = {
                 'isin': stmt.get('isin'),
                 'shares': stmt.get('shares'),
-                'balance': stmt.get('closing_balance')
+                'balance': stmt.get('closing_balance'),
+                'depot_fees': stmt.get('depot_fees'),        # Depot-Gebühren (brutto)
+                'depot_fee_net': stmt.get('depot_fee_net'),  # Depot-Gebühren (netto)
+                'vat_rate': stmt.get('vat_rate'),           # USt-Satz
+                'vat_amount': stmt.get('vat_amount')        # USt-Betrag
             }
         
         # Reichere Transaktionen mit Depotabschluss-Daten an
@@ -1267,6 +1441,14 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                         trans['isin'] = depot_data['isin']
                     if depot_data['shares'] is not None:
                         trans['shares'] = depot_data['shares']
+                    # Übernehme Depot-Gebühren aus Depotabschluss
+                    if depot_data.get('depot_fees') is not None and not trans.get('fees'):
+                        trans['fees'] = depot_data['depot_fees']  # Brutto
+                        trans['depot_fee_net'] = depot_data.get('depot_fee_net')
+                        trans['vat_rate'] = depot_data.get('vat_rate')
+                        trans['vat_amount'] = depot_data.get('vat_amount')
+                        trans['is_depot_fee'] = True
+                        trans['is_vat_free'] = False
         
         # Extrahiere Kosteninformationen
         cost_info = self.extract_cost_information(depot_path)
@@ -1492,6 +1674,16 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             background-color: #f9f9f9;
         }}
         
+        /* Prevent line breaks in all table cells */
+        td {{
+            white-space: nowrap;
+        }}
+        
+        /* Bold styling for cumulative values in year summary rows */
+        .bold-value {{
+            font-weight: bold;
+        }}
+        
         /* Spezielle Zeilen-Styles für Transaktionen */
         .profit-row {{
             background-color: #28a745 !important;  /* Grün für Gewinn */
@@ -1627,6 +1819,28 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             border-radius: 4px;
         }}
         
+        /* Jahresübergangs-Saldenzeilen */
+        .year-summary-row {{
+            background-color: #ffd700 !important;  /* Gold/Gelb */
+            font-weight: bold;
+            color: #000000 !important;
+        }}
+        
+        .year-summary-row td {{
+            color: #000000 !important;
+            border-top: 2px solid #000000;
+        }}
+        
+        .year-start-row {{
+            background-color: #ffeb3b !important;  /* Helleres Gelb */
+            font-style: italic;
+            color: #000000 !important;
+        }}
+        
+        .year-separator {{
+            border-bottom: 3px solid #000000 !important;
+        }}
+        
         .explanation-box h4 {{
             margin-top: 0;
             color: #1565c0;
@@ -1689,6 +1903,9 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         """Generiert vollständigen HTML-Bericht aus der Analyse"""
         if not analysis:
             return self._create_error_html()
+        
+        # Symbol for empty/missing values (middle dot instead of dash to avoid confusion with negative values)
+        EMPTY_VALUE = '•'  # Unicode U+2022 (bullet)
         
         # Start HTML document
         html = self._create_html_header(analysis)
@@ -1776,6 +1993,10 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 <th>Stück</th>
                 <th>ISIN</th>
                 <th>Depotbestand (EUR)</th>
+                <th>Gebühren netto</th>
+                <th>USt %</th>
+                <th>USt (EUR)</th>
+                <th>Gebühren brutto</th>
                 <th>Dokument</th>
             </tr>
         </thead>
@@ -1797,6 +2018,21 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     display_name = file_name[:37] + '...' if len(file_name) > 40 else file_name
                     doc_link = f'<a href="docs/{analysis["depot_info"]["folder"]}/{file_name}">{display_name}</a>'
                     
+                    # Format depot fees
+                    depot_fee_net_str = EMPTY_VALUE
+                    vat_rate_str = EMPTY_VALUE
+                    vat_amount_str = EMPTY_VALUE
+                    depot_fees_str = EMPTY_VALUE
+                    
+                    if statement.get('depot_fee_net') is not None:
+                        depot_fee_net_str = self.format_number_german(statement['depot_fee_net'], 2)
+                    if statement.get('vat_rate') is not None:
+                        vat_rate_str = f"{statement['vat_rate']}%"
+                    if statement.get('vat_amount') is not None:
+                        vat_amount_str = self.format_number_german(statement['vat_amount'], 2)
+                    if statement.get('depot_fees') is not None:
+                        depot_fees_str = self.format_number_german(statement['depot_fees'], 2)
+                    
                     html += f"""
             <tr>
                 <td>{type_display}</td>
@@ -1805,6 +2041,10 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 <td class="number">{shares_str}</td>
                 <td>{isin_str}</td>
                 <td class="number">{closing}</td>
+                <td class="number">{depot_fee_net_str}</td>
+                <td class="number">{vat_rate_str}</td>
+                <td class="number">{vat_amount_str}</td>
+                <td class="number">{depot_fees_str}</td>
                 <td>{doc_link}</td>
             </tr>"""
                 
@@ -2000,6 +2240,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
     <ul>
         <li><strong>Nr.:</strong> Laufende Nummer der Transaktion</li>
         <li><strong>Transaktion:</strong> Transaktionsdatum/Handelstag (Ausführung)</li>
+        <li><strong>Referenz:</strong> Auftragsnummer/Referenznummer</li>
         <li><strong>Wertst.:</strong> Wertstellungsdatum/Valuta (Settlement)</li>
         <li><strong>Dokument:</strong> Dokumenterstellungsdatum</li>
         <li><strong>Gebühren:</strong> Nettogebühren ohne Umsatzsteuer (EUR)</li>
@@ -2022,6 +2263,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             <tr>
                 <th>Nr.</th>
                 <th>Transaktion</th>
+                <th>Referenz</th>
                 <th>Wertst.</th>
                 <th>Dokument</th>
                 <th class="type-column">Typ</th>
@@ -2056,8 +2298,15 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 depot_statement_lookup[file_key] = {
                     'isin': stmt.get('isin'),
                     'shares': stmt.get('shares'),
-                    'balance': stmt.get('closing_balance')
+                    'balance': stmt.get('closing_balance'),
+                    'depot_fees': stmt.get('depot_fees'),        # Depot-Gebühren (brutto)
+                    'depot_fee_net': stmt.get('depot_fee_net'),  # Depot-Gebühren (netto)
+                    'vat_rate': stmt.get('vat_rate'),           # USt-Satz
+                    'vat_amount': stmt.get('vat_amount')        # USt-Betrag
                 }
+            
+            # Symbol for empty/missing values (middle dot instead of dash to avoid confusion with negative values)
+            EMPTY_VALUE = '•'  # Unicode U+2022 (bullet)
             
             transaction_number = 0
             cumulative_stock_pnl = 0.0
@@ -2073,6 +2322,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             # Track current share balances per ISIN
             # None = unknown (before first depot statement), number = known balance
             isin_balances = {}
+            depot_statement_seen = False  # Track if we've seen any depot statement
             
             for idx, trans in enumerate(analysis['transactions']):
                 transaction_number += 1
@@ -2089,11 +2339,14 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 
                 trans_type = trans['type']
                 
-                # Determine fiscal year - use stichtag for Depotabschluss
+                # Determine fiscal year - use execution date for regular transactions, stichtag for Depotabschluss
+                # This ensures transactions are assigned to the FY when they were executed, not when they settle
                 if 'Depotabschluss' in trans_type:
                     fy_date = trans.get('stichtag') or value_date
                 else:
-                    fy_date = value_date
+                    # For regular transactions, use execution_date (when trade happened)
+                    # not value_date (when money settles, which can be in next FY)
+                    fy_date = execution_date or value_date
                 fiscal_year = self.get_fiscal_year(fy_date, fiscal_type)
                 
                 # Check if this depot statement marks the end of a fiscal year
@@ -2142,6 +2395,14 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                         stmt_data = depot_statement_lookup[file_key]
                         trans['isin'] = trans.get('isin') or stmt_data.get('isin')
                         trans['shares'] = trans.get('shares') or stmt_data.get('shares')
+                        # Übernehme Depot-Gebühren aus Depotabschluss
+                        if stmt_data.get('depot_fees') is not None and not trans.get('fees'):
+                            trans['fees'] = stmt_data['depot_fees']  # Brutto
+                            trans['depot_fee_net'] = stmt_data.get('depot_fee_net')
+                            trans['vat_rate'] = stmt_data.get('vat_rate')
+                            trans['vat_amount'] = stmt_data.get('vat_amount')
+                            trans['is_depot_fee'] = True
+                            trans['is_vat_free'] = False
                 elif 'Verkauf' in trans_type and 'Ausführungsanzeige' not in trans_type:
                     if trans.get('profit_loss') is not None:
                         if trans['profit_loss'] > 0:
@@ -2158,38 +2419,52 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 
                 # Format shares display with balance and change columns
                 shares_balance = '?'  # Default: unknown
-                shares_change = '-'
+                shares_change = EMPTY_VALUE
                 
                 # Get current ISIN
                 current_isin = trans.get('isin', 'N/A')
                 
                 # First, show current balance BEFORE this transaction
-                if current_isin in isin_balances and isin_balances[current_isin] is not None and current_isin != 'N/A':
-                    shares_balance = str(isin_balances[current_isin])
-                elif current_isin != 'N/A':
-                    shares_balance = '?'
+                if current_isin not in ['N/A', 'None', None, '']:
+                    # Valid ISIN
+                    if current_isin not in isin_balances:
+                        if depot_statement_seen:
+                            # After depot statement: new ISINs start at 0
+                            isin_balances[current_isin] = 0
+                            shares_balance = '0'
+                        else:
+                            # Before any depot statement: unknown
+                            shares_balance = '?'
+                    else:
+                        # ISIN is tracked - show current balance
+                        shares_balance = str(isin_balances[current_isin])
                 else:
+                    # No valid ISIN - show dash
                     shares_balance = '-'
                 
                 # Now process the transaction and update balance
                 if 'Depotabschluss' in trans_type:
-                    # Depot statement sets the balance
-                    if trans.get('shares') is not None:
+                    # Mark that we've seen a depot statement
+                    depot_statement_seen = True
+                    
+                    # First, set all previously tracked ISINs to 0 (they're not in depot if not mentioned)
+                    for known_isin in list(isin_balances.keys()):
+                        if known_isin not in ['None', 'N/A', None, '']:
+                            isin_balances[known_isin] = 0
+                    
+                    # Then update with values from this depot statement
+                    if trans.get('shares') is not None and current_isin not in ['N/A', 'None', None, '']:
                         # For depot statements, the balance shown IS the new balance
                         shares_balance = str(trans.get('shares', 0))
                         isin_balances[current_isin] = trans.get('shares', 0)
-                    elif current_isin == 'None' or current_isin == 'N/A':
-                        # Depotabschluss without ISIN means empty depot - set all known ISINs to 0
-                        shares_balance = '0'
-                        # Set all previously seen ISINs to 0
-                        for known_isin in list(isin_balances.keys()):
-                            if known_isin not in ['None', 'N/A']:
-                                isin_balances[known_isin] = 0
+                    elif current_isin in ['None', 'N/A', None, '']:
+                        # Depotabschluss without valid ISIN
+                        shares_balance = EMPTY_VALUE
                     else:
                         # Specific ISIN depot statement without shares means 0 for that ISIN
                         shares_balance = '0'
                         isin_balances[current_isin] = 0
-                    shares_change = '-'
+                    shares_change = EMPTY_VALUE
                     
                 elif 'Kauf' in trans_type or 'Orderabrechnung-Kauf' in trans_type:
                     # Add shares on purchase (but NOT for Ausführungsanzeige)
@@ -2201,7 +2476,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                                 isin_balances[current_isin] += trans['shares']
                         # If balance was unknown, it stays unknown
                     else:
-                        shares_change = '-'
+                        shares_change = EMPTY_VALUE
                         
                 elif 'Verkauf' in trans_type:
                     # Subtract shares on sale (but NOT for Ausführungsanzeige)
@@ -2210,28 +2485,46 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                         # Update balance AFTER showing it - but NOT for Ausführungsanzeige
                         if 'Ausführungsanzeige' not in trans_type:
                             if current_isin in isin_balances and isin_balances[current_isin] is not None:
-                                isin_balances[current_isin] -= trans['shares']
+                                new_balance = isin_balances[current_isin] - trans['shares']
+                                if new_balance < 0:
+                                    print(f"  ⚠️ WARNUNG: Negative Bilanz für {current_isin} in Transaktion {transaction_number}: {isin_balances[current_isin]} - {trans['shares']} = {new_balance}")
+                                    print(f"     Datum: {value_date_str}, Typ: {trans_type}, Ref: {trans.get('transaction_ref', 'N/A')}")
+                                isin_balances[current_isin] = new_balance
                         # If balance was unknown, it stays unknown
                     else:
-                        shares_change = '-'
+                        shares_change = EMPTY_VALUE
                         
                 else:
                     # Other transactions don't change balance
-                    shares_change = '-'
+                    shares_change = EMPTY_VALUE
                 
                 if trans.get('execution_price'):
                     price_str = self.format_number_german(trans['execution_price'], 2)
                 else:
-                    price_str = '-'
+                    price_str = EMPTY_VALUE
                 
-                kurswert = self.format_number_german(trans['gross_amount'], 2) if trans.get('gross_amount') else '-'
+                # Format Kurswert with sign logic
+                kurswert_str = EMPTY_VALUE
+                if trans.get('gross_amount'):
+                    kurswert_val = trans['gross_amount']
+                    if 'Verkauf' in trans_type and 'Ausführungsanzeige' not in trans_type:
+                        # Sales show positive (money coming in)
+                        kurswert_str = '+' + self.format_number_german(kurswert_val, 2)
+                    elif 'Kauf' in trans_type:
+                        # Purchases show negative (money going out)
+                        kurswert_str = '-' + self.format_number_german(kurswert_val, 2)
+                    else:
+                        # Others without sign
+                        kurswert_str = self.format_number_german(kurswert_val, 2)
+                else:
+                    kurswert_str = EMPTY_VALUE
                 
                 # Calculate fees and VAT
-                gebuhren_netto_str = '-'
-                ust_prozent_str = '-'
-                ust_str = '-'
-                gebuhren_brutto_str = '-'
-                ausmachend_str = '-'
+                gebuhren_netto_str = EMPTY_VALUE
+                ust_prozent_str = EMPTY_VALUE
+                ust_str = EMPTY_VALUE
+                gebuhren_brutto_str = EMPTY_VALUE
+                ausmachend_str = EMPTY_VALUE
                 
                 if trans.get('fees'):
                     # Fees are stored as gross (including VAT if applicable)
@@ -2251,9 +2544,16 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                         fees_vat = fees_gross - fees_net
                         ust_prozent_str = '19'
                     
-                    gebuhren_netto_str = self.format_number_german(fees_net, 2)
-                    ust_str = self.format_number_german(fees_vat, 2)
-                    gebuhren_brutto_str = self.format_number_german(fees_gross, 2)
+                    # Fees are always costs (negative) except for depot statements
+                    if 'Depotabschluss' not in trans_type:
+                        gebuhren_netto_str = '-' + self.format_number_german(fees_net, 2)
+                        ust_str = '-' + self.format_number_german(fees_vat, 2) if fees_vat > 0 else '0,00'
+                        gebuhren_brutto_str = '-' + self.format_number_german(fees_gross, 2)
+                    else:
+                        # Depot statements show fees without sign
+                        gebuhren_netto_str = self.format_number_german(fees_net, 2)
+                        ust_str = self.format_number_german(fees_vat, 2)
+                        gebuhren_brutto_str = self.format_number_german(fees_gross, 2)
                     
                     # Add to cumulative
                     cumulative_fees_net += fees_net
@@ -2263,29 +2563,51 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     fees_net = 0
                     fees_vat = 0
                 
-                # Calculate Ausmachender Betrag
+                # Calculate Ausmachender Betrag with sign logic
                 if trans.get('net_amount'):
-                    ausmachend_str = self.format_number_german(trans['net_amount'], 2)
+                    ausmachend_val = trans['net_amount']
+                    if 'Verkauf' in trans_type and 'Ausführungsanzeige' not in trans_type:
+                        # Sales: positive if money received
+                        if ausmachend_val > 0:
+                            ausmachend_str = '+' + self.format_number_german(ausmachend_val, 2)
+                        else:
+                            ausmachend_str = self.format_number_german(ausmachend_val, 2)
+                    elif 'Kauf' in trans_type:
+                        # Purchases: always negative (total cost)
+                        ausmachend_str = '-' + self.format_number_german(abs(ausmachend_val), 2)
+                    else:
+                        ausmachend_str = self.format_number_german(ausmachend_val, 2)
                 elif trans.get('gross_amount'):
-                    ausmachend_val = trans['gross_amount'] + fees_gross
-                    ausmachend_str = self.format_number_german(ausmachend_val, 2)
+                    ausmachend_val = trans['gross_amount'] - fees_gross  # Subtract fees (they're positive values)
+                    if 'Verkauf' in trans_type and 'Ausführungsanzeige' not in trans_type:
+                        # Sales: positive if money received
+                        if ausmachend_val > 0:
+                            ausmachend_str = '+' + self.format_number_german(ausmachend_val, 2)
+                        else:
+                            ausmachend_str = self.format_number_german(ausmachend_val, 2)
+                    elif 'Kauf' in trans_type:
+                        # Purchases: negative (total cost = gross + fees)
+                        total_cost = trans['gross_amount'] + fees_gross
+                        ausmachend_str = '-' + self.format_number_german(total_cost, 2)
+                    else:
+                        ausmachend_str = self.format_number_german(ausmachend_val, 2)
                 
                 # Determine security type (stock vs non-stock)
                 is_stock = False
                 if isin and isin != 'N/A':
                     is_stock = self.is_stock_isin(isin)
                 
-                # Format cumulative fee values
-                kum_geb_str = self.format_number_german(cumulative_fees_net, 2) if cumulative_fees_net != 0 else '-'
-                kum_ust_str = self.format_number_german(cumulative_fees_vat, 2) if cumulative_fees_vat != 0 else '-'
+                # Format cumulative fee values (always negative as they are costs)
+                kum_geb_str = '-' + self.format_number_german(cumulative_fees_net, 2) if cumulative_fees_net != 0 else EMPTY_VALUE
+                kum_ust_str = '-' + self.format_number_german(cumulative_fees_vat, 2) if cumulative_fees_vat != 0 else EMPTY_VALUE
                 
                 # Initialize all G/V strings
-                gv_aktien_str = '-'
-                kum_aktien_str = '-'
-                gv_non_aktien_str = '-'
-                kum_non_aktien_str = '-'
-                gv_gesamt_str = '-'
-                kum_gesamt_str = '-'
+                gv_aktien_str = EMPTY_VALUE
+                kum_aktien_str = EMPTY_VALUE
+                gv_non_aktien_str = EMPTY_VALUE
+                kum_non_aktien_str = EMPTY_VALUE
+                gv_gesamt_str = EMPTY_VALUE
+                kum_gesamt_str = EMPTY_VALUE
                 
                 # Calculate G/V values if profit/loss exists
                 if trans.get('profit_loss') is not None:
@@ -2334,6 +2656,13 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 
                 doc_link = f'<a href="docs/{analysis["depot_info"]["folder"]}/{trans.get("original_file", "")}">{doc_name}</a>'
                 
+                # Get reference number (order number or transaction ref)
+                reference_str = EMPTY_VALUE
+                if trans.get('order_number'):
+                    reference_str = trans.get('order_number')
+                elif trans.get('transaction_ref'):
+                    reference_str = trans.get('transaction_ref')
+                
                 # Shorten type display
                 if 'Orderabrechnung-' in trans_type:
                     display_type = trans_type.replace('Orderabrechnung-', '')
@@ -2346,6 +2675,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             <tr class="{row_class}">
                 <td>{formatted_transaction_number}</td>
                 <td>{execution_date_str}</td>
+                <td>{reference_str}</td>
                 <td>{value_date_str}</td>
                 <td>{doc_date_str}</td>
                 <td class="type-column">{display_type}</td>
@@ -2353,7 +2683,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 <td class="number">{shares_balance}</td>
                 <td class="number">{shares_change}</td>
                 <td class="number">{price_str}</td>
-                <td class="number">{kurswert}</td>
+                <td class="number">{kurswert_str}</td>
                 <td class="number fee-block-start">{gebuhren_netto_str}</td>
                 <td class="number">{ust_prozent_str}</td>
                 <td class="number">{ust_str}</td>
@@ -2369,6 +2699,90 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 <td class="number">{kum_gesamt_str}</td>
                 <td>{doc_link}</td>
             </tr>"""
+                
+                # Insert year summary rows after year-end depot statement
+                if is_year_end_depot:
+                    # Save the depot statement's ISIN and balance for the summary rows
+                    depot_isin = isin if isin not in ['N/A', 'None', None, ''] else ''
+                    depot_shares = shares_balance if shares_balance not in ['?', '-'] else ''
+                    
+                    # Calculate next fiscal year
+                    if fiscal_year.startswith('FY'):
+                        try:
+                            current_year = int(fiscal_year[2:])  # Extract year from FY2021 format
+                            next_fiscal_year = f'FY{current_year + 1}'
+                        except (ValueError, IndexError):
+                            # Fallback for unexpected format
+                            next_fiscal_year = fiscal_year + '_NEXT'
+                    else:
+                        # Fallback for unexpected format
+                        next_fiscal_year = fiscal_year + '_NEXT'
+                    
+                    # Get the last transaction number for this fiscal year
+                    last_fy_number = fiscal_year_counters.get(fiscal_year, transaction_number)
+                    
+                    # Insert year-end summary row
+                    html += f"""
+            <tr class="year-summary-row year-separator">
+                <td>{fiscal_year}-{str(last_fy_number + 1).zfill(3)}</td>
+                <td colspan="5" style="text-align: center; font-weight: bold;">
+                    === JAHRESSALDO {fiscal_year} ===
+                </td>
+                <td>{depot_isin}</td>
+                <td class="number">{depot_shares}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="number fee-block-start"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="number bold-value">{'-' + self.format_number_german(cumulative_fees_net, 2) if cumulative_fees_net != 0 else '0,00'}</td>
+                <td class="number fee-block-end bold-value">{'-' + self.format_number_german(cumulative_fees_vat, 2) if cumulative_fees_vat != 0 else '0,00'}</td>
+                <td></td>
+                <td class="number bold-value">{self.format_number_german(cumulative_stock_pnl, 2, show_sign=True) if cumulative_stock_pnl != 0 else '0,00'}</td>
+                <td></td>
+                <td class="number bold-value">{self.format_number_german(cumulative_non_stock_pnl, 2, show_sign=True) if cumulative_non_stock_pnl != 0 else '0,00'}</td>
+                <td></td>
+                <td class="number bold-value">{self.format_number_german(cumulative_total_pnl, 2, show_sign=True) if cumulative_total_pnl != 0 else '0,00'}</td>
+                <td></td>
+            </tr>"""
+                    
+                    # Insert year-start row for new fiscal year
+                    html += f"""
+            <tr class="year-start-row">
+                <td>{next_fiscal_year}-000</td>
+                <td colspan="5" style="text-align: center; font-style: italic;">
+                    === JAHRESANFANG {next_fiscal_year} ===
+                </td>
+                <td>{depot_isin}</td>
+                <td class="number">{depot_shares}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="number fee-block-start"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="number bold-value">0,00</td>
+                <td class="number fee-block-end bold-value">0,00</td>
+                <td></td>
+                <td class="number bold-value">0,00</td>
+                <td></td>
+                <td class="number bold-value">0,00</td>
+                <td></td>
+                <td class="number bold-value">0,00</td>
+                <td></td>
+            </tr>"""
+                    
+                    # Reset cumulative values for new fiscal year
+                    cumulative_stock_pnl = 0.0
+                    cumulative_non_stock_pnl = 0.0
+                    cumulative_total_pnl = 0.0
+                    cumulative_fees_net = 0.0
+                    cumulative_fees_vat = 0.0
             
             html += """
         </tbody>
