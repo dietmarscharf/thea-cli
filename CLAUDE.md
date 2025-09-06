@@ -9,7 +9,7 @@ THEA is a comprehensive PDF processing and financial document analysis system th
 2. **AI-powered document analysis** using Ollama models with retry logic and pattern detection
 3. **Financial account analysis system** for processing bank statements and investment documents
 
-The system processes 618+ financial documents across 6 account types, extracting structured data and generating comprehensive markdown reports. Output files use the `.thea_extract` extension with additional sidecar files for metadata.
+The system processes 618+ financial documents across 6 account types, extracting structured data and generating comprehensive HTML reports. Output files use the `.thea_extract` extension with additional sidecar files for metadata.
 
 ## Architecture
 
@@ -56,15 +56,16 @@ The repository includes specialized scripts for analyzing financial documents:
 
 - **`Depotkonto.py`** - Analyzes depot/investment accounts
   - Processes ISIN codes and transaction types
-  - Generates `BLUEITS-Depotkonto.md` and `Ramteid-Depotkonto.md`
+  - Fallback to docling.txt when THEA extract lacks table data via `parse_docling_table()`
+  - Generates `BLUEITS-Depotkonto.html` and `Ramteid-Depotkonto.html`
 
 - **`Girokonto.py`** - Analyzes checking accounts
   - Transaction categorization and balance tracking
-  - Generates `BLUEITS-Girokonto.md` and `Ramteid-Girokonto.md`
+  - Generates `BLUEITS-Girokonto.html` and `Ramteid-Girokonto.html`
 
 - **`Geldmarktkonto.py`** - Analyzes money market accounts
   - Interest rate analysis features
-  - Generates `BLUEITS-Geldmarktkonto.md` and `Ramteid-Geldmarktkonto.md`
+  - Generates `BLUEITS-Geldmarktkonto.html` and `Ramteid-Geldmarktkonto.html`
 
 ### Core Processing Flow
 
@@ -389,6 +390,11 @@ This color scheme is distinguishable for most types of color blindness (deuteran
 - Linux/macOS: `sudo apt-get install poppler-utils` or `brew install poppler`
 - Windows: Download from GitHub, add bin folder to PATH
 - Verify: `pdftoppm -h`
+
+### Depot statement parsing issues
+- Check `Depotkonto.py:673` for `parse_docling_table()` fallback logic
+- Ensures extraction from docling.txt when THEA model fails on tables
+- Debug with: `python3 -c "from Depotkonto import DepotkontoAnalyzer; analyzer = DepotkontoAnalyzer(); result = analyzer.parse_docling_table(Path('path/to/docling.txt')); print(result)"`
 
 ### Vertical layout extraction issues (Sparkasse documents)
 - Check `Depotkonto.py:190-260` for vertical layout detection logic
