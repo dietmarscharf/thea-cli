@@ -124,6 +124,39 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         else:  # calendar year
             return f'FY{year}'
     
+    def get_calendar_year(self, date_str: str) -> str:
+        """
+        Bestimmt das Kalenderjahr aus einem Datum.
+        
+        Args:
+            date_str: Datum im Format YYYY-MM-DD oder als String
+            
+        Returns:
+            Kalenderjahr als String, z.B. 'CY2024'
+        """
+        import datetime
+        
+        if not date_str:
+            return 'CY0000'
+        
+        # Parse date if it's a string
+        if isinstance(date_str, str):
+            try:
+                # Try parsing YYYY-MM-DD format
+                if '-' in date_str:
+                    date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%d')
+                # Try parsing DD.MM.YYYY format
+                elif '.' in date_str:
+                    date_obj = datetime.datetime.strptime(date_str, '%d.%m.%Y')
+                else:
+                    return 'CY0000'
+            except:
+                return 'CY0000'
+        else:
+            date_obj = date_str
+        
+        return f'CY{date_obj.year}'
+    
     def extract_trading_details(self, text: str) -> Dict[str, Any]:
         """
         Extrahiert detaillierte Handelsinformationen aus Orderabrechnungen.
@@ -708,6 +741,20 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         # Bestimme Wertpapiertyp (Aktie oder Nicht-Aktie)
         security_type = 'stock' if self.is_stock_isin(isin) else 'non-stock' if isin else None
         
+        # Handle stock splits (Kapitalmaßnahme)
+        stock_split_data = {}
+        if transaction_type == 'Kapitalmaßnahme':
+            # Extract stock split data
+            split_data = self.extract_stock_split_data(extracted_text)
+            if split_data:
+                stock_split_data['original_shares'] = split_data.get('original_shares', 0)
+                stock_split_data['split_multiplier'] = split_data.get('split_multiplier', 1)
+                stock_split_data['new_shares_added'] = split_data.get('new_shares_added', 0)
+                stock_split_data['split_ratio_text'] = split_data.get('split_ratio_text', '')
+                # Set shares to original amount (before split)
+                if 'original_shares' in split_data:
+                    trading_details['shares'] = split_data['original_shares']
+        
         # Kombiniere alle Daten
         result = {
             **base_data,
@@ -720,7 +767,9 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             'amounts': amounts,
             'max_amount': max(amounts) if amounts else 0,
             # Neue detaillierte Handelsdaten
-            **trading_details
+            **trading_details,
+            # Stock split data (if applicable)
+            **stock_split_data
         }
         
         # Verwende net_amount als max_amount wenn verfügbar (genauer)
@@ -849,6 +898,37 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             print(f"Error parsing docling file {docling_path}: {e}")
             
         return result
+    
+    def extract_stock_split_data(self, text: str) -> Dict[str, Any]:
+        """Extract stock split information from Kapitalmaßnahme documents"""
+        split_data = {}
+        
+        # Parse original shares (Nominale/Stück before split)
+        # Pattern: "Nominale ... Stück 200"
+        original_match = re.search(r'Nominale.*?Stück\s+(\d+)', text, re.DOTALL | re.IGNORECASE)
+        if original_match:
+            split_data['original_shares'] = int(original_match.group(1))
+        
+        # Parse split ratio (Verhältnis: 1 : 2 means 1→3)
+        ratio_match = re.search(r'Verhältnis:\s*(\d+)\s*:\s*(\d+)', text, re.IGNORECASE)
+        if ratio_match:
+            base = int(ratio_match.group(1))
+            additional = int(ratio_match.group(2))
+            # Calculate multiplier: for 1:2 split, you get 2 additional shares, so total is 3x
+            split_data['split_multiplier'] = (base + additional) / base
+            split_data['split_ratio_text'] = f"{base}:{additional}"
+            
+        # Parse new shares added (Einbuchung Stück)
+        new_shares_match = re.search(r'Einbuchung\s+Stück\s+(\d+)', text, re.IGNORECASE)
+        if new_shares_match:
+            split_data['new_shares_added'] = int(new_shares_match.group(1))
+            
+        # Also check for phrases like "verdreifacht" (tripled)
+        if 'dreifache' in text.lower() or 'verdreifacht' in text.lower():
+            if 'split_multiplier' not in split_data:
+                split_data['split_multiplier'] = 3.0
+                
+        return split_data
     
     def extract_depot_balance(self, depot_path: Path) -> Dict[str, Any]:
         """Extrahiert Depot-Salden aus Depotabschluss-Dokumenten"""
@@ -1646,6 +1726,23 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             border-right: 2px solid #dee2e6 !important;
         }}
         
+        /* Non-stock block visual separation */
+        .non-stock-block-start {{
+            border-left: 2px solid #2c3e50 !important;
+        }}
+        
+        .non-stock-block-end {{
+            border-right: 2px solid #2c3e50 !important;
+        }}
+        
+        td.non-stock-block-start {{
+            border-left: 2px solid #dee2e6 !important;
+        }}
+        
+        td.non-stock-block-end {{
+            border-right: 2px solid #dee2e6 !important;
+        }}
+        
         /* Type column visual separation */
         .type-column {{
             border-left: 2px solid #2c3e50 !important;
@@ -1739,6 +1836,20 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         
         .neutral-row {{
             background-color: #e9ecef !important;
+        }}
+        
+        /* Capital actions (stock splits, etc.) */
+        .capital-action-row {{
+            background-color: #9c27b0 !important;  /* Purple for stock splits */
+            color: white !important;
+        }}
+        
+        .capital-action-row td {{
+            color: white !important;
+        }}
+        
+        .capital-action-row a {{
+            color: #64b5f6 !important;
         }}
         
         /* Links */
@@ -1841,6 +1952,23 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             border-bottom: 3px solid #000000 !important;
         }}
         
+        /* Calendar year transitions (blue) - only for FY != CY */
+        .calendar-year-summary-row {{
+            background-color: #1976d2 !important;  /* Blue */
+            font-weight: bold;
+            color: #ffffff !important;  /* White text */
+        }}
+        
+        .calendar-year-start-row {{
+            background-color: #1565c0 !important;  /* Slightly darker blue */
+            font-style: italic;
+            color: #ffffff !important;  /* White text */
+        }}
+        
+        .calendar-year-separator {{
+            border-bottom: 3px solid #000000 !important;  /* Black border like FY separator */
+        }}
+        
         .explanation-box h4 {{
             margin-top: 0;
             color: #1565c0;
@@ -1894,7 +2022,6 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         return f"""
     <div class="footer">
         <p>Erstellt am {current_date} mit THEA Document Analysis System</p>
-        <p>© 2024 - Automated Financial Document Processing</p>
     </div>
 </body>
 </html>"""
@@ -2233,6 +2360,9 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         
         # SECTION 5: Enhanced Transaction table with cumulative P&L
         if analysis.get('transactions'):
+            # Get fiscal type early for table structure decisions
+            fiscal_type = analysis.get('fiscal_year', {}).get('type', 'calendar')
+            
             html += """
     <h2>Transaktionsverlauf (Detailliert)</h2>
     
@@ -2247,15 +2377,33 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         <li><strong>USt %:</strong> Umsatzsteuersatz (0% für umsatzsteuerfreie Gebühren, 19% für normale Gebühren)</li>
         <li><strong>USt:</strong> Umsatzsteuerbetrag (EUR)</li>
         <li><strong>Geb. Brutto:</strong> Bruttogebühren inklusive Umsatzsteuer (EUR)</li>
-        <li><strong>Ausmach.:</strong> Ausmachender Betrag = Kurswert + Gebühren Brutto (EUR)</li>
+        <li><strong>Ausmach.:</strong> Ausmachender Betrag = Kurswert + Gebühren Brutto (EUR)</li>"""
+            
+            # Add FY/CY specific legends based on fiscal type
+            if fiscal_type == 'april_march':
+                html += """
+        <li><strong>Kum. Geb. (FY):</strong> Kumulierte Nettogebühren im Geschäftsjahr (EUR)</li>
+        <li><strong>Kum. Geb. (CY):</strong> Kumulierte Nettogebühren im Kalenderjahr (EUR)</li>
+        <li><strong>Kum. USt (FY):</strong> Kumulierte Umsatzsteuer im Geschäftsjahr (EUR)</li>
+        <li><strong>Kum. USt (CY):</strong> Kumulierte Umsatzsteuer im Kalenderjahr (EUR)</li>
+        <li><strong>G/V Akt.:</strong> Gewinn/Verlust aus Aktienverkäufen (EUR)</li>
+        <li><strong>Kum. Akt. (FY):</strong> Kumulierter Gewinn/Verlust Aktien im Geschäftsjahr (EUR)</li>
+        <li><strong>Kum. Akt. (CY):</strong> Kumulierter Gewinn/Verlust Aktien im Kalenderjahr (EUR)</li>
+        <li><strong>G/V N-Akt.:</strong> Gewinn/Verlust aus Nicht-Aktien (Derivate, Zertifikate, strukturierte Produkte) (EUR)</li>
+        <li><strong>Kum. N-Akt. (FY):</strong> Kumulierter Gewinn/Verlust Nicht-Aktien im Geschäftsjahr (EUR)</li>
+        <li><strong>Kum. N-Akt. (CY):</strong> Kumulierter Gewinn/Verlust Nicht-Aktien im Kalenderjahr (EUR)</li>
+"""
+            else:
+                html += """
         <li><strong>Kum. Geb.:</strong> Kumulierte Nettogebühren (EUR)</li>
         <li><strong>Kum. USt:</strong> Kumulierte Umsatzsteuer (EUR)</li>
         <li><strong>G/V Akt.:</strong> Gewinn/Verlust aus Aktienverkäufen (EUR)</li>
         <li><strong>Kum. Akt.:</strong> Kumulierter Gewinn/Verlust Aktien (EUR)</li>
         <li><strong>G/V N-Akt.:</strong> Gewinn/Verlust aus Nicht-Aktien (Derivate, Zertifikate, strukturierte Produkte) (EUR)</li>
         <li><strong>Kum. N-Akt.:</strong> Kumulierter Gewinn/Verlust Nicht-Aktien (EUR)</li>
-        <li><strong>G/V Ges.:</strong> Gewinn/Verlust Gesamt (EUR)</li>
-        <li><strong>Kum. Ges.:</strong> Kumulierter Gewinn/Verlust Gesamt (EUR)</li>
+"""
+            
+            html += """
     </ul>
     
     <table>
@@ -2276,15 +2424,31 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 <th>USt %</th>
                 <th>USt</th>
                 <th>Geb. Brutto</th>
-                <th>Ausmach.</th>
+                <th>Ausmach.</th>"""
+            
+            # Add cumulative column headers based on fiscal type
+            if fiscal_type == 'april_march':
+                html += """
+                <th>Kum. Geb. (FY)</th>
+                <th>Kum. Geb. (CY)</th>
+                <th>Kum. USt (FY)</th>
+                <th class="fee-block-end">Kum. USt (CY)</th>
+                <th>G/V Akt.</th>
+                <th>Kum. Akt. (FY)</th>
+                <th>Kum. Akt. (CY)</th>
+                <th class="non-stock-block-start">G/V N-Akt.</th>
+                <th>Kum. N-Akt. (FY)</th>
+                <th class="non-stock-block-end">Kum. N-Akt. (CY)</th>"""
+            else:
+                html += """
                 <th>Kum. Geb.</th>
                 <th class="fee-block-end">Kum. USt</th>
                 <th>G/V Akt.</th>
                 <th>Kum. Akt.</th>
-                <th>G/V N-Akt.</th>
-                <th>Kum. N-Akt.</th>
-                <th>G/V Ges.</th>
-                <th>Kum. Ges.</th>
+                <th class="non-stock-block-start">G/V N-Akt.</th>
+                <th class="non-stock-block-end">Kum. N-Akt.</th>"""
+                
+            html += """
                 <th>Dokument</th>
             </tr>
         </thead>
@@ -2315,9 +2479,29 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             cumulative_fees_net = 0.0
             cumulative_fees_vat = 0.0
             
+            # Tracking für alle Geschäftsjahre (wird nie zurückgesetzt)
+            all_years_stock_pnl = 0.0
+            all_years_non_stock_pnl = 0.0
+            all_years_total_pnl = 0.0
+            all_years_fees_net = 0.0
+            all_years_fees_vat = 0.0
+            
             # Track transaction numbers per fiscal year
             fiscal_year_counters = {}
-            fiscal_type = analysis.get('fiscal_year', {}).get('type', 'calendar')
+            # Track summaries per fiscal year for detailed overview
+            fiscal_year_summaries = {}
+            
+            # Calendar year tracking (only used when FY != CY)
+            is_dual_tracking = fiscal_type == 'april_march'  # FY != CY
+            if is_dual_tracking:
+                cumulative_cy_stock_pnl = 0.0
+                cumulative_cy_non_stock_pnl = 0.0
+                cumulative_cy_total_pnl = 0.0
+                cumulative_cy_fees_net = 0.0
+                cumulative_cy_fees_vat = 0.0
+                calendar_year_counters = {}
+                calendar_year_summaries = {}
+                previous_calendar_year = None  # Track previous CY to detect transitions
             
             # Track current share balances per ISIN
             # None = unknown (before first depot statement), number = known balance
@@ -2348,6 +2532,33 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     # not value_date (when money settles, which can be in next FY)
                     fy_date = execution_date or value_date
                 fiscal_year = self.get_fiscal_year(fy_date, fiscal_type)
+                trans['fiscal_year'] = fiscal_year  # Store fiscal_year in transaction for later filtering
+                
+                # Track calendar year for dual tracking
+                if is_dual_tracking:
+                    if 'Depotabschluss' in trans_type:
+                        # For Depotabschluss, use stichtag for calendar year (the actual reporting date)
+                        # This ensures Dec 31 Depotabschluss is assigned to the correct calendar year
+                        # Use stichtag directly, not the fallback value_date which might be a later date
+                        stichtag = trans.get('stichtag')
+                        calendar_year = self.get_calendar_year(stichtag) if stichtag else self.get_calendar_year(value_date)
+                    else:
+                        calendar_year = self.get_calendar_year(fy_date)
+                    trans['calendar_year'] = calendar_year
+                    
+                    # Check if we've entered a new calendar year (reset CY cumulative values)
+                    if previous_calendar_year and calendar_year != previous_calendar_year:
+                        # We've crossed into a new calendar year - reset CY cumulative values
+                        cumulative_cy_stock_pnl = 0.0
+                        cumulative_cy_non_stock_pnl = 0.0
+                        cumulative_cy_total_pnl = 0.0
+                        cumulative_cy_fees_net = 0.0
+                        cumulative_cy_fees_vat = 0.0
+                    
+                    # Get or initialize counter for this calendar year
+                    if calendar_year not in calendar_year_counters:
+                        calendar_year_counters[calendar_year] = 0
+                    calendar_year_counters[calendar_year] += 1
                 
                 # Check if this depot statement marks the end of a fiscal year
                 is_year_end_depot = False
@@ -2368,6 +2579,51 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     else:
                         # Last transaction is always year-end if it's a Depotabschluss
                         is_year_end_depot = True
+                
+                # Check for calendar year transition (only when dual tracking)
+                # Only insert separator if this is truly the LAST transaction of the calendar year
+                is_calendar_year_end = False
+                next_calendar_year = None
+                if is_dual_tracking and idx + 1 < len(analysis['transactions']):
+                    next_trans = analysis['transactions'][idx + 1]
+                    next_date = next_trans.get('value_date') or next_trans.get('execution_date') or next_trans.get('stichtag') or next_trans.get('date')
+                    if next_date:
+                        current_cy = trans.get('calendar_year', '')
+                        next_cy = self.get_calendar_year(next_date)
+                        if current_cy and next_cy and current_cy != next_cy:
+                            # Check if we're at a significant year boundary
+                            # Only insert separator if this is a Depotabschluss OR if it's actually Dec 31
+                            if 'Depotabschluss' in trans_type:
+                                # For Depotabschluss at calendar year boundary
+                                # The stichtag (reporting date) determines if it's a year-end report
+                                stichtag = trans.get('stichtag')
+                                check_date = stichtag or value_date
+                                
+                                if check_date:
+                                    import datetime
+                                    if isinstance(check_date, str):
+                                        try:
+                                            if '-' in check_date:
+                                                date_obj = datetime.datetime.strptime(check_date, '%Y-%m-%d')
+                                            elif '.' in check_date:
+                                                date_obj = datetime.datetime.strptime(check_date, '%d.%m.%Y')
+                                            else:
+                                                date_obj = None
+                                        except:
+                                            date_obj = None
+                                    else:
+                                        date_obj = check_date
+                                    
+                                    if date_obj:
+                                        # Check if this is a year-end Depotabschluss (December stichtag)
+                                        # or early year Depotabschluss reporting on previous year
+                                        if date_obj.month == 12 and date_obj.day >= 20:
+                                            is_calendar_year_end = True
+                                            next_calendar_year = next_cy
+                                        elif date_obj.month == 1:
+                                            # January Depotabschluss reporting on previous year
+                                            is_calendar_year_end = True
+                                            next_calendar_year = next_cy
                 
                 # Get or initialize counter for this fiscal year
                 if fiscal_year not in fiscal_year_counters:
@@ -2411,6 +2667,8 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                             row_class = "loss-row"
                         else:
                             row_class = "neutral-row"
+                elif trans_type == 'Kapitalmaßnahme':
+                    row_class = "capital-action-row"
                 elif trans_type not in ['Kauf', 'Orderabrechnung-Kauf']:
                     row_class = "misc-row"
                 
@@ -2494,6 +2752,34 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     else:
                         shares_change = EMPTY_VALUE
                         
+                elif trans_type == 'Kapitalmaßnahme':
+                    # Handle stock splits
+                    if trans.get('split_multiplier') and trans.get('split_multiplier') > 1:
+                        multiplier = trans['split_multiplier']
+                        new_shares_added = trans.get('new_shares_added', 0)
+                        
+                        # Show the change
+                        if new_shares_added > 0:
+                            shares_change = f"+{new_shares_added}"  # Show actual shares added
+                        else:
+                            shares_change = f"×{multiplier:.0f}"  # Show multiplication factor
+                        
+                        # Update balance if ISIN is tracked
+                        if current_isin in isin_balances and isin_balances[current_isin] is not None:
+                            old_balance = isin_balances[current_isin]
+                            # Calculate new balance
+                            if new_shares_added > 0:
+                                # Use the explicit new shares added
+                                new_balance = old_balance + new_shares_added
+                            else:
+                                # Use multiplier
+                                new_balance = int(old_balance * multiplier)
+                            
+                            isin_balances[current_isin] = new_balance
+                            print(f"  📊 Aktiensplit {current_isin}: {old_balance} → {new_balance} (×{multiplier})")
+                    else:
+                        shares_change = EMPTY_VALUE
+                        
                 else:
                     # Other transactions don't change balance
                     shares_change = EMPTY_VALUE
@@ -2544,20 +2830,21 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                         fees_vat = fees_gross - fees_net
                         ust_prozent_str = '19'
                     
-                    # Fees are always costs (negative) except for depot statements
-                    if 'Depotabschluss' not in trans_type:
-                        gebuhren_netto_str = '-' + self.format_number_german(fees_net, 2)
-                        ust_str = '-' + self.format_number_german(fees_vat, 2) if fees_vat > 0 else '0,00'
-                        gebuhren_brutto_str = '-' + self.format_number_german(fees_gross, 2)
-                    else:
-                        # Depot statements show fees without sign
-                        gebuhren_netto_str = self.format_number_german(fees_net, 2)
-                        ust_str = self.format_number_german(fees_vat, 2)
-                        gebuhren_brutto_str = self.format_number_german(fees_gross, 2)
+                    # Fees are always costs (negative)
+                    gebuhren_netto_str = '-' + self.format_number_german(fees_net, 2)
+                    ust_str = '-' + self.format_number_german(fees_vat, 2) if fees_vat > 0 else '0,00'
+                    gebuhren_brutto_str = '-' + self.format_number_german(fees_gross, 2)
                     
-                    # Add to cumulative
+                    # Add to cumulative (fiscal year and all years)
                     cumulative_fees_net += fees_net
                     cumulative_fees_vat += fees_vat
+                    all_years_fees_net += fees_net
+                    all_years_fees_vat += fees_vat
+                    
+                    # Update calendar year cumulative values for dual tracking
+                    if is_dual_tracking:
+                        cumulative_cy_fees_net += fees_net
+                        cumulative_cy_fees_vat += fees_vat
                 else:
                     fees_gross = 0
                     fees_net = 0
@@ -2596,10 +2883,16 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 is_stock = False
                 if isin and isin != 'N/A':
                     is_stock = self.is_stock_isin(isin)
+                trans['is_stock'] = is_stock  # Store for later use in calendar year calculations
                 
                 # Format cumulative fee values (always negative as they are costs)
                 kum_geb_str = '-' + self.format_number_german(cumulative_fees_net, 2) if cumulative_fees_net != 0 else EMPTY_VALUE
                 kum_ust_str = '-' + self.format_number_german(cumulative_fees_vat, 2) if cumulative_fees_vat != 0 else EMPTY_VALUE
+                
+                # Format calendar year cumulative values for dual tracking
+                if is_dual_tracking:
+                    kum_cy_geb_str = '-' + self.format_number_german(cumulative_cy_fees_net, 2) if cumulative_cy_fees_net != 0 else EMPTY_VALUE
+                    kum_cy_ust_str = '-' + self.format_number_german(cumulative_cy_fees_vat, 2) if cumulative_cy_fees_vat != 0 else EMPTY_VALUE
                 
                 # Initialize all G/V strings
                 gv_aktien_str = EMPTY_VALUE
@@ -2609,6 +2902,12 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 gv_gesamt_str = EMPTY_VALUE
                 kum_gesamt_str = EMPTY_VALUE
                 
+                # Initialize CY cumulative strings for dual tracking
+                if is_dual_tracking:
+                    kum_cy_aktien_str = EMPTY_VALUE
+                    kum_cy_non_aktien_str = EMPTY_VALUE
+                    kum_cy_gesamt_str = EMPTY_VALUE
+                
                 # Calculate G/V values if profit/loss exists
                 if trans.get('profit_loss') is not None:
                     profit_loss_val = trans['profit_loss']
@@ -2617,10 +2916,23 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     if is_stock:
                         cumulative_stock_pnl += profit_loss_val
                         cumulative_total_pnl += profit_loss_val
+                        all_years_stock_pnl += profit_loss_val
+                        all_years_total_pnl += profit_loss_val
+                        
+                        # Update calendar year cumulative values for dual tracking
+                        if is_dual_tracking:
+                            cumulative_cy_stock_pnl += profit_loss_val
+                            cumulative_cy_total_pnl += profit_loss_val
                         
                         # Format stock G/V
                         gv_aktien_str = self.format_number_german(profit_loss_val, 2, show_sign=True)
                         kum_aktien_str = self.format_number_german(cumulative_stock_pnl, 2, show_sign=True)
+                        
+                        # Format CY cumulative values for dual tracking
+                        if is_dual_tracking:
+                            kum_cy_aktien_str = self.format_number_german(cumulative_cy_stock_pnl, 2, show_sign=True)
+                            if cumulative_cy_non_stock_pnl != 0:
+                                kum_cy_non_aktien_str = self.format_number_german(cumulative_cy_non_stock_pnl, 2, show_sign=True)
                         
                         # Non-stock remains dash, but show cumulative if exists
                         if cumulative_non_stock_pnl != 0:
@@ -2628,10 +2940,23 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     else:
                         cumulative_non_stock_pnl += profit_loss_val
                         cumulative_total_pnl += profit_loss_val
+                        all_years_non_stock_pnl += profit_loss_val
+                        all_years_total_pnl += profit_loss_val
+                        
+                        # Update calendar year cumulative values for dual tracking
+                        if is_dual_tracking:
+                            cumulative_cy_non_stock_pnl += profit_loss_val
+                            cumulative_cy_total_pnl += profit_loss_val
                         
                         # Format non-stock G/V
                         gv_non_aktien_str = self.format_number_german(profit_loss_val, 2, show_sign=True)
                         kum_non_aktien_str = self.format_number_german(cumulative_non_stock_pnl, 2, show_sign=True)
+                        
+                        # Format CY cumulative values for dual tracking
+                        if is_dual_tracking:
+                            kum_cy_non_aktien_str = self.format_number_german(cumulative_cy_non_stock_pnl, 2, show_sign=True)
+                            if cumulative_cy_stock_pnl != 0:
+                                kum_cy_aktien_str = self.format_number_german(cumulative_cy_stock_pnl, 2, show_sign=True)
                         
                         # Stock remains dash, but show cumulative if exists
                         if cumulative_stock_pnl != 0:
@@ -2640,6 +2965,10 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     # Always show total G/V
                     gv_gesamt_str = self.format_number_german(profit_loss_val, 2, show_sign=True)
                     kum_gesamt_str = self.format_number_german(cumulative_total_pnl, 2, show_sign=True)
+                    
+                    # Format CY total cumulative for dual tracking
+                    if is_dual_tracking:
+                        kum_cy_gesamt_str = self.format_number_german(cumulative_cy_total_pnl, 2, show_sign=True)
                 else:
                     # No G/V for this transaction, but show cumulative values if they exist
                     if cumulative_stock_pnl != 0:
@@ -2648,6 +2977,15 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                         kum_non_aktien_str = self.format_number_german(cumulative_non_stock_pnl, 2, show_sign=True)
                     if cumulative_total_pnl != 0:
                         kum_gesamt_str = self.format_number_german(cumulative_total_pnl, 2, show_sign=True)
+                    
+                    # Format CY cumulative values if they exist
+                    if is_dual_tracking:
+                        if cumulative_cy_stock_pnl != 0:
+                            kum_cy_aktien_str = self.format_number_german(cumulative_cy_stock_pnl, 2, show_sign=True)
+                        if cumulative_cy_non_stock_pnl != 0:
+                            kum_cy_non_aktien_str = self.format_number_german(cumulative_cy_non_stock_pnl, 2, show_sign=True)
+                        if cumulative_cy_total_pnl != 0:
+                            kum_cy_gesamt_str = self.format_number_german(cumulative_cy_total_pnl, 2, show_sign=True)
                 
                 # Shorten document name
                 doc_name = trans.get('original_file', '')
@@ -2688,15 +3026,31 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 <td class="number">{ust_prozent_str}</td>
                 <td class="number">{ust_str}</td>
                 <td class="number">{gebuhren_brutto_str}</td>
-                <td class="number">{ausmachend_str}</td>
+                <td class="number">{ausmachend_str}</td>"""
+                
+                # Add cumulative columns based on fiscal type
+                if is_dual_tracking:
+                    html += f"""
+                <td class="number">{kum_geb_str}</td>
+                <td class="number">{kum_cy_geb_str}</td>
+                <td class="number">{kum_ust_str}</td>
+                <td class="number fee-block-end">{kum_cy_ust_str}</td>
+                <td class="number">{gv_aktien_str}</td>
+                <td class="number">{kum_aktien_str}</td>
+                <td class="number">{kum_cy_aktien_str}</td>
+                <td class="number non-stock-block-start">{gv_non_aktien_str}</td>
+                <td class="number">{kum_non_aktien_str}</td>
+                <td class="number non-stock-block-end">{kum_cy_non_aktien_str}</td>"""
+                else:
+                    html += f"""
                 <td class="number">{kum_geb_str}</td>
                 <td class="number fee-block-end">{kum_ust_str}</td>
                 <td class="number">{gv_aktien_str}</td>
                 <td class="number">{kum_aktien_str}</td>
-                <td class="number">{gv_non_aktien_str}</td>
-                <td class="number">{kum_non_aktien_str}</td>
-                <td class="number">{gv_gesamt_str}</td>
-                <td class="number">{kum_gesamt_str}</td>
+                <td class="number non-stock-block-start">{gv_non_aktien_str}</td>
+                <td class="number non-stock-block-end">{kum_non_aktien_str}</td>"""
+                
+                html += f"""
                 <td>{doc_link}</td>
             </tr>"""
                 
@@ -2737,16 +3091,33 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 <td></td>
                 <td></td>
                 <td></td>
+                <td></td>"""
+                    
+                    # Add cumulative columns - only FY columns for FY transition rows
+                    if is_dual_tracking:
+                        html += f"""
+                <td class="number bold-value">{'-' + self.format_number_german(cumulative_fees_net, 2) if cumulative_fees_net != 0 else '0,00'}</td>
                 <td></td>
+                <td class="number bold-value">{'-' + self.format_number_german(cumulative_fees_vat, 2) if cumulative_fees_vat != 0 else '0,00'}</td>
+                <td class="number fee-block-end"></td>
+                <td></td>
+                <td class="number bold-value">{self.format_number_german(cumulative_stock_pnl, 2, show_sign=True) if cumulative_stock_pnl != 0 else '0,00'}</td>
+                <td></td>
+                <td class="non-stock-block-start"></td>
+                <td class="number bold-value">{self.format_number_german(cumulative_non_stock_pnl, 2, show_sign=True) if cumulative_non_stock_pnl != 0 else '0,00'}</td>
+                <td></td>
+                <td class="non-stock-block-end"></td>"""
+                    else:
+                        html += f"""
                 <td class="number bold-value">{'-' + self.format_number_german(cumulative_fees_net, 2) if cumulative_fees_net != 0 else '0,00'}</td>
                 <td class="number fee-block-end bold-value">{'-' + self.format_number_german(cumulative_fees_vat, 2) if cumulative_fees_vat != 0 else '0,00'}</td>
                 <td></td>
                 <td class="number bold-value">{self.format_number_german(cumulative_stock_pnl, 2, show_sign=True) if cumulative_stock_pnl != 0 else '0,00'}</td>
-                <td></td>
-                <td class="number bold-value">{self.format_number_german(cumulative_non_stock_pnl, 2, show_sign=True) if cumulative_non_stock_pnl != 0 else '0,00'}</td>
-                <td></td>
-                <td class="number bold-value">{self.format_number_german(cumulative_total_pnl, 2, show_sign=True) if cumulative_total_pnl != 0 else '0,00'}</td>
-                <td></td>
+                <td class="non-stock-block-start"></td>
+                <td class="number bold-value non-stock-block-end">{self.format_number_german(cumulative_non_stock_pnl, 2, show_sign=True) if cumulative_non_stock_pnl != 0 else '0,00'}</td>
+                <td></td>"""
+                    
+                    html += """
             </tr>"""
                     
                     # Insert year-start row for new fiscal year
@@ -2765,17 +3136,56 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 <td></td>
                 <td></td>
                 <td></td>
+                <td></td>"""
+                    
+                    # Add reset columns - only FY columns for FY transition rows
+                    if is_dual_tracking:
+                        html += f"""
+                <td class="number bold-value">0,00</td>
                 <td></td>
+                <td class="number bold-value">0,00</td>
+                <td class="number fee-block-end"></td>
+                <td></td>
+                <td class="number bold-value">0,00</td>
+                <td></td>
+                <td class="non-stock-block-start"></td>
+                <td class="number bold-value">0,00</td>
+                <td></td>
+                <td class="non-stock-block-end"></td>"""
+                    else:
+                        html += f"""
                 <td class="number bold-value">0,00</td>
                 <td class="number fee-block-end bold-value">0,00</td>
                 <td></td>
                 <td class="number bold-value">0,00</td>
-                <td></td>
-                <td class="number bold-value">0,00</td>
-                <td></td>
-                <td class="number bold-value">0,00</td>
-                <td></td>
+                <td class="non-stock-block-start"></td>
+                <td class="number bold-value non-stock-block-end">0,00</td>
+                <td></td>"""
+                    
+                    html += """
             </tr>"""
+                    
+                    # Save fiscal year summary before resetting
+                    fiscal_year_summaries[fiscal_year] = {
+                        'stock_pnl': cumulative_stock_pnl,
+                        'non_stock_pnl': cumulative_non_stock_pnl,
+                        'total_pnl': cumulative_total_pnl,
+                        'fees_net': cumulative_fees_net,
+                        'fees_vat': cumulative_fees_vat,
+                        'transactions': fiscal_year_counters.get(fiscal_year, 0),
+                        'purchases_count': sum(1 for t in analysis['transactions'] 
+                                             if t.get('fiscal_year') == fiscal_year 
+                                             and 'Kauf' in t.get('type', '')),
+                        'purchases_volume': sum((t.get('gross_amount') or 0) for t in analysis['transactions'] 
+                                              if t.get('fiscal_year') == fiscal_year 
+                                              and 'Kauf' in t.get('type', '')),
+                        'sales_count': sum(1 for t in analysis['transactions'] 
+                                         if t.get('fiscal_year') == fiscal_year 
+                                         and 'Verkauf' in t.get('type', '')),
+                        'sales_volume': sum((t.get('gross_amount') or 0) for t in analysis['transactions'] 
+                                          if t.get('fiscal_year') == fiscal_year 
+                                          and 'Verkauf' in t.get('type', ''))
+                    }
                     
                     # Reset cumulative values for new fiscal year
                     cumulative_stock_pnl = 0.0
@@ -2783,66 +3193,366 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     cumulative_total_pnl = 0.0
                     cumulative_fees_net = 0.0
                     cumulative_fees_vat = 0.0
+                
+                # Insert calendar year transition rows (only for dual tracking)
+                if is_calendar_year_end and is_dual_tracking:
+                    calendar_year = trans.get('calendar_year', '')
+                    
+                    # Save calendar year summary before inserting rows
+                    if calendar_year in calendar_year_summaries:
+                        calendar_year_summaries[calendar_year].update({
+                            'cy_stock_pnl': cumulative_cy_stock_pnl,
+                            'cy_non_stock_pnl': cumulative_cy_non_stock_pnl,
+                            'cy_total_pnl': cumulative_cy_total_pnl,
+                            'cy_fees_net': cumulative_cy_fees_net,
+                            'cy_fees_vat': cumulative_cy_fees_vat,
+                            'transactions': calendar_year_counters.get(calendar_year, 0)
+                        })
+                    else:
+                        calendar_year_summaries[calendar_year] = {
+                            'cy_stock_pnl': cumulative_cy_stock_pnl,
+                            'cy_non_stock_pnl': cumulative_cy_non_stock_pnl,
+                            'cy_total_pnl': cumulative_cy_total_pnl,
+                            'cy_fees_net': cumulative_cy_fees_net,
+                            'cy_fees_vat': cumulative_cy_fees_vat,
+                            'transactions': calendar_year_counters.get(calendar_year, 0),
+                            'purchases_count': sum(1 for t in analysis['transactions'] 
+                                                 if t.get('calendar_year') == calendar_year 
+                                                 and 'Kauf' in t.get('type', '')),
+                            'purchases_volume': sum((t.get('gross_amount') or 0) for t in analysis['transactions'] 
+                                                  if t.get('calendar_year') == calendar_year 
+                                                  and 'Kauf' in t.get('type', '')),
+                            'sales_count': sum(1 for t in analysis['transactions'] 
+                                             if t.get('calendar_year') == calendar_year 
+                                             and 'Verkauf' in t.get('type', '')),
+                            'sales_volume': sum((t.get('gross_amount') or 0) for t in analysis['transactions'] 
+                                              if t.get('calendar_year') == calendar_year 
+                                              and 'Verkauf' in t.get('type', ''))
+                        }
+                    
+                    # Get transaction number for CY summary row
+                    last_cy_number = calendar_year_counters.get(calendar_year, 0)
+                    
+                    # Insert calendar year-end summary row (blue)
+                    html += f"""
+            <tr class="calendar-year-summary-row calendar-year-separator">
+                <td>{calendar_year}-001</td>
+                <td colspan="5" style="text-align: center; font-weight: bold;">
+                    === KALENDERJAHR {calendar_year.replace('CY', '')} ENDE ===
+                </td>
+                <td>{isin if isin not in ['N/A', 'None', None, ''] else ''}</td>
+                <td class="number">{shares_balance if shares_balance not in ['?', '-'] else ''}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="number fee-block-start"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>"""
+                    
+                    # Add cumulative columns - only CY columns for CY transition rows (white text on blue background)
+                    html += f"""
+                <td></td>
+                <td class="number bold-value">{'-' + self.format_number_german(cumulative_cy_fees_net, 2) if cumulative_cy_fees_net != 0 else '0,00'}</td>
+                <td></td>
+                <td class="number fee-block-end bold-value">{'-' + self.format_number_german(cumulative_cy_fees_vat, 2) if cumulative_cy_fees_vat != 0 else '0,00'}</td>
+                <td></td>
+                <td></td>
+                <td class="number bold-value">{self.format_number_german(cumulative_cy_stock_pnl, 2, show_sign=True) if cumulative_cy_stock_pnl != 0 else '0,00'}</td>
+                <td></td>
+                <td class="non-stock-block-start"></td>
+                <td class="number bold-value">{self.format_number_german(cumulative_cy_non_stock_pnl, 2, show_sign=True) if cumulative_cy_non_stock_pnl != 0 else '0,00'}</td>
+                <td></td>
+                <td class="non-stock-block-end"></td>
+            </tr>"""
+                    
+                    # Insert calendar year-start row for new year
+                    html += f"""
+            <tr class="calendar-year-start-row">
+                <td>{next_calendar_year}-000</td>
+                <td colspan="5" style="text-align: center; font-style: italic;">
+                    === KALENDERJAHR {next_calendar_year.replace('CY', '')} ANFANG ===
+                </td>
+                <td>{isin if isin not in ['N/A', 'None', None, ''] else ''}</td>
+                <td class="number">{shares_balance if shares_balance not in ['?', '-'] else ''}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="number fee-block-start"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>"""
+                    
+                    # Add reset cumulative columns - only CY columns for CY transition rows (white text on blue background)
+                    html += f"""
+                <td></td>
+                <td class="number bold-value">0,00</td>
+                <td></td>
+                <td class="number fee-block-end bold-value">0,00</td>
+                <td></td>
+                <td class="non-stock-block-start"></td>
+                <td class="number bold-value">0,00</td>
+                <td></td>
+                <td class="non-stock-block-end"></td>
+            </tr>"""
+                    
+                    # Note: CY cumulative values are now reset at the beginning of the next transaction
+                    # when we detect a calendar year change
+                
+                # Update previous calendar year for next iteration (to detect transitions)
+                if is_dual_tracking:
+                    previous_calendar_year = calendar_year
+            
+            # Save summaries for ALL calendar years (for dual tracking)
+            if is_dual_tracking:
+                # Collect all unique calendar years from transactions
+                all_calendar_years = set()
+                for t in analysis['transactions']:
+                    cy = t.get('calendar_year')
+                    if cy:
+                        all_calendar_years.add(cy)
+                
+                # Create summaries for each calendar year
+                for cy in all_calendar_years:
+                    if cy not in calendar_year_summaries:
+                        calendar_year_summaries[cy] = {}
+                    
+                    # Calculate values for this calendar year
+                    cy_transactions = [t for t in analysis['transactions'] if t.get('calendar_year') == cy]
+                    
+                    # Calculate P&L for this calendar year
+                    cy_stock_pnl = sum((t.get('profit_loss') or 0) for t in cy_transactions 
+                                      if 'Verkauf' in t.get('type', '') and t.get('is_stock'))
+                    cy_non_stock_pnl = sum((t.get('profit_loss') or 0) for t in cy_transactions 
+                                          if 'Verkauf' in t.get('type', '') and not t.get('is_stock'))
+                    cy_total_pnl = cy_stock_pnl + cy_non_stock_pnl
+                    
+                    # Calculate fees for this calendar year
+                    cy_fees_net = sum((t.get('fees_net') or 0) for t in cy_transactions)
+                    cy_fees_vat = sum((t.get('fees_vat') or 0) for t in cy_transactions)
+                    
+                    calendar_year_summaries[cy].update({
+                    'cy_stock_pnl': cy_stock_pnl,
+                    'cy_non_stock_pnl': cy_non_stock_pnl,
+                    'cy_total_pnl': cy_total_pnl,
+                    'cy_fees_net': cy_fees_net,
+                    'cy_fees_vat': cy_fees_vat,
+                    'transactions': calendar_year_counters.get(cy, 0),
+                    'purchases_count': sum(1 for t in cy_transactions 
+                                         if 'Kauf' in t.get('type', '')),
+                    'purchases_volume': sum((t.get('gross_amount') or 0) for t in cy_transactions 
+                                          if 'Kauf' in t.get('type', '')),
+                    'sales_count': sum(1 for t in cy_transactions 
+                                     if 'Verkauf' in t.get('type', '')),
+                    'sales_volume': sum((t.get('gross_amount') or 0) for t in cy_transactions 
+                                      if 'Verkauf' in t.get('type', ''))
+                })
+            
+            # Save the last fiscal year's summary
+            if fiscal_year:
+                fiscal_year_summaries[fiscal_year] = {
+                    'stock_pnl': cumulative_stock_pnl,
+                    'non_stock_pnl': cumulative_non_stock_pnl,
+                    'total_pnl': cumulative_total_pnl,
+                    'fees_net': cumulative_fees_net,
+                    'fees_vat': cumulative_fees_vat,
+                    'transactions': fiscal_year_counters.get(fiscal_year, 0),
+                    'purchases_count': sum(1 for t in analysis['transactions'] 
+                                         if t.get('fiscal_year') == fiscal_year 
+                                         and 'Kauf' in t.get('type', '')),
+                    'purchases_volume': sum(t.get('gross_amount', 0) for t in analysis['transactions'] 
+                                          if t.get('fiscal_year') == fiscal_year 
+                                          and 'Kauf' in t.get('type', '')),
+                    'sales_count': sum(1 for t in analysis['transactions'] 
+                                     if t.get('fiscal_year') == fiscal_year 
+                                     and 'Verkauf' in t.get('type', '')),
+                    'sales_volume': sum(t.get('gross_amount', 0) for t in analysis['transactions'] 
+                                      if t.get('fiscal_year') == fiscal_year 
+                                      and 'Verkauf' in t.get('type', ''))
+                }
             
             html += """
         </tbody>
     </table>
 """
             
-            # Performance summary
-            total_sales = sum(1 for t in analysis['transactions'] if 'Verkauf' in t['type'] and t.get('profit_loss') is not None)
-            total_profit = sum(t['profit_loss'] for t in analysis['transactions'] if 'Verkauf' in t['type'] and t.get('profit_loss') is not None and t['profit_loss'] > 0)
-            total_loss = sum(t['profit_loss'] for t in analysis['transactions'] if 'Verkauf' in t['type'] and t.get('profit_loss') is not None and t['profit_loss'] < 0)
+            # Performance summary - now using all_years totals
+            total_purchases = sum(1 for t in analysis['transactions'] if 'Kauf' in t['type'])
+            total_purchases_volume = sum((t.get('gross_amount') or 0) for t in analysis['transactions'] if 'Kauf' in t['type'])
+            total_sales = sum(1 for t in analysis['transactions'] if 'Verkauf' in t['type'])
+            total_sales_volume = sum((t.get('gross_amount') or 0) for t in analysis['transactions'] if 'Verkauf' in t['type'])
             
-            if total_sales > 0:
+            if total_sales > 0 or fiscal_year_summaries:
+                # Determine header text based on fiscal year type
+                year_header = "Jahr" if fiscal_type == 'calendar' else "Geschäftsjahr"
+                performance_title = "Performance-Übersicht" if fiscal_type == 'calendar' else "Performance nach Geschäftsjahren"
+                
                 html += f"""
-    <h3>Performance-Zusammenfassung:</h3>
-    <ul>
-        <li><strong>Anzahl Verkäufe mit G/V:</strong> {total_sales}</li>
-        <li><strong>Gesamtgewinn:</strong> <span class="positive">{self.format_number_german(total_profit, 2)} EUR</span></li>
-        <li><strong>Gesamtverlust:</strong> <span class="negative">{self.format_number_german(total_loss, 2)} EUR</span></li>
-        <li><strong>Netto G/V Aktien:</strong> <span class="{'positive' if cumulative_stock_pnl > 0 else 'negative'}">{self.format_number_german(cumulative_stock_pnl, 2)} EUR</span></li>
-        <li><strong>Netto G/V Nicht-Aktien:</strong> <span class="{'positive' if cumulative_non_stock_pnl > 0 else 'negative'}">{self.format_number_german(cumulative_non_stock_pnl, 2)} EUR</span></li>
-        <li><strong>Netto G/V Gesamt:</strong> <span class="{'positive' if cumulative_total_pnl > 0 else 'negative'}">{self.format_number_german(cumulative_total_pnl, 2)} EUR</span></li>
-    </ul>
-"""
-        
-        # SECTION 6: Zeitliche Verteilung (Time Distribution)
-        if analysis.get('transactions'):
-            monthly_groups = calculate_monthly_aggregates(analysis['transactions'])
-            
-            if monthly_groups:
-                html += """
-    <h2>Zeitliche Verteilung</h2>
-    <table>
+    <h3>{performance_title}</h3>
+    <table style="width: auto;">
         <thead>
             <tr>
-                <th>Monat</th>
-                <th>Anzahl Transaktionen</th>
-                <th>Gesamtvolumen (EUR)</th>
+                <th>{year_header}</th>
+                <th>Käufe<br>Anz.</th>
+                <th>Käufe<br>Volumen</th>
+                <th>Verkäufe<br>Anz.</th>
+                <th>Verkäufe<br>Volumen</th>
+                <th>G/V<br>Aktien</th>
+                <th>G/V<br>Nicht-Aktien</th>
+                <th>G/V<br>Gesamt</th>
+                <th>Gebühren<br>(netto)</th>
+                <th>USt</th>
             </tr>
         </thead>
-        <tbody>
-"""
-                for month in sorted(monthly_groups.keys()):
-                    data = monthly_groups[month]
-                    html += f"""
+        <tbody>"""
+                
+                # Add rows for each fiscal year
+                if fiscal_year_summaries:
+                    for fy in sorted(fiscal_year_summaries.keys()):
+                        summary = fiscal_year_summaries[fy]
+                        stock_pnl_class = 'positive' if summary.get('stock_pnl', 0) >= 0 else 'negative'
+                        non_stock_pnl_class = 'positive' if summary.get('non_stock_pnl', 0) >= 0 else 'negative'
+                        total_pnl_class = 'positive' if summary['total_pnl'] >= 0 else 'negative'
+                        
+                        # Format year display based on fiscal type
+                        year_display = fy.replace('FY', '') if fiscal_type == 'calendar' else fy
+                        
+                        html += f"""
             <tr>
-                <td>{month}</td>
-                <td class="number">{data['count']}</td>
-                <td class="number">{self.format_number_german(data['volume'], 2)}</td>
+                <td>{year_display}</td>
+                <td class="number">{summary.get('purchases_count', 0)}</td>
+                <td class="number">{self.format_number_german(summary.get('purchases_volume', 0), 2)}</td>
+                <td class="number">{summary.get('sales_count', 0)}</td>
+                <td class="number">{self.format_number_german(summary.get('sales_volume', 0), 2)}</td>
+                <td class="number {stock_pnl_class}">{self.format_number_german(summary.get('stock_pnl', 0), 2, show_sign=True)}</td>
+                <td class="number {non_stock_pnl_class}">{self.format_number_german(summary.get('non_stock_pnl', 0), 2, show_sign=True)}</td>
+                <td class="number {total_pnl_class}">{self.format_number_german(summary['total_pnl'], 2, show_sign=True)}</td>
+                <td class="number negative">{self.format_number_german(-summary['fees_net'], 2)}</td>
+                <td class="number negative">{self.format_number_german(-summary['fees_vat'], 2)}</td>
+            </tr>"""
+                
+                # Add summary row with totals
+                stock_pnl_total_class = 'positive' if all_years_stock_pnl >= 0 else 'negative'
+                non_stock_pnl_total_class = 'positive' if all_years_non_stock_pnl >= 0 else 'negative'
+                total_pnl_total_class = 'positive' if all_years_total_pnl >= 0 else 'negative'
+                
+                html += f"""
+            <tr class="summary-row" style="border-top: 2px solid #333; font-weight: bold;">
+                <td>Gesamt</td>
+                <td class="number">{total_purchases}</td>
+                <td class="number">{self.format_number_german(total_purchases_volume, 2)}</td>
+                <td class="number">{total_sales}</td>
+                <td class="number">{self.format_number_german(total_sales_volume, 2)}</td>
+                <td class="number {stock_pnl_total_class}">{self.format_number_german(all_years_stock_pnl, 2, show_sign=True)}</td>
+                <td class="number {non_stock_pnl_total_class}">{self.format_number_german(all_years_non_stock_pnl, 2, show_sign=True)}</td>
+                <td class="number {total_pnl_total_class}">{self.format_number_german(all_years_total_pnl, 2, show_sign=True)}</td>
+                <td class="number negative">{self.format_number_german(-all_years_fees_net, 2)}</td>
+                <td class="number negative">{self.format_number_german(-all_years_fees_vat, 2)}</td>
             </tr>"""
                 
                 html += """
         </tbody>
     </table>
 """
-                # Summary
-                months = list(monthly_groups.keys())
-                first_month = min(months)
-                last_month = max(months)
-                total_years = len(set(m[:4] for m in months))
-                html += f'<p><em>Aktivität in {len(months)} Monaten über {total_years} Jahre ({first_month} bis {last_month})</em></p>'
+            
+            # Add calendar year performance table for dual tracking
+            if is_dual_tracking and calendar_year_summaries:
+                html += """
+    <h3>Performance nach Kalenderjahren</h3>
+    <table style="width: auto;">
+        <thead>
+            <tr>
+                <th>Kalenderjahr</th>
+                <th>Käufe<br>Anz.</th>
+                <th>Käufe<br>Volumen</th>
+                <th>Verkäufe<br>Anz.</th>
+                <th>Verkäufe<br>Volumen</th>
+                <th>G/V<br>Aktien</th>
+                <th>G/V<br>Nicht-Aktien</th>
+                <th>G/V<br>Gesamt</th>
+                <th>Gebühren<br>(netto)</th>
+                <th>USt</th>
+            </tr>
+        </thead>
+        <tbody>"""
+                
+                # Calculate totals for calendar years
+                cy_total_purchases = 0
+                cy_total_purchases_volume = 0.0
+                cy_total_sales = 0
+                cy_total_sales_volume = 0.0
+                cy_total_stock_pnl = 0.0
+                cy_total_non_stock_pnl = 0.0
+                cy_total_pnl = 0.0
+                cy_total_fees_net = 0.0
+                cy_total_fees_vat = 0.0
+                
+                for cy in sorted(calendar_year_summaries.keys()):
+                    summary = calendar_year_summaries[cy]
+                    cy_display = cy.replace('CY', '')
+                    
+                    # Get values with fallback
+                    stock_pnl = summary.get('cy_stock_pnl', 0)
+                    non_stock_pnl = summary.get('cy_non_stock_pnl', 0)
+                    total_pnl = summary.get('cy_total_pnl', 0)
+                    fees_net = summary.get('cy_fees_net', 0)
+                    fees_vat = summary.get('cy_fees_vat', 0)
+                    
+                    # Update totals
+                    cy_total_purchases += summary.get('purchases_count', 0)
+                    cy_total_purchases_volume += summary.get('purchases_volume', 0)
+                    cy_total_sales += summary.get('sales_count', 0)
+                    cy_total_sales_volume += summary.get('sales_volume', 0)
+                    cy_total_stock_pnl += stock_pnl
+                    cy_total_non_stock_pnl += non_stock_pnl
+                    cy_total_pnl += total_pnl
+                    cy_total_fees_net += fees_net
+                    cy_total_fees_vat += fees_vat
+                    
+                    # Determine CSS classes
+                    stock_pnl_class = 'positive' if stock_pnl >= 0 else 'negative'
+                    non_stock_pnl_class = 'positive' if non_stock_pnl >= 0 else 'negative'
+                    total_pnl_class = 'positive' if total_pnl >= 0 else 'negative'
+                    
+                    html += f"""
+            <tr>
+                <td>{cy_display}</td>
+                <td class="number">{summary.get('purchases_count', 0)}</td>
+                <td class="number">{self.format_number_german(summary.get('purchases_volume', 0), 2)}</td>
+                <td class="number">{summary.get('sales_count', 0)}</td>
+                <td class="number">{self.format_number_german(summary.get('sales_volume', 0), 2)}</td>
+                <td class="number {stock_pnl_class}">{self.format_number_german(stock_pnl, 2, show_sign=True)}</td>
+                <td class="number {non_stock_pnl_class}">{self.format_number_german(non_stock_pnl, 2, show_sign=True)}</td>
+                <td class="number {total_pnl_class}">{self.format_number_german(total_pnl, 2, show_sign=True)}</td>
+                <td class="number negative">{self.format_number_german(-fees_net, 2) if fees_net > 0 else '0,00'}</td>
+                <td class="number negative">{self.format_number_german(-fees_vat, 2) if fees_vat > 0 else '0,00'}</td>
+            </tr>"""
+                
+                # Add summary row
+                cy_stock_pnl_class = 'positive' if cy_total_stock_pnl >= 0 else 'negative'
+                cy_non_stock_pnl_class = 'positive' if cy_total_non_stock_pnl >= 0 else 'negative'
+                cy_total_pnl_class = 'positive' if cy_total_pnl >= 0 else 'negative'
+                
+                html += f"""
+            <tr class="summary-row" style="border-top: 2px solid #333; font-weight: bold;">
+                <td>Gesamt</td>
+                <td class="number">{cy_total_purchases}</td>
+                <td class="number">{self.format_number_german(cy_total_purchases_volume, 2)}</td>
+                <td class="number">{cy_total_sales}</td>
+                <td class="number">{self.format_number_german(cy_total_sales_volume, 2)}</td>
+                <td class="number {cy_stock_pnl_class}">{self.format_number_german(cy_total_stock_pnl, 2, show_sign=True)}</td>
+                <td class="number {cy_non_stock_pnl_class}">{self.format_number_german(cy_total_non_stock_pnl, 2, show_sign=True)}</td>
+                <td class="number {cy_total_pnl_class}">{self.format_number_german(cy_total_pnl, 2, show_sign=True)}</td>
+                <td class="number negative">{self.format_number_german(-cy_total_fees_net, 2) if cy_total_fees_net > 0 else '0,00'}</td>
+                <td class="number negative">{self.format_number_german(-cy_total_fees_vat, 2) if cy_total_fees_vat > 0 else '0,00'}</td>
+            </tr>"""
+                
+                html += """
+        </tbody>
+    </table>
+"""
         
         # Add footer
         html += self._create_html_footer()
