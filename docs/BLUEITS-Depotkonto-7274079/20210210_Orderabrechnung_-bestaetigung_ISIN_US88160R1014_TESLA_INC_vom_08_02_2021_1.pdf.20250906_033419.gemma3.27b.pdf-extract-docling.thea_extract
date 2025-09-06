@@ -6,19 +6,19 @@
       "pdf_absolute_path": "/mnt/c/Projects/THEA/docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021_1.pdf",
       "pdf_size_bytes": 57170,
       "pdf_pages": 0,
-      "output_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021_1.pdf.20250902_224238.gemma3.27b.pdf-extract-docling.thea_extract"
+      "output_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021_1.pdf.20250906_033419.gemma3.27b.pdf-extract-docling.thea_extract"
     },
     "processing": {
-      "timestamp": "20250902_224238",
-      "start_time": "2025-09-02T22:42:38.819333Z",
-      "end_time": "2025-09-02T22:43:07.148492Z",
-      "processing_time_seconds": 28.327949285507202,
+      "timestamp": "20250906_033419",
+      "start_time": "2025-09-06T03:34:19.474967Z",
+      "end_time": "2025-09-06T03:34:47.419571Z",
+      "processing_time_seconds": 27.94330644607544,
       "hostname": "BLUEITS-DS-Privat",
       "platform": "linux",
       "pipeline": "pdf-extract-docling",
       "pipeline_metadata": {
         "pipeline": "pdf-extract-docling",
-        "timestamp": "2025-09-02T22:42:35.948690Z",
+        "timestamp": "2025-09-06T03:34:16.460207Z",
         "pdf_path": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021_1.pdf",
         "extractor": "docling",
         "fallback_model": "gemma3:27b",
@@ -27,12 +27,12 @@
           {
             "extractor": "docling",
             "type": "text/plain",
-            "text_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021_1.pdf.20250902_224235.gemma3.27b.pdf-extract-docling.docling.txt",
-            "json_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021_1.pdf.20250902_224235.gemma3.27b.pdf-extract-docling.docling.json",
+            "text_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021_1.pdf.20250906_033416.gemma3.27b.pdf-extract-docling.docling.txt",
+            "json_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021_1.pdf.20250906_033416.gemma3.27b.pdf-extract-docling.docling.json",
             "confidence": 0.9,
             "character_count": 1396,
             "file_size": 1409,
-            "md_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021_1.pdf.20250902_224235.gemma3.27b.pdf-extract-docling.docling.md"
+            "md_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021_1.pdf.20250906_033416.gemma3.27b.pdf-extract-docling.docling.md"
           }
         ],
         "extraction_success": true,
@@ -57,7 +57,7 @@
     "prompt_file": "prompts/pdf-extract-docling.prompt",
     "save_sidecars": true,
     "dpi": 300,
-    "max_attempts": 3,
+    "max_attempts": 10,
     "initial_temperature": 0.2,
     "temperature_progression": [
       0.2
@@ -70,18 +70,18 @@
     "final_temperature": 0.2,
     "stuck_pattern_detected": false,
     "pattern_type": null,
-    "chunks_received": 857,
-    "request_time_seconds": 28.327834367752075,
+    "chunks_received": 855,
+    "request_time_seconds": 27.943204402923584,
     "files_processed": [
       {
         "extractor": "docling",
         "type": "text/plain",
-        "text_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021_1.pdf.20250902_224235.gemma3.27b.pdf-extract-docling.docling.txt",
-        "json_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021_1.pdf.20250902_224235.gemma3.27b.pdf-extract-docling.docling.json",
+        "text_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021_1.pdf.20250906_033416.gemma3.27b.pdf-extract-docling.docling.txt",
+        "json_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021_1.pdf.20250906_033416.gemma3.27b.pdf-extract-docling.docling.json",
         "confidence": 0.9,
         "character_count": 1396,
         "file_size": 1409,
-        "md_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021_1.pdf.20250902_224235.gemma3.27b.pdf-extract-docling.docling.md"
+        "md_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021_1.pdf.20250906_033416.gemma3.27b.pdf-extract-docling.docling.md"
       }
     ]
   },
@@ -135,7 +135,7 @@
     }
   },
   "response": {
-    "text": "{\"extracted_text\": \"Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\\n\\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\\n\\n## Depotnummer\\n\\n7274079\\n\\nKundennummer\\n\\n24711383 BLUEITS GmbH 678034/62.00 08.02.2021 W02279-0000003134/21 DE131841737\\n\\nAuftragsnummer Datum Rechnungsnummer Umsatzsteuer-ID\\n\\n## Wertpapier Abrechnung Kauf\\n\\n| Nominale   | Wertpapierbezeichnung                | ISIN         | (WKN)    |\\n|------------|--------------------------------------|--------------|----------|\\n| Stück 28   | TESLA INC. REGISTERED SHARES DL-,001 | US88160R1014 | (A1CX3T) |\\n\\nHandels-/Ausführungsplatz Börsensegment\\n\\nTradegate (gemäß Weisung) XGAT\\n\\n## Market-Orde r\\n\\nLimit\\n\\nbilligst\\n\\nSchlusstag/-Zeit 08.02.2021 13:19:29 Ausführungskurs 701,10 EUR\\n\\nSchlusstag/-Zeit 08.02.2021 13:19:29 Ausführungskurs 701,10 EUR\\n\\nAuftraggeber\\n\\nDietmar Scharf\\n\\nAuftragserteilung/ -ort\\n\\nOnline-Banking\\n\\nGirosammelverw. mehrere Sammelurkunden - kein Stückeausdruck -\\n\\nKurswert\\n\\n19.630,80- EUR\\n\\nProvision\\n\\n19,14- EUR\\n\\nAusmachender Betrag\\n\\n19.649,94- EUR\\n\\nDen Gegenwert buchen wir mit Valuta 10.02.2021 zu Lasten des Kontos 21503990 (IBAN DE51 7525 0000 0021 5039 90), BLZ 75250000 (BIC BYLADEM1ABG).\\n\\nDie Wertpapiere schreiben wir Ihrem Depotkonto gut.\\n\\nSofern keine Umsatzsteuer ausgewiesen ist, handelt es sich um eine umsatzsteuerbefreite Finanzdienstleistung.\\n\\nFür das Geschäft wurde keine Anlageberatung erbracht.\", \"character_count\": 1396, \"document_type\": \"Invoice\", \"three_word_description_german\": \"Depotabrechnung Tesla Aktie\", \"three_word_description_english\": \"Tesla Stock Statement\", \"content_summary_german\": \"Dieses Dokument ist eine Depotabrechnung für den Kauf von Tesla Aktien. Es enthält Details wie Anzahl der Aktien, Ausführungskurs und den Gesamtbetrag. Die Abrechnung bestätigt den Kauf und die Gutschrift auf das Depotkonto.\", \"content_summary_english\": \"This document is a statement for the purchase of Tesla shares. It contains details such as the number of shares, execution price, and the total amount. The statement confirms the purchase and the credit to the depot account.\", \"extraction_quality\": \"excellent\", \"has_tables\": true, \"has_formulas\": false, \"document_sections\": [\"Depotnummer\", \"Wertpapier Abrechnung Kauf\", \"Market-Orde r\"]}",
+    "text": "{\"extracted_text\": \"Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\\n\\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\\n\\n## Depotnummer\\n\\n7274079\\n\\nKundennummer\\n\\n24711383 BLUEITS GmbH 678034/62.00 08.02.2021 W02279-0000003134/21 DE131841737\\n\\nAuftragsnummer Datum Rechnungsnummer Umsatzsteuer-ID\\n\\n## Wertpapier Abrechnung Kauf\\n\\n| Nominale   | Wertpapierbezeichnung                | ISIN         | (WKN)    |\\n|------------|--------------------------------------|--------------|----------|\\n| Stück 28   | TESLA INC. REGISTERED SHARES DL-,001 | US88160R1014 | (A1CX3T) |\\n\\nHandels-/Ausführungsplatz Börsensegment\\n\\nTradegate (gemäß Weisung) XGAT\\n\\n## Market-Orde r\\n\\nLimit\\n\\nbilligst\\n\\nSchlusstag/-Zeit 08.02.2021 13:19:29 Ausführungskurs 701,10 EUR\\n\\nSchlusstag/-Zeit 08.02.2021 13:19:29 Ausführungskurs 701,10 EUR\\n\\nAuftraggeber\\n\\nDietmar Scharf\\n\\nAuftragserteilung/ -ort\\n\\nOnline-Banking\\n\\nGirosammelverw. mehrere Sammelurkunden - kein Stückeausdruck -\\n\\nKurswert\\n\\n19.630,80- EUR\\n\\nProvision\\n\\n19,14- EUR\\n\\nAusmachender Betrag\\n\\n19.649,94- EUR\\n\\nDen Gegenwert buchen wir mit Valuta 10.02.2021 zu Lasten des Kontos 21503990 (IBAN DE51 7525 0000 0021 5039 90), BLZ 75250000 (BIC BYLADEM1ABG).\\n\\nDie Wertpapiere schreiben wir Ihrem Depotkonto gut.\\n\\nSofern keine Umsatzsteuer ausgewiesen ist, handelt es sich um eine umsatzsteuerbefreite Finanzdienstleistung.\\n\\nFür das Geschäft wurde keine Anlageberatung erbracht.\", \"character_count\": 1396, \"document_type\": \"Invoice\", \"three_word_description_german\": \"Depotabrechnung Tesla Aktie\", \"three_word_description_english\": \"Tesla Stock Statement\", \"content_summary_german\": \"Dieses Dokument ist eine Depotabrechnung für den Kauf von 28 Tesla Aktien am 08.02.2021. Es enthält Details wie Kurswert, Provision und den zu zahlenden Gesamtbetrag.\", \"content_summary_english\": \"This document is a statement for the purchase of 28 Tesla shares on February 8, 2021. It includes details such as market value, commission, and the total amount due.\", \"extraction_quality\": \"excellent\", \"has_tables\": true, \"has_formulas\": false, \"document_sections\": [\"Depotnummer\", \"Wertpapier Abrechnung Kauf\", \"Market-Orde r\"]}",
     "thinking": null,
     "json": {
       "extracted_text": "Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\n\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\n\n## Depotnummer\n\n7274079\n\nKundennummer\n\n24711383 BLUEITS GmbH 678034/62.00 08.02.2021 W02279-0000003134/21 DE131841737\n\nAuftragsnummer Datum Rechnungsnummer Umsatzsteuer-ID\n\n## Wertpapier Abrechnung Kauf\n\n| Nominale   | Wertpapierbezeichnung                | ISIN         | (WKN)    |\n|------------|--------------------------------------|--------------|----------|\n| Stück 28   | TESLA INC. REGISTERED SHARES DL-,001 | US88160R1014 | (A1CX3T) |\n\nHandels-/Ausführungsplatz Börsensegment\n\nTradegate (gemäß Weisung) XGAT\n\n## Market-Orde r\n\nLimit\n\nbilligst\n\nSchlusstag/-Zeit 08.02.2021 13:19:29 Ausführungskurs 701,10 EUR\n\nSchlusstag/-Zeit 08.02.2021 13:19:29 Ausführungskurs 701,10 EUR\n\nAuftraggeber\n\nDietmar Scharf\n\nAuftragserteilung/ -ort\n\nOnline-Banking\n\nGirosammelverw. mehrere Sammelurkunden - kein Stückeausdruck -\n\nKurswert\n\n19.630,80- EUR\n\nProvision\n\n19,14- EUR\n\nAusmachender Betrag\n\n19.649,94- EUR\n\nDen Gegenwert buchen wir mit Valuta 10.02.2021 zu Lasten des Kontos 21503990 (IBAN DE51 7525 0000 0021 5039 90), BLZ 75250000 (BIC BYLADEM1ABG).\n\nDie Wertpapiere schreiben wir Ihrem Depotkonto gut.\n\nSofern keine Umsatzsteuer ausgewiesen ist, handelt es sich um eine umsatzsteuerbefreite Finanzdienstleistung.\n\nFür das Geschäft wurde keine Anlageberatung erbracht.",
@@ -143,8 +143,8 @@
       "document_type": "Invoice",
       "three_word_description_german": "Depotabrechnung Tesla Aktie",
       "three_word_description_english": "Tesla Stock Statement",
-      "content_summary_german": "Dieses Dokument ist eine Depotabrechnung für den Kauf von Tesla Aktien. Es enthält Details wie Anzahl der Aktien, Ausführungskurs und den Gesamtbetrag. Die Abrechnung bestätigt den Kauf und die Gutschrift auf das Depotkonto.",
-      "content_summary_english": "This document is a statement for the purchase of Tesla shares. It contains details such as the number of shares, execution price, and the total amount. The statement confirms the purchase and the credit to the depot account.",
+      "content_summary_german": "Dieses Dokument ist eine Depotabrechnung für den Kauf von 28 Tesla Aktien am 08.02.2021. Es enthält Details wie Kurswert, Provision und den zu zahlenden Gesamtbetrag.",
+      "content_summary_english": "This document is a statement for the purchase of 28 Tesla shares on February 8, 2021. It includes details such as market value, commission, and the total amount due.",
       "extraction_quality": "excellent",
       "has_tables": true,
       "has_formulas": false,
@@ -158,14 +158,14 @@
   "statistics": {
     "tokens": {
       "input_estimated": 1065,
-      "output_estimated": 578,
-      "total_estimated": 1643,
-      "tokens_per_second": 20.403877251210318
+      "output_estimated": 548,
+      "total_estimated": 1613,
+      "tokens_per_second": 19.61113660824362
     },
     "characters": {
-      "response_total": 2312,
+      "response_total": 2195,
       "extracted_text": 1380,
-      "json_formatted": 2437
+      "json_formatted": 2310
     }
   },
   "errors": [],

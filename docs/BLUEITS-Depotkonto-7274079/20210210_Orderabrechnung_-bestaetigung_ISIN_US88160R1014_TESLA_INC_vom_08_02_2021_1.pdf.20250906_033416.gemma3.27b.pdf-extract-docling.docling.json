@@ -1,19 +1,21 @@
 {
   "extractor": "docling",
   "confidence": 0.9,
-  "character_count": 1069,
+  "character_count": 1396,
   "extraction_metadata": {
-    "extraction_time": 2.0514986515045166,
+    "extraction_time": 3.0064187049865723,
     "pages": 1,
     "tables": [
       "Table 1"
     ],
     "sections": [
-      "Wertpapier Streichungsbest\u00e4tigung Verkauf"
+      "Depotnummer",
+      "Wertpapier Abrechnung Kauf",
+      "Market-Orde r"
     ],
     "has_tables": true,
     "has_formulas": false,
-    "document_type": "document"
+    "document_type": "invoice"
   },
-  "file_size": 1082
+  "file_size": 1409
 }

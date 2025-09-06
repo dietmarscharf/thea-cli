@@ -1,17 +1,19 @@
 {
   "extractor": "docling",
-  "confidence": 0.85,
-  "character_count": 908,
+  "confidence": 0.9,
+  "character_count": 1069,
   "extraction_metadata": {
-    "extraction_time": 3.0384089946746826,
+    "extraction_time": 2.9321491718292236,
     "pages": 1,
-    "tables": [],
+    "tables": [
+      "Table 1"
+    ],
     "sections": [
       "Wertpapier Streichungsbest\u00e4tigung Verkauf"
     ],
-    "has_tables": false,
+    "has_tables": true,
     "has_formulas": false,
     "document_type": "document"
   },
-  "file_size": 921
+  "file_size": 1082
 }

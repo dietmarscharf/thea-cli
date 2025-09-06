@@ -6,19 +6,19 @@
       "pdf_absolute_path": "/mnt/c/Projects/THEA/docs/BLUEITS-Depotkonto-7274079/20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021_1.pdf",
       "pdf_size_bytes": 53748,
       "pdf_pages": 0,
-      "output_file": "docs/BLUEITS-Depotkonto-7274079/20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021_1.pdf.20250902_224418.gemma3.27b.pdf-extract-docling.thea_extract"
+      "output_file": "docs/BLUEITS-Depotkonto-7274079/20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021_1.pdf.20250906_033559.gemma3.27b.pdf-extract-docling.thea_extract"
     },
     "processing": {
-      "timestamp": "20250902_224418",
-      "start_time": "2025-09-02T22:44:18.407307Z",
-      "end_time": "2025-09-02T22:44:38.526684Z",
-      "processing_time_seconds": 20.117711544036865,
+      "timestamp": "20250906_033559",
+      "start_time": "2025-09-06T03:35:59.430414Z",
+      "end_time": "2025-09-06T03:36:21.129885Z",
+      "processing_time_seconds": 21.69819688796997,
       "hostname": "BLUEITS-DS-Privat",
       "platform": "linux",
       "pipeline": "pdf-extract-docling",
       "pipeline_metadata": {
         "pipeline": "pdf-extract-docling",
-        "timestamp": "2025-09-02T22:44:16.347218Z",
+        "timestamp": "2025-09-06T03:35:56.486735Z",
         "pdf_path": "docs/BLUEITS-Depotkonto-7274079/20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021_1.pdf",
         "extractor": "docling",
         "fallback_model": "gemma3:27b",
@@ -27,12 +27,12 @@
           {
             "extractor": "docling",
             "type": "text/plain",
-            "text_file": "docs/BLUEITS-Depotkonto-7274079/20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021_1.pdf.20250902_224416.gemma3.27b.pdf-extract-docling.docling.txt",
-            "json_file": "docs/BLUEITS-Depotkonto-7274079/20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021_1.pdf.20250902_224416.gemma3.27b.pdf-extract-docling.docling.json",
+            "text_file": "docs/BLUEITS-Depotkonto-7274079/20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021_1.pdf.20250906_033556.gemma3.27b.pdf-extract-docling.docling.txt",
+            "json_file": "docs/BLUEITS-Depotkonto-7274079/20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021_1.pdf.20250906_033556.gemma3.27b.pdf-extract-docling.docling.json",
             "confidence": 0.9,
             "character_count": 1069,
             "file_size": 1082,
-            "md_file": "docs/BLUEITS-Depotkonto-7274079/20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021_1.pdf.20250902_224416.gemma3.27b.pdf-extract-docling.docling.md"
+            "md_file": "docs/BLUEITS-Depotkonto-7274079/20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021_1.pdf.20250906_033556.gemma3.27b.pdf-extract-docling.docling.md"
           }
         ],
         "extraction_success": true,
@@ -57,7 +57,7 @@
     "prompt_file": "prompts/pdf-extract-docling.prompt",
     "save_sidecars": true,
     "dpi": 300,
-    "max_attempts": 3,
+    "max_attempts": 10,
     "initial_temperature": 0.2,
     "temperature_progression": [
       0.2
@@ -70,18 +70,18 @@
     "final_temperature": 0.2,
     "stuck_pattern_detected": false,
     "pattern_type": null,
-    "chunks_received": 632,
-    "request_time_seconds": 20.11758828163147,
+    "chunks_received": 645,
+    "request_time_seconds": 21.698084592819214,
     "files_processed": [
       {
         "extractor": "docling",
         "type": "text/plain",
-        "text_file": "docs/BLUEITS-Depotkonto-7274079/20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021_1.pdf.20250902_224416.gemma3.27b.pdf-extract-docling.docling.txt",
-        "json_file": "docs/BLUEITS-Depotkonto-7274079/20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021_1.pdf.20250902_224416.gemma3.27b.pdf-extract-docling.docling.json",
+        "text_file": "docs/BLUEITS-Depotkonto-7274079/20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021_1.pdf.20250906_033556.gemma3.27b.pdf-extract-docling.docling.txt",
+        "json_file": "docs/BLUEITS-Depotkonto-7274079/20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021_1.pdf.20250906_033556.gemma3.27b.pdf-extract-docling.docling.json",
         "confidence": 0.9,
         "character_count": 1069,
         "file_size": 1082,
-        "md_file": "docs/BLUEITS-Depotkonto-7274079/20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021_1.pdf.20250902_224416.gemma3.27b.pdf-extract-docling.docling.md"
+        "md_file": "docs/BLUEITS-Depotkonto-7274079/20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021_1.pdf.20250906_033556.gemma3.27b.pdf-extract-docling.docling.md"
       }
     ]
   },
@@ -135,7 +135,7 @@
     }
   },
   "response": {
-    "text": "{\"extracted_text\": \"Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\\n\\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\\n\\n## Wertpapier Streichungsbestätigung Verkauf\\n\\nAuftrag vom 08.02.2021 14:31:10 Uhr\\n\\n| Nominale    | Wertpapierbezeichnung                | ISIN         | (WKN)    |\\n|-------------|--------------------------------------|--------------|----------|\\n| Stück 1.665 | TESLA INC. REGISTERED SHARES DL-,001 | US88160R1014 | (A1CX3T) |\\n\\nHandels-/Ausführungsplatz\\n\\nTradegate (gemäß Weisung)\\n\\nLimit-Orde r\\n\\nLimit\\n\\n748,00 EUR\\n\\nGültigkeit\\n\\n26.02.2021\\n\\nAuftraggeber\\n\\nScharf, Dietmar\\n\\nAuftragserteilung/ -ort\\n\\nOnline-Banking\\n\\nGirosammelverw. mehrere Sammelurkunden - kein Stückeausdruck -\\n\\nVorstehenden Auftrag haben wir vorbehaltlich einer zwischenzeitlich erfolgten Orderausführung gestrichen.\\n\\nFür das Geschäft wurde keine Anlageberatung erbracht.\\n\\nKundenwunsch Initiator der Besprechung war der Kunde.\\n\\nDie Order wurde auf Ihren Wunsch gestrichen.\\n\\nDepotnummer\\n\\n7274079\\n\\nKundennummer\\n\\n24711383 BLUEITS GmbH 675272/29.00 23.02.2021\\n\\nAuftragsnummer Datum\", \"character_count\": 1069, \"document_type\": \"Confirmation\", \"three_word_description_german\": \"Order Stornierung Bestätigung\", \"three_word_description_english\": \"Order Cancellation Confirmation\", \"content_summary_german\": \"Dieses Dokument bestätigt die Stornierung eines Verkaufsauftrags für Aktien von Tesla Inc. vom 08.02.2021. Die Order wurde auf Wunsch des Kunden gestrichen.\", \"content_summary_english\": \"This document confirms the cancellation of a sales order for Tesla Inc. shares from February 8, 2021. The order was cancelled at the customer's request.\", \"extraction_quality\": \"excellent\", \"has_tables\": true, \"has_formulas\": false, \"document_sections\": [\"Wertpapier Streichungsbestätigung Verkauf\"]}",
+    "text": "{\"extracted_text\": \"Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\\n\\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\\n\\n## Wertpapier Streichungsbestätigung Verkauf\\n\\nAuftrag vom 08.02.2021 14:31:10 Uhr\\n\\n| Nominale    | Wertpapierbezeichnung                | ISIN         | (WKN)    |\\n|-------------|--------------------------------------|--------------|----------|\\n| Stück 1.665 | TESLA INC. REGISTERED SHARES DL-,001 | US88160R1014 | (A1CX3T) |\\n\\nHandels-/Ausführungsplatz\\n\\nTradegate (gemäß Weisung)\\n\\nLimit-Orde r\\n\\nLimit\\n\\n748,00 EUR\\n\\nGültigkeit\\n\\n26.02.2021\\n\\nAuftraggeber\\n\\nScharf, Dietmar\\n\\nAuftragserteilung/ -ort\\n\\nOnline-Banking\\n\\nGirosammelverw. mehrere Sammelurkunden - kein Stückeausdruck -\\n\\nVorstehenden Auftrag haben wir vorbehaltlich einer zwischenzeitlich erfolgten Orderausführung gestrichen.\\n\\nFür das Geschäft wurde keine Anlageberatung erbracht.\\n\\nKundenwunsch Initiator der Besprechung war der Kunde.\\n\\nDie Order wurde auf Ihren Wunsch gestrichen.\\n\\nDepotnummer\\n\\n7274079\\n\\nKundennummer\\n\\n24711383 BLUEITS GmbH 675272/29.00 23.02.2021\\n\\nAuftragsnummer Datum\", \"character_count\": 1069, \"document_type\": \"Confirmation\", \"three_word_description_german\": \"Order Stornierung Bestätigung\", \"three_word_description_english\": \"Order Cancellation Confirmation\", \"content_summary_german\": \"Dieses Dokument bestätigt die Stornierung eines Verkaufsauftrags für Tesla-Aktien vom 08.02.2021. Der Auftrag wurde auf Wunsch des Kunden gestrichen und die Stornierung wird hiermit bestätigt.\", \"content_summary_english\": \"This document confirms the cancellation of a sales order for Tesla shares from February 8, 2021. The order was cancelled at the customer's request and the cancellation is hereby confirmed.\", \"extraction_quality\": \"excellent\", \"has_tables\": true, \"has_formulas\": false, \"document_sections\": [\"Wertpapier Streichungsbestätigung Verkauf\"]}",
     "thinking": null,
     "json": {
       "extracted_text": "Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\n\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\n\n## Wertpapier Streichungsbestätigung Verkauf\n\nAuftrag vom 08.02.2021 14:31:10 Uhr\n\n| Nominale    | Wertpapierbezeichnung                | ISIN         | (WKN)    |\n|-------------|--------------------------------------|--------------|----------|\n| Stück 1.665 | TESLA INC. REGISTERED SHARES DL-,001 | US88160R1014 | (A1CX3T) |\n\nHandels-/Ausführungsplatz\n\nTradegate (gemäß Weisung)\n\nLimit-Orde r\n\nLimit\n\n748,00 EUR\n\nGültigkeit\n\n26.02.2021\n\nAuftraggeber\n\nScharf, Dietmar\n\nAuftragserteilung/ -ort\n\nOnline-Banking\n\nGirosammelverw. mehrere Sammelurkunden - kein Stückeausdruck -\n\nVorstehenden Auftrag haben wir vorbehaltlich einer zwischenzeitlich erfolgten Orderausführung gestrichen.\n\nFür das Geschäft wurde keine Anlageberatung erbracht.\n\nKundenwunsch Initiator der Besprechung war der Kunde.\n\nDie Order wurde auf Ihren Wunsch gestrichen.\n\nDepotnummer\n\n7274079\n\nKundennummer\n\n24711383 BLUEITS GmbH 675272/29.00 23.02.2021\n\nAuftragsnummer Datum",
@@ -143,8 +143,8 @@
       "document_type": "Confirmation",
       "three_word_description_german": "Order Stornierung Bestätigung",
       "three_word_description_english": "Order Cancellation Confirmation",
-      "content_summary_german": "Dieses Dokument bestätigt die Stornierung eines Verkaufsauftrags für Aktien von Tesla Inc. vom 08.02.2021. Die Order wurde auf Wunsch des Kunden gestrichen.",
-      "content_summary_english": "This document confirms the cancellation of a sales order for Tesla Inc. shares from February 8, 2021. The order was cancelled at the customer's request.",
+      "content_summary_german": "Dieses Dokument bestätigt die Stornierung eines Verkaufsauftrags für Tesla-Aktien vom 08.02.2021. Der Auftrag wurde auf Wunsch des Kunden gestrichen und die Stornierung wird hiermit bestätigt.",
+      "content_summary_english": "This document confirms the cancellation of a sales order for Tesla shares from February 8, 2021. The order was cancelled at the customer's request and the cancellation is hereby confirmed.",
       "extraction_quality": "excellent",
       "has_tables": true,
       "has_formulas": false,
@@ -156,14 +156,14 @@
   "statistics": {
     "tokens": {
       "input_estimated": 973,
-      "output_estimated": 458,
-      "total_estimated": 1431,
-      "tokens_per_second": 22.766008897058512
+      "output_estimated": 476,
+      "total_estimated": 1449,
+      "tokens_per_second": 21.937306701457135
     },
     "characters": {
-      "response_total": 1835,
+      "response_total": 1907,
       "extracted_text": 1053,
-      "json_formatted": 1952
+      "json_formatted": 2029
     }
   },
   "errors": [],

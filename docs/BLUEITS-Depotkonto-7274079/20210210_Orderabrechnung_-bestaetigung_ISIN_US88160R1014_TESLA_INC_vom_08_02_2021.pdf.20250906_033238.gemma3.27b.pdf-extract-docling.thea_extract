@@ -6,19 +6,19 @@
       "pdf_absolute_path": "/mnt/c/Projects/THEA/docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021.pdf",
       "pdf_size_bytes": 54922,
       "pdf_pages": 0,
-      "output_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021.pdf.20250902_224213.gemma3.27b.pdf-extract-docling.thea_extract"
+      "output_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021.pdf.20250906_033238.gemma3.27b.pdf-extract-docling.thea_extract"
     },
     "processing": {
-      "timestamp": "20250902_224213",
-      "start_time": "2025-09-02T22:42:13.012718Z",
-      "end_time": "2025-09-02T22:42:35.942839Z",
-      "processing_time_seconds": 22.92840600013733,
+      "timestamp": "20250906_033238",
+      "start_time": "2025-09-06T03:32:38.766896Z",
+      "end_time": "2025-09-06T03:34:16.447300Z",
+      "processing_time_seconds": 97.67915606498718,
       "hostname": "BLUEITS-DS-Privat",
       "platform": "linux",
       "pipeline": "pdf-extract-docling",
       "pipeline_metadata": {
         "pipeline": "pdf-extract-docling",
-        "timestamp": "2025-09-02T22:42:09.741905Z",
+        "timestamp": "2025-09-06T03:32:31.514935Z",
         "pdf_path": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021.pdf",
         "extractor": "docling",
         "fallback_model": "gemma3:27b",
@@ -27,12 +27,12 @@
           {
             "extractor": "docling",
             "type": "text/plain",
-            "text_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021.pdf.20250902_224209.gemma3.27b.pdf-extract-docling.docling.txt",
-            "json_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021.pdf.20250902_224209.gemma3.27b.pdf-extract-docling.docling.json",
+            "text_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021.pdf.20250906_033231.gemma3.27b.pdf-extract-docling.docling.txt",
+            "json_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021.pdf.20250906_033231.gemma3.27b.pdf-extract-docling.docling.json",
             "confidence": 0.9,
             "character_count": 1121,
             "file_size": 1135,
-            "md_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021.pdf.20250902_224209.gemma3.27b.pdf-extract-docling.docling.md"
+            "md_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021.pdf.20250906_033231.gemma3.27b.pdf-extract-docling.docling.md"
           }
         ],
         "extraction_success": true,
@@ -57,7 +57,7 @@
     "prompt_file": "prompts/pdf-extract-docling.prompt",
     "save_sidecars": true,
     "dpi": 300,
-    "max_attempts": 3,
+    "max_attempts": 10,
     "initial_temperature": 0.2,
     "temperature_progression": [
       0.2
@@ -70,18 +70,18 @@
     "final_temperature": 0.2,
     "stuck_pattern_detected": false,
     "pattern_type": null,
-    "chunks_received": 675,
-    "request_time_seconds": 22.92829656600952,
+    "chunks_received": 672,
+    "request_time_seconds": 97.67904686927795,
     "files_processed": [
       {
         "extractor": "docling",
         "type": "text/plain",
-        "text_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021.pdf.20250902_224209.gemma3.27b.pdf-extract-docling.docling.txt",
-        "json_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021.pdf.20250902_224209.gemma3.27b.pdf-extract-docling.docling.json",
+        "text_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021.pdf.20250906_033231.gemma3.27b.pdf-extract-docling.docling.txt",
+        "json_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021.pdf.20250906_033231.gemma3.27b.pdf-extract-docling.docling.json",
         "confidence": 0.9,
         "character_count": 1121,
         "file_size": 1135,
-        "md_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021.pdf.20250902_224209.gemma3.27b.pdf-extract-docling.docling.md"
+        "md_file": "docs/BLUEITS-Depotkonto-7274079/20210210_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_02_2021.pdf.20250906_033231.gemma3.27b.pdf-extract-docling.docling.md"
       }
     ]
   },
@@ -135,16 +135,16 @@
     }
   },
   "response": {
-    "text": "{\"extracted_text\": \"Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\\n\\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\\n\\nDepotnummer\\n\\n7274079\\n\\nKundennummer\\n\\n24711383 BLUEITS GmbH 675272/29.00 08.02.2021\\n\\nAuftragsnummer Datum\\n\\n## Wertpapier Auftragsbestätigung Verkauf\\n\\n| Nominale    | Wertpapierbezeichnung                | ISIN         | (WKN)    |\\n|-------------|--------------------------------------|--------------|----------|\\n| Stück 1.665 | TESLA INC. REGISTERED SHARES DL-,001 | US88160R1014 | (A1CX3T) |\\n\\nHandels-/Ausführungsplatz\\n\\nTradegate (gemäß Weisung)\\n\\nLimit-Orde r Limit\\n\\n748,00 EUR\\n\\nGültigkeit\\n\\nAuftraggeber\\n\\nDietmar Scharf\\n\\nAuftragserteilung/ -ort\\n\\nOnline-Banking\\n\\n26.02.2021\\n\\nGirosammelverw. mehrere Sammelurkunden - kein Stückeausdruck -\\n\\nDas Vormerkungsentgelt von 3,50 EUR haben wir Ihrem Konto 21503990 (IBAN DE51 7525 0000 0021 5039 90), BLZ 75250000 (BIC BYLADEM1ABG) belastet.\\n\\nWir haben den Auftrag wie vorstehend angegeben in Vormerkung genommen. Zum Zeitpunkt der Erstellung dieser Bestätigung war die Order noch nicht ausgeführt.\\n\\nFür das Geschäft wurde keine Anlageberatung erbracht.\", \"character_count\": 1121, \"document_type\": \"Confirmation\", \"three_word_description_german\": \"Depot Auftragsbestätigung Verkauf\", \"three_word_description_english\": \"Trade Confirmation Order\", \"content_summary_german\": \"Dieses Dokument ist eine Auftragsbestätigung für den Verkauf von Tesla-Aktien über die Sparkasse Amberg-Sulzbach. Es bestätigt die Vormerkung des Auftrags und die Belastung des Kontos für das Vormerkungsentgelt.\", \"content_summary_english\": \"This document is a trade confirmation for the sale of Tesla shares through Sparkasse Amberg-Sulzbach. It confirms the pending order and the debit of the account for the pre-advice fee.\", \"extraction_quality\": \"excellent\", \"has_tables\": true, \"has_formulas\": false, \"document_sections\": [\"Wertpapier Auftragsbestätigung Verkauf\"]}",
+    "text": "{\"extracted_text\": \"Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\\n\\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\\n\\nDepotnummer\\n\\n7274079\\n\\nKundennummer\\n\\n24711383 BLUEITS GmbH 675272/29.00 08.02.2021\\n\\nAuftragsnummer Datum\\n\\n## Wertpapier Auftragsbestätigung Verkauf\\n\\n| Nominale    | Wertpapierbezeichnung                | ISIN         | (WKN)    |\\n|-------------|--------------------------------------|--------------|----------|\\n| Stück 1.665 | TESLA INC. REGISTERED SHARES DL-,001 | US88160R1014 | (A1CX3T) |\\n\\nHandels-/Ausführungsplatz\\n\\nTradegate (gemäß Weisung)\\n\\nLimit-Orde r Limit\\n\\n748,00 EUR\\n\\nGültigkeit\\n\\nAuftraggeber\\n\\nDietmar Scharf\\n\\nAuftragserteilung/ -ort\\n\\nOnline-Banking\\n\\n26.02.2021\\n\\nGirosammelverw. mehrere Sammelurkunden - kein Stückeausdruck -\\n\\nDas Vormerkungsentgelt von 3,50 EUR haben wir Ihrem Konto 21503990 (IBAN DE51 7525 0000 0021 5039 90), BLZ 75250000 (BIC BYLADEM1ABG) belastet.\\n\\nWir haben den Auftrag wie vorstehend angegeben in Vormerkung genommen. Zum Zeitpunkt der Erstellung dieser Bestätigung war die Order noch nicht ausgeführt.\\n\\nFür das Geschäft wurde keine Anlageberatung erbracht.\", \"character_count\": 1121, \"document_type\": \"Confirmation\", \"three_word_description_german\": \"Depot Order Bestätigung\", \"three_word_description_english\": \"Order Confirmation Document\", \"content_summary_german\": \"Dieses Dokument ist eine Auftragsbestätigung für den Verkauf von Tesla-Aktien über die Sparkasse Amberg-Sulzbach. Es bestätigt die Vormerkung des Auftrags und die Belastung des Kontos für das Vormerkungsentgelt.\", \"content_summary_english\": \"This document is an order confirmation for the sale of Tesla shares through Sparkasse Amberg-Sulzbach. It confirms the pending order and the debit of the account for the preliminary notification fee.\", \"extraction_quality\": \"excellent\", \"has_tables\": true, \"has_formulas\": false, \"document_sections\": [\"Wertpapier Auftragsbestätigung Verkauf\"]}",
     "thinking": null,
     "json": {
       "extracted_text": "Sparkasse Amberg-Sulzbach · Postfach 16 61 · 92206 Amberg\n\nFirma BLUEITS GmbH Auf den Hochäckern 5 92224 Amberg\n\nDepotnummer\n\n7274079\n\nKundennummer\n\n24711383 BLUEITS GmbH 675272/29.00 08.02.2021\n\nAuftragsnummer Datum\n\n## Wertpapier Auftragsbestätigung Verkauf\n\n| Nominale    | Wertpapierbezeichnung                | ISIN         | (WKN)    |\n|-------------|--------------------------------------|--------------|----------|\n| Stück 1.665 | TESLA INC. REGISTERED SHARES DL-,001 | US88160R1014 | (A1CX3T) |\n\nHandels-/Ausführungsplatz\n\nTradegate (gemäß Weisung)\n\nLimit-Orde r Limit\n\n748,00 EUR\n\nGültigkeit\n\nAuftraggeber\n\nDietmar Scharf\n\nAuftragserteilung/ -ort\n\nOnline-Banking\n\n26.02.2021\n\nGirosammelverw. mehrere Sammelurkunden - kein Stückeausdruck -\n\nDas Vormerkungsentgelt von 3,50 EUR haben wir Ihrem Konto 21503990 (IBAN DE51 7525 0000 0021 5039 90), BLZ 75250000 (BIC BYLADEM1ABG) belastet.\n\nWir haben den Auftrag wie vorstehend angegeben in Vormerkung genommen. Zum Zeitpunkt der Erstellung dieser Bestätigung war die Order noch nicht ausgeführt.\n\nFür das Geschäft wurde keine Anlageberatung erbracht.",
       "character_count": 1121,
       "document_type": "Confirmation",
-      "three_word_description_german": "Depot Auftragsbestätigung Verkauf",
-      "three_word_description_english": "Trade Confirmation Order",
+      "three_word_description_german": "Depot Order Bestätigung",
+      "three_word_description_english": "Order Confirmation Document",
       "content_summary_german": "Dieses Dokument ist eine Auftragsbestätigung für den Verkauf von Tesla-Aktien über die Sparkasse Amberg-Sulzbach. Es bestätigt die Vormerkung des Auftrags und die Belastung des Kontos für das Vormerkungsentgelt.",
-      "content_summary_english": "This document is a trade confirmation for the sale of Tesla shares through Sparkasse Amberg-Sulzbach. It confirms the pending order and the debit of the account for the pre-advice fee.",
+      "content_summary_english": "This document is an order confirmation for the sale of Tesla shares through Sparkasse Amberg-Sulzbach. It confirms the pending order and the debit of the account for the preliminary notification fee.",
       "extraction_quality": "excellent",
       "has_tables": true,
       "has_formulas": false,
@@ -156,14 +156,14 @@
   "statistics": {
     "tokens": {
       "input_estimated": 982,
-      "output_estimated": 490,
-      "total_estimated": 1472,
-      "tokens_per_second": 21.370870700608894
+      "output_estimated": 492,
+      "total_estimated": 1474,
+      "tokens_per_second": 5.036898554617591
     },
     "characters": {
-      "response_total": 1962,
+      "response_total": 1970,
       "extracted_text": 1105,
-      "json_formatted": 2099
+      "json_formatted": 2107
     }
   },
   "errors": [],
