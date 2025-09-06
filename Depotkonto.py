@@ -96,10 +96,12 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             'execution_date': None  # Neu: Explizites Ausführungsdatum
         }
         
-        # Extrahiere Stückzahl
-        shares_match = re.search(r'Stück\s+(\d+)', text)
+        # Extrahiere Stückzahl (mit Unterstützung für deutsche Tausendertrennzeichen)
+        shares_match = re.search(r'Stück\s+([\d.]+)', text)
         if shares_match:
-            details['shares'] = int(shares_match.group(1))
+            # Entferne deutsche Tausendertrennzeichen (Punkt) vor der Konvertierung
+            shares_str = shares_match.group(1).replace('.', '')
+            details['shares'] = int(shares_str)
         
         # Extrahiere Limit (falls vorhanden)
         limit_match = re.search(r'Limit\s+([\d.,]+)\s*EUR', text)
@@ -188,7 +190,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         # Extrahiere Veräußerungsgewinn/Verlust mit erweiterten Patterns
         # Spezialbehandlung für vertikales Layout (Sparkasse-Format)
         vertical_layout_match = re.search(
-            r'Ermittlung steuerrelevante Erträge\s+Veräußerungsgewinn\s+Ausmachender Betrag',
+            r'Ermittlung steuerrelevante Erträge\s+Veräußerungs(?:gewinn|verlust)\s+Ausmachender Betrag',
             text, re.IGNORECASE
         )
         
@@ -198,7 +200,8 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             numbers_found = []
             for i, line in enumerate(lines[:15]):  # Schaue die nächsten 15 Zeilen
                 # Suche nach Zahlen mit oder ohne EUR in derselben oder nächsten Zeilen
-                number_match = re.search(r'([-]?[\d]{1,3}(?:\.[\d]{3})*(?:,[\d]{2})?)', line)
+                # Unterstützt auch nachgestelltes Minus (deutsches Buchführungsformat)
+                number_match = re.search(r'([-]?[\d]{1,3}(?:\.[\d]{3})*(?:,[\d]{2})?[-]?)', line)
                 if number_match:
                     # Prüfe ob EUR in derselben oder in den nächsten 2 Zeilen ist
                     # (EUR kann auf einer separaten Zeile stehen)
@@ -207,20 +210,29 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                               (i+2 < len(lines) and 'EUR' in lines[i+2]))
                     if has_eur:
                         # Prüfe ob es eine plausible Zahl ist
-                        test_str = number_match.group(1).replace('.', '').replace(',', '.')
+                        # Behandle nachgestelltes Minus
+                        raw_number = number_match.group(1)
+                        test_str = raw_number.rstrip('-').replace('.', '').replace(',', '.')
                         try:
                             test_val = float(test_str)
                             if test_val > 100:  # Ignoriere kleine Zahlen
-                                numbers_found.append(number_match.group(1))
+                                numbers_found.append(raw_number)
                         except:
                             pass
                 if len(numbers_found) >= 2:
                     break
             
             if len(numbers_found) >= 2:
-                # Konvertiere beide Zahlen
-                value1 = float(numbers_found[0].replace('.', '').replace(',', '.'))
-                value2 = float(numbers_found[1].replace('.', '').replace(',', '.'))
+                # Konvertiere beide Zahlen mit Unterstützung für nachgestelltes Minus
+                num1_str = numbers_found[0]
+                num2_str = numbers_found[1]
+                
+                # Prüfe und behandle nachgestelltes Minus
+                value1_sign = -1.0 if num1_str.endswith('-') else 1.0
+                value2_sign = -1.0 if num2_str.endswith('-') else 1.0
+                
+                value1 = float(num1_str.rstrip('-').replace('.', '').replace(',', '.')) * value1_sign
+                value2 = float(num2_str.rstrip('-').replace('.', '').replace(',', '.')) * value2_sign
                 
                 # Debug-Ausgabe für BLUEITS-Transaktionen
                 if 'BLUEITS' in text[:1000] and 'Verkauf' in text[:1000]:
@@ -268,14 +280,17 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         else:
             # Standard Patterns für normale Layouts
             profit_loss_patterns = [
-                # Standard Patterns
+                # Patterns mit nachgestelltem Minus (deutsches Buchführungsformat)
+                (r'Veräußerungsverlust\s+([\d.,]+)-\s*EUR', -1.0),  # Verlust mit nachgestelltem Minus
+                (r'Veräußerungsgewinn\s+([\d.,]+)\s*EUR', 1.0),     # Gewinn ohne Minus
+                # Standard Patterns (mit vorangestelltem Minus)
                 (r'Veräußerungsgewinn\s+([-]?[\d.,]+)\s*EUR', 1.0),  # Positiv
                 (r'Veräußerungsverlust\s+([-]?[\d.,]+)\s*EUR', -1.0), # Negativ
                 # Alternative Begriffe
-                (r'Gewinn\s+aus\s+Verkauf\s+([-]?[\d.,]+)\s*EUR', 1.0),
-                (r'Verlust\s+aus\s+Verkauf\s+([-]?[\d.,]+)\s*EUR', -1.0),
-                (r'Realisierter\s+Gewinn\s+([-]?[\d.,]+)\s*EUR', 1.0),
-                (r'Realisierter\s+Verlust\s+([-]?[\d.,]+)\s*EUR', -1.0),
+                (r'Gewinn\s+aus\s+Verkauf\s+([\d.,]+)-?\s*EUR', lambda x: -1.0 if x.endswith('-') else 1.0),
+                (r'Verlust\s+aus\s+Verkauf\s+([\d.,]+)-?\s*EUR', -1.0),
+                (r'Realisierter\s+Gewinn\s+([\d.,]+)-?\s*EUR', lambda x: -1.0 if x.endswith('-') else 1.0),
+                (r'Realisierter\s+Verlust\s+([\d.,]+)-?\s*EUR', -1.0),
                 # Mit Pipe-Separator
                 (r'Veräußerungsgewinn\s*\|\s*([-]?[\d.,]+)\s*€', 1.0),
                 (r'Veräußerungsverlust\s*\|\s*([-]?[\d.,]+)\s*€', -1.0),
@@ -290,8 +305,21 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             for pattern, multiplier in profit_loss_patterns:
                 match = re.search(pattern, text)
                 if match:
-                    value = float(match.group(1).replace('.', '').replace(',', '.'))
-                    details['profit_loss'] = value * multiplier
+                    # Extrahiere den Wert und entferne nachgestelltes Minus
+                    value_str = match.group(1).rstrip('-')
+                    # Prüfe ob ursprünglich ein nachgestelltes Minus vorhanden war
+                    has_trailing_minus = match.group(1).endswith('-')
+                    # Konvertiere zu float (deutsches Format)
+                    value = float(value_str.replace('.', '').replace(',', '.'))
+                    # Wende Multiplier an, berücksichtige nachgestelltes Minus
+                    if callable(multiplier):
+                        details['profit_loss'] = value * (multiplier(match.group(1)))
+                    else:
+                        # Bei nachgestelltem Minus ist der Wert immer negativ
+                        if has_trailing_minus and multiplier > 0:
+                            details['profit_loss'] = -value
+                        else:
+                            details['profit_loss'] = value * multiplier
                     break
         
         # Extrahiere Ausmachender Betrag (Netto) - nur wenn nicht bereits aus vertikalem Layout extrahiert
@@ -396,9 +424,15 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         filename_lower = base_data.get('original_file', '').lower()
         date_str = base_data.get('date', '')
         
+        # Check for capital measures (stock splits, etc.)
+        if ('kapitalmaßnahme' in extracted_lower or 'kapitalmassnahme' in extracted_lower or
+            'aktiensplit' in extracted_lower or 'stock split' in extracted_lower or
+            'neueinteilung des grundkapitals' in extracted_lower or
+            'kapitalmaßnahme' in filename_lower or 'kapitalmassnahme' in filename_lower):
+            transaction_type = 'Kapitalmaßnahme'
         # Check for cost information documents (MiFID II Kostenaufstellung)
         # These are specifically the Ex-Post cost reports, not regular orders mentioning cost information
-        if ('information über kosten und nebenkosten' in extracted_lower or 
+        elif ('information über kosten und nebenkosten' in extracted_lower or 
             'ex-post-kosteninformation' in extracted_lower or
             ('dienstleistungskosten' in extracted_lower and 'übergreifende kosten' in extracted_lower)):
             transaction_type = 'Kostenaufstellung'
@@ -435,8 +469,14 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 transaction_type = 'Depotabschluss'
         # Check for Orderabrechnung/Wertpapierabrechnung
         elif 'orderabrechnung' in filename_lower or 'wertpapier' in extracted_lower:
+            # Check for limit order confirmation (Vormerkung) first
+            if 'auftragsbestätigung' in extracted_lower or 'vormerkungsentgelt' in extracted_lower:
+                transaction_type = 'Limit-Order-Vormerkung'
+            # Check for order cancellation
+            elif 'streichungsbestätigung' in extracted_lower or 'order wurde' in extracted_lower and 'gestrichen' in extracted_lower:
+                transaction_type = 'Orderabrechnung-Stornierung'
             # Determine if buy or sell
-            if 'verkauf' in extracted_lower or 'sell' in extracted_lower:
+            elif 'verkauf' in extracted_lower or 'sell' in extracted_lower:
                 transaction_type = 'Orderabrechnung-Verkauf'
             elif 'kauf' in extracted_lower or 'buy' in extracted_lower or 'erwerb' in extracted_lower:
                 transaction_type = 'Orderabrechnung-Kauf'
@@ -696,20 +736,20 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                             r'Stück\s+\|\s+([\d.,]+)',   # Stück | 1.300
                             r'Stück\s+\|\s+(\d+)',        # Stück | 950
                             
-                            # Tabellen ohne Trennzeichen
-                            r'Stück\s+(\d+)(?:\s|$)',     # Stück 950
-                            r'(\d+)\s+Stück',              # 950 Stück
+                            # Tabellen ohne Trennzeichen (mit deutscher Zahlenformatierung)
+                            r'Stück\s+([\d.]+)(?:\s|$)',     # Stück 950 oder Stück 1.665
+                            r'([\d.]+)\s+Stück',              # 950 Stück oder 1.665 Stück
                             
-                            # In Zeilen mit TESLA
-                            r'TESLA[^\n]*?(\d{2,4})\s+Stück',
-                            r'TESLA[^\n]*?Stück\s+(\d{2,4})',
+                            # In Zeilen mit TESLA (mit deutscher Zahlenformatierung)
+                            r'TESLA[^\n]*?([\d.]{2,6})\s+Stück',
+                            r'TESLA[^\n]*?Stück\s+([\d.]{2,6})',
                             
                             # Mit ISIN - removed to avoid capturing dates
                             # r'US88160R1014[^\n]*?(\d{3,4})\s+',
-                            r'US88160R1014[^\n]*?Stück\s+(\d{2,4})',
+                            r'US88160R1014[^\n]*?Stück\s+([\d.]{2,6})',
                             
-                            # Spezielle Formate
-                            r'Bestand:\s*(\d+)\s+Stück',
+                            # Spezielle Formate (mit deutscher Zahlenformatierung)
+                            r'Bestand:\s*([\d.]+)\s+Stück',
                             r'Anzahl:\s*(\d+)',
                             r'Position[^\n]*?(\d{3,4})\s+Stück',
                         ]
@@ -724,7 +764,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                                     try:
                                         test_shares = int(number_str)
                                         # Exclude year-like numbers (2020-2030) and use plausible share range
-                                        if 10 <= test_shares <= 10000 and not (2020 <= test_shares <= 2030):
+                                        if 1 <= test_shares <= 100000 and not (2020 <= test_shares <= 2030):
                                             shares = test_shares
                                             break
                                     except ValueError:
@@ -997,8 +1037,8 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             if data_quality['missing_amounts'] > 0:
                 print(f"  ⚠️  Fehlende Beträge: {data_quality['missing_amounts']} Transaktionen")
             
-            # Erfolgsrate für Gewinn/Verlust bei Verkäufen
-            verkauf_count = sum(1 for t in transactions if 'Verkauf' in t['type'])
+            # Erfolgsrate für Gewinn/Verlust bei Verkäufen (ohne Kapitalmaßnahmen)
+            verkauf_count = sum(1 for t in transactions if 'Verkauf' in t['type'] and t['type'] != 'Kapitalmaßnahme')
             if verkauf_count > 0:
                 gv_rate = (data_quality['with_profit_loss'] / verkauf_count) * 100
                 print(f"  - Verkäufe mit G/V-Daten: {data_quality['with_profit_loss']}/{verkauf_count} ({gv_rate:.1f}%)")
@@ -1225,6 +1265,8 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 categories['Depotabschluss'].append((trans_type, count))
             elif 'Orderabrechnung' in trans_type:
                 categories['Orderabrechnung'].append((trans_type, count))
+            elif 'Limit-Order-Vormerkung' in trans_type:
+                categories['Orderabrechnung'].append((trans_type, count))
             elif 'Kostenaufstellung' in trans_type:
                 categories['Kostenaufstellung'].append((trans_type, count))
             else:
@@ -1324,6 +1366,8 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             # Kürze den Transaktionstyp für bessere Lesbarkeit
             if 'Orderabrechnung-' in trans_type:
                 display_type = trans_type.replace('Orderabrechnung-', '')
+            elif 'Limit-Order-Vormerkung' in trans_type:
+                display_type = 'Vormerkung'
             elif 'Depotabschluss-' in trans_type:
                 display_type = 'Depotabschluss'
             else:
@@ -1492,7 +1536,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         
         # Count different transaction types
         depotabschluss_count = sum(1 for t in analysis['transactions'] if 'Depotabschluss' in t['type'])
-        orderabrechnung_count = sum(1 for t in analysis['transactions'] if 'Orderabrechnung' in t['type'])
+        orderabrechnung_count = sum(1 for t in analysis['transactions'] if 'Orderabrechnung' in t['type'] or t['type'] == 'Limit-Order-Vormerkung')
         verkauf_count = sum(1 for t in analysis['transactions'] if t['type'] == 'Verkauf')
         kauf_count = sum(1 for t in analysis['transactions'] if t['type'] == 'Kauf')
         unknown_count = sum(1 for t in analysis['transactions'] if t['type'] == 'Unbekannt')
