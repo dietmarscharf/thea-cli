@@ -1809,8 +1809,25 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             color: white !important;
         }}
         
+        /* Nr. column and Document column should have white background */
+        .profit-row td:first-child,
+        .loss-row td:first-child,
+        .depot-statement-row td:first-child,
+        .depot-statement-year-end td:first-child,
+        .capital-action-row td:first-child,
+        .profit-row td:last-child,
+        .loss-row td:last-child,
+        .depot-statement-row td:last-child,
+        .depot-statement-year-end td:last-child,
+        .capital-action-row td:last-child {{
+            background-color: white !important;
+            color: black !important;
+        }}
+        
+        /* All document links should be black */
         .depot-statement-row a {{
-            color: #64b5f6 !important;
+            color: black !important;
+            text-decoration: underline !important;
         }}
         
         .depot-statement-year-end {{
@@ -1823,7 +1840,8 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         }}
         
         .depot-statement-year-end a {{
-            color: #64b5f6 !important;
+            color: black !important;
+            text-decoration: underline !important;
         }}
         
         .misc-row {{
@@ -1849,23 +1867,26 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         }}
         
         .capital-action-row a {{
-            color: #64b5f6 !important;
+            color: #3498db !important;
+            text-decoration: underline !important;
         }}
         
         /* Links */
         a {{
             color: #3498db;
-            text-decoration: none;
+            text-decoration: underline;
+        }}
+        
+        /* Document column links - consistent style */
+        td:last-child a {{
+            color: black !important;
+            text-decoration: underline !important;
         }}
         
         a:hover {{
             text-decoration: underline;
         }}
         
-        .profit-row a, .loss-row a {{
-            color: white !important;
-            text-decoration: underline;
-        }}
         
         /* Zahlen-Formatierung */
         .number {{
@@ -2830,6 +2851,10 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                         fees_vat = fees_gross - fees_net
                         ust_prozent_str = '19'
                     
+                    # Store fees in transaction for later calendar year calculations
+                    trans['fees_net'] = fees_net
+                    trans['fees_vat'] = fees_vat
+                    
                     # Fees are always costs (negative)
                     gebuhren_netto_str = '-' + self.format_number_german(fees_net, 2)
                     ust_str = '-' + self.format_number_german(fees_vat, 2) if fees_vat > 0 else '0,00'
@@ -2849,6 +2874,9 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     fees_gross = 0
                     fees_net = 0
                     fees_vat = 0
+                    # Store zeros in transaction for later calendar year calculations
+                    trans['fees_net'] = 0
+                    trans['fees_vat'] = 0
                 
                 # Calculate Ausmachender Betrag with sign logic
                 if trans.get('net_amount'):
@@ -3105,7 +3133,6 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 <td></td>
                 <td class="non-stock-block-start"></td>
                 <td class="number bold-value">{self.format_number_german(cumulative_non_stock_pnl, 2, show_sign=True) if cumulative_non_stock_pnl != 0 else '0,00'}</td>
-                <td></td>
                 <td class="non-stock-block-end"></td>"""
                     else:
                         html += f"""
@@ -3114,8 +3141,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 <td></td>
                 <td class="number bold-value">{self.format_number_german(cumulative_stock_pnl, 2, show_sign=True) if cumulative_stock_pnl != 0 else '0,00'}</td>
                 <td class="non-stock-block-start"></td>
-                <td class="number bold-value non-stock-block-end">{self.format_number_german(cumulative_non_stock_pnl, 2, show_sign=True) if cumulative_non_stock_pnl != 0 else '0,00'}</td>
-                <td></td>"""
+                <td class="number bold-value non-stock-block-end">{self.format_number_german(cumulative_non_stock_pnl, 2, show_sign=True) if cumulative_non_stock_pnl != 0 else '0,00'}</td>"""
                     
                     html += """
             </tr>"""
@@ -3150,7 +3176,6 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 <td></td>
                 <td class="non-stock-block-start"></td>
                 <td class="number bold-value">0,00</td>
-                <td></td>
                 <td class="non-stock-block-end"></td>"""
                     else:
                         html += f"""
@@ -3159,8 +3184,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 <td></td>
                 <td class="number bold-value">0,00</td>
                 <td class="non-stock-block-start"></td>
-                <td class="number bold-value non-stock-block-end">0,00</td>
-                <td></td>"""
+                <td class="number bold-value non-stock-block-end">0,00</td>"""
                     
                     html += """
             </tr>"""
@@ -3260,11 +3284,9 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 <td></td>
                 <td></td>
                 <td class="number bold-value">{self.format_number_german(cumulative_cy_stock_pnl, 2, show_sign=True) if cumulative_cy_stock_pnl != 0 else '0,00'}</td>
+                <td class="number non-stock-block-start"></td>
                 <td></td>
-                <td class="non-stock-block-start"></td>
-                <td class="number bold-value">{self.format_number_german(cumulative_cy_non_stock_pnl, 2, show_sign=True) if cumulative_cy_non_stock_pnl != 0 else '0,00'}</td>
-                <td></td>
-                <td class="non-stock-block-end"></td>
+                <td class="number non-stock-block-end bold-value">{self.format_number_german(cumulative_cy_non_stock_pnl, 2, show_sign=True) if cumulative_cy_non_stock_pnl != 0 else '0,00'}</td>
             </tr>"""
                     
                     # Insert calendar year-start row for new year
@@ -3292,10 +3314,11 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 <td></td>
                 <td class="number fee-block-end bold-value">0,00</td>
                 <td></td>
-                <td class="non-stock-block-start"></td>
-                <td class="number bold-value">0,00</td>
                 <td></td>
-                <td class="non-stock-block-end"></td>
+                <td class="number bold-value">0,00</td>
+                <td class="number non-stock-block-start"></td>
+                <td></td>
+                <td class="number non-stock-block-end bold-value">0,00</td>
             </tr>"""
                     
                     # Note: CY cumulative values are now reset at the beginning of the next transaction
