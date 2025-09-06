@@ -376,6 +376,11 @@ class BaseKontoAnalyzer:
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(content)
     
+    def save_html(self, content: str, output_file: str) -> None:
+        """Speichert den HTML-Inhalt in eine Datei"""
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write(content)
+    
     def print_summary(self, output_file: str, analysis: Dict[str, Any]) -> None:
         """Gibt eine Zusammenfassung der Analyse aus"""
         print(f"✓ {output_file} erstellt")
