@@ -31,8 +31,57 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             }
         }
     
+    def is_stock_isin(self, isin: str) -> bool:
+        """
+        Bestimmt ob eine ISIN eine Aktie oder ein Nicht-Aktien-Produkt ist.
+        
+        Aktien:
+        - US88160R1014 (TESLA INC)
+        - Weitere US-Aktien (US...)
+        
+        Nicht-Aktien (Derivate, Zertifikate, strukturierte Produkte):
+        - DE000JN9UFS3 (J.P. Morgan Structured Product)
+        - Andere strukturierte Produkte und Derivate
+        """
+        if not isin:
+            return False
+            
+        # Tesla und andere US-Aktien sind Aktien
+        if isin.startswith('US'):
+            return True
+            
+        # DE-ISINs können Aktien oder Derivate sein
+        # Bekannte Derivate/Zertifikate explizit als Nicht-Aktien markieren
+        known_derivatives = [
+            'DE000JN9UFS3',  # J.P. Morgan Structured Product
+            # Weitere bekannte Derivate können hier hinzugefügt werden
+        ]
+        
+        if isin in known_derivatives:
+            return False
+            
+        # Standard: DE-ISINs als Aktien behandeln, außer sie sind als Derivate bekannt
+        # Dies kann je nach Portfolio angepasst werden
+        if isin.startswith('DE'):
+            # Wenn nicht in der Liste der bekannten Derivate, als Aktie behandeln
+            return isin not in known_derivatives
+            
+        # Andere Länder-ISINs (FR, GB, etc.) sind üblicherweise Aktien
+        return True
+    
     def extract_trading_details(self, text: str) -> Dict[str, Any]:
-        """Extrahiert detaillierte Handelsinformationen aus Orderabrechnungen"""
+        """
+        Extrahiert detaillierte Handelsinformationen aus Orderabrechnungen.
+        
+        Wichtige Hinweise zu Gebühren:
+        - Viele Transaktionen haben legitim KEINE Gebühren (wenn Kurswert = Ausmachender Betrag)
+        - Dies tritt häufig auf bei: Sparplänen, Aktionsangeboten, Teilausführungen
+        - Typische Gebührenstruktur wenn vorhanden:
+          * Provision: 0,25% - 1% des Ordervolumens
+          * Handelsplatzgebühr: 2-5 EUR
+          * Mindestgebühr: 8-10 EUR  
+          * USt: 19% auf alle Gebühren (bereits in Gebührenbetrag enthalten)
+        """
         details = {
             'shares': None,
             'execution_price': None,
@@ -43,7 +92,8 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             'gross_amount': None,
             'fees': None,
             'profit_loss': None,
-            'net_amount': None
+            'net_amount': None,
+            'execution_date': None  # Neu: Explizites Ausführungsdatum
         }
         
         # Extrahiere Stückzahl
@@ -72,67 +122,252 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 details['execution_price_avg'] = sum(prices) / len(prices)
         
         # Extrahiere Kurswert (Brutto)
-        kurswert_match = re.search(r'Kurswert\s+([\d.,]+)[\s-]*EUR', text)
-        if kurswert_match:
-            details['gross_amount'] = float(kurswert_match.group(1).replace('.', '').replace(',', '.'))
+        # Erweiterte Patterns für verschiedene Layouts
+        kurswert_patterns = [
+            r'Kurswert\s+([\d.,]+)[\s-]*EUR',  # Standard mit EUR
+            r'Kurswert\s+([\d.,]+)\s*\n\s*EUR',  # EUR auf nächster Zeile
+            r'Kurswert[\s\n]+([\d.,]+)',  # Ohne EUR-Anforderung
+            r'Kurswert\s*\|\s*([\d.,]+)',  # Mit Pipe-Separator
+        ]
+        
+        for pattern in kurswert_patterns:
+            kurswert_match = re.search(pattern, text, re.MULTILINE | re.DOTALL)
+            if kurswert_match:
+                value_str = kurswert_match.group(1).replace('.', '').replace(',', '.')
+                try:
+                    value = float(value_str)
+                    if value > 0:  # Plausibilitätsprüfung
+                        details['gross_amount'] = value
+                        break
+                except ValueError:
+                    continue
         
         # Extrahiere Provision/Gebühren mit erweiterten Patterns
         fee_patterns = [
+            # Spezifische Gebührenarten
             r'Provision\s+([\d.,]+)[\s-]*EUR',
             r'Handelsplatzgebühr\s+([\d.,]+)[\s-]*EUR',
             r'Maklercourtage\s+([\d.,]+)[\s-]*EUR',
             r'Fremdspesen\s+([\d.,]+)[\s-]*EUR',
             r'Börsengebühr\s+([\d.,]+)[\s-]*EUR',
-            r'Gebühren\s+gesamt\s+([\d.,]+)[\s-]*EUR',
             r'Transaktionsentgelt\s+([\d.,]+)[\s-]*EUR',
             r'Orderprovision\s+([\d.,]+)[\s-]*EUR',
+            # Summen und Gesamtbeträge
+            r'Gebühren\s+gesamt\s+([\d.,]+)[\s-]*EUR',
+            r'Summe\s+Gebühren\s+([\d.,]+)[\s-]*EUR',
+            r'Provision\s+und\s+Gebühren\s+([\d.,]+)[\s-]*EUR',
             # Mit Pipe-Separator
             r'Provision\s*\|\s*([\d.,]+)\s*€',
             r'Gebühren\s*\|\s*([\d.,]+)\s*€',
             r'Handelsplatzgebühr\s*\|\s*([\d.,]+)\s*€',
+            r'Summe\s*\|\s*([\d.,]+)\s*€',
+            # Minus-Beträge (Gebühren als Abzug)
+            r'[\-\s]+([\d.,]+)\s*EUR\s*(?:Provision|Gebühr)',
+            r'Abzüge\s+([\d.,]+)\s*EUR',
             # Allgemeinere Patterns
             r'Gebühren[^\d]+([\d.,]+)\s*(?:EUR|€)',
-            r'Entgelte[^\d]+([\d.,]+)\s*(?:EUR|€)'
+            r'Entgelte[^\d]+([\d.,]+)\s*(?:EUR|€)',
+            r'Kosten[^\d]+([\d.,]+)\s*(?:EUR|€)'
         ]
         
+        total_fees = 0.0
+        fees_found = []
+        
+        # Suche nach allen Gebührenposten und summiere sie
         for pattern in fee_patterns:
-            fee_match = re.search(pattern, text)
-            if fee_match:
-                details['fees'] = float(fee_match.group(1).replace('.', '').replace(',', '.'))
-                break
+            matches = re.findall(pattern, text)
+            for match in matches:
+                fee_value = float(match.replace('.', '').replace(',', '.'))
+                if fee_value > 0 and fee_value < 10000:  # Plausibilitätsprüfung
+                    fees_found.append(fee_value)
+        
+        # Verwende die höchste gefundene Gebühr (wahrscheinlich die Summe)
+        if fees_found:
+            details['fees'] = max(fees_found)
         
         # Extrahiere Veräußerungsgewinn/Verlust mit erweiterten Patterns
-        profit_loss_patterns = [
-            # Standard Patterns
-            (r'Veräußerungsgewinn\s+([-]?[\d.,]+)\s*EUR', 1.0),  # Positiv
-            (r'Veräußerungsverlust\s+([-]?[\d.,]+)\s*EUR', -1.0), # Negativ
-            # Alternative Begriffe
-            (r'Gewinn\s+aus\s+Verkauf\s+([-]?[\d.,]+)\s*EUR', 1.0),
-            (r'Verlust\s+aus\s+Verkauf\s+([-]?[\d.,]+)\s*EUR', -1.0),
-            (r'Realisierter\s+Gewinn\s+([-]?[\d.,]+)\s*EUR', 1.0),
-            (r'Realisierter\s+Verlust\s+([-]?[\d.,]+)\s*EUR', -1.0),
+        # Spezialbehandlung für vertikales Layout (Sparkasse-Format)
+        vertical_layout_match = re.search(
+            r'Ermittlung steuerrelevante Erträge\s+Veräußerungsgewinn\s+Ausmachender Betrag',
+            text, re.IGNORECASE
+        )
+        
+        if vertical_layout_match:
+            # Bei vertikalem Layout: Erste Zahl = Gewinn/Verlust, Zweite Zahl = Ausmachender Betrag
+            lines = text[vertical_layout_match.end():].split('\n')
+            numbers_found = []
+            for i, line in enumerate(lines[:15]):  # Schaue die nächsten 15 Zeilen
+                # Suche nach Zahlen mit oder ohne EUR in derselben oder nächsten Zeilen
+                number_match = re.search(r'([-]?[\d]{1,3}(?:\.[\d]{3})*(?:,[\d]{2})?)', line)
+                if number_match:
+                    # Prüfe ob EUR in derselben oder in den nächsten 2 Zeilen ist
+                    # (EUR kann auf einer separaten Zeile stehen)
+                    has_eur = ('EUR' in line or 
+                              (i+1 < len(lines) and 'EUR' in lines[i+1]) or
+                              (i+2 < len(lines) and 'EUR' in lines[i+2]))
+                    if has_eur:
+                        # Prüfe ob es eine plausible Zahl ist
+                        test_str = number_match.group(1).replace('.', '').replace(',', '.')
+                        try:
+                            test_val = float(test_str)
+                            if test_val > 100:  # Ignoriere kleine Zahlen
+                                numbers_found.append(number_match.group(1))
+                        except:
+                            pass
+                if len(numbers_found) >= 2:
+                    break
+            
+            if len(numbers_found) >= 2:
+                # Konvertiere beide Zahlen
+                value1 = float(numbers_found[0].replace('.', '').replace(',', '.'))
+                value2 = float(numbers_found[1].replace('.', '').replace(',', '.'))
+                
+                # Debug-Ausgabe für BLUEITS-Transaktionen
+                if 'BLUEITS' in text[:1000] and 'Verkauf' in text[:1000]:
+                    print(f"  Debug: Vertikales Layout - Wert1={value1}, Wert2={value2}")
+                    if details.get('gross_amount'):
+                        print(f"  Debug: Kurswert={details['gross_amount']}")
+                
+                # Verbesserte Zuordnungslogik
+                # Prinzip: Der Ausmachende Betrag ist IMMER ähnlich zum Kurswert
+                # Der Gewinn/Verlust ist IMMER deutlich kleiner
+                
+                if details.get('gross_amount'):
+                    kurswert = details['gross_amount']
+                    
+                    # Berechne absolute Differenzen zum Kurswert
+                    diff1_to_kurswert = abs(value1 - kurswert)
+                    diff2_to_kurswert = abs(value2 - kurswert)
+                    
+                    # Der Wert mit der kleineren Differenz zum Kurswert ist der Ausmachende Betrag
+                    if diff1_to_kurswert < diff2_to_kurswert:
+                        # value1 ist näher am Kurswert -> Ausmachender Betrag
+                        details['net_amount'] = value1
+                        details['profit_loss'] = value2
+                        if 'BLUEITS' in text[:1000]:
+                            print(f"  -> Zuordnung: Ausmachend={value1:.2f}, G/V={value2:.2f}")
+                    else:
+                        # value2 ist näher am Kurswert -> Ausmachender Betrag  
+                        details['net_amount'] = value2
+                        details['profit_loss'] = value1
+                        if 'BLUEITS' in text[:1000]:
+                            print(f"  -> Zuordnung: Ausmachend={value2:.2f}, G/V={value1:.2f}")
+                else:
+                    # Ohne Kurswert: Der größere Wert ist fast immer der Ausmachende Betrag
+                    # (da Gewinn/Verlust normalerweise nur ein Bruchteil des Transaktionswerts ist)
+                    if value2 > value1 * 3:  # Wenn value2 deutlich größer
+                        details['profit_loss'] = value1
+                        details['net_amount'] = value2
+                    elif value1 > value2 * 3:  # Wenn value1 deutlich größer
+                        details['profit_loss'] = value2
+                        details['net_amount'] = value1
+                    else:
+                        # Bei ähnlichen Werten: Dokumentreihenfolge (erst G/V, dann Ausmachend)
+                        details['profit_loss'] = value1
+                        details['net_amount'] = value2
+        else:
+            # Standard Patterns für normale Layouts
+            profit_loss_patterns = [
+                # Standard Patterns
+                (r'Veräußerungsgewinn\s+([-]?[\d.,]+)\s*EUR', 1.0),  # Positiv
+                (r'Veräußerungsverlust\s+([-]?[\d.,]+)\s*EUR', -1.0), # Negativ
+                # Alternative Begriffe
+                (r'Gewinn\s+aus\s+Verkauf\s+([-]?[\d.,]+)\s*EUR', 1.0),
+                (r'Verlust\s+aus\s+Verkauf\s+([-]?[\d.,]+)\s*EUR', -1.0),
+                (r'Realisierter\s+Gewinn\s+([-]?[\d.,]+)\s*EUR', 1.0),
+                (r'Realisierter\s+Verlust\s+([-]?[\d.,]+)\s*EUR', -1.0),
+                # Mit Pipe-Separator
+                (r'Veräußerungsgewinn\s*\|\s*([-]?[\d.,]+)\s*€', 1.0),
+                (r'Veräußerungsverlust\s*\|\s*([-]?[\d.,]+)\s*€', -1.0),
+                # Spezielle Formate (Betrag in Klammern = negativ)
+                (r'Veräußerungsergebnis\s+\(([\d.,]+)\)\s*EUR', -1.0),  # In Klammern = Verlust
+                (r'Veräußerungsergebnis\s+([\d.,]+)\s*EUR', 1.0),       # Ohne Klammern = Gewinn
+                # Allgemeinere Patterns
+                (r'Gewinn/Verlust\s+([-]?[\d.,]+)\s*(?:EUR|€)', 1.0),
+                (r'Ergebnis\s+([-]?[\d.,]+)\s*(?:EUR|€)', 1.0)
+            ]
+            
+            for pattern, multiplier in profit_loss_patterns:
+                match = re.search(pattern, text)
+                if match:
+                    value = float(match.group(1).replace('.', '').replace(',', '.'))
+                    details['profit_loss'] = value * multiplier
+                    break
+        
+        # Extrahiere Ausmachender Betrag (Netto) - nur wenn nicht bereits aus vertikalem Layout extrahiert
+        if not details.get('net_amount'):
+            ausmachend_patterns = [
+                r'Ausmachender\s+Betrag\s+([\d.,]+)\s*EUR',
+                r'Zu\s+Ihren\s+Gunsten\s+([\d.,]+)\s*EUR',
+                r'Zu\s+Ihren\s+Lasten\s+([\d.,]+)\s*EUR',
+                r'Abrechnungsbetrag\s+([\d.,]+)\s*EUR',
+                r'Endbetrag\s+([\d.,]+)\s*EUR',
+                r'Gesamt\s+([\d.,]+)\s*EUR',
+                # Mit Pipe-Separator
+                r'Ausmachender\s+Betrag\s*\|\s*([\d.,]+)\s*€',
+                r'Gesamt\s*\|\s*([\d.,]+)\s*€'
+            ]
+            
+            for pattern in ausmachend_patterns:
+                match = re.search(pattern, text)
+                if match:
+                    details['net_amount'] = float(match.group(1).replace('.', '').replace(',', '.'))
+                    break
+        
+        # Fallback: Berechne Gebühren aus Differenz wenn möglich
+        if details['gross_amount'] and details['net_amount'] and not details['fees']:
+            # Bei Verkauf: Gebühren = Kurswert - Ausmachend
+            # Bei Kauf: Gebühren = Ausmachend - Kurswert
+            diff = abs(details['gross_amount'] - details['net_amount'])
+            if diff > 0 and diff < details['gross_amount'] * 0.1:  # Max 10% Gebühren
+                details['fees'] = diff
+        
+        # Validierung der extrahierten Werte
+        if details.get('gross_amount') and details.get('net_amount'):
+            # Bei Verkäufen sollte net_amount >= gross_amount - fees sein
+            if details.get('profit_loss') is not None:
+                # Prüfe ob der Gewinn/Verlust plausibel ist
+                if abs(details['profit_loss']) > details['gross_amount']:
+                    # Gewinn/Verlust kann nicht größer als der Kurswert sein
+                    # Möglicherweise wurden die Werte vertauscht
+                    print(f"  ⚠️  Warnung: Unplausibler G/V-Wert: {details['profit_loss']} bei Kurswert {details['gross_amount']}")
+            
+            # Prüfe ob Ausmachender Betrag plausibel ist
+            if details['net_amount'] < details['gross_amount'] * 0.5:
+                # Ausmachender Betrag sollte nicht weniger als 50% des Kurswerts sein (außer bei hohen Gebühren)
+                if not details.get('fees') or details['fees'] < details['gross_amount'] * 0.5:
+                    print(f"  ⚠️  Warnung: Unplausibler Ausmachender Betrag: {details['net_amount']} bei Kurswert {details['gross_amount']}")
+        
+        # Extrahiere Stichtag/Valuta/Ausführungsdatum
+        stichtag_patterns = [
+            # Valuta oder Schlusstag
+            r'Valuta\s*[:\s]\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
+            r'Schlusstag\s*[:\s]\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
+            r'Schlusstag\s+(\d{1,2})\.(\d{1,2})\.(\d{4})',
+            r'Ausführungstag\s*[:\s]\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
+            r'Ausführung\s+am\s+(\d{1,2})\.(\d{1,2})\.(\d{4})',
+            r'Geschäftstag\s*[:\s]\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
+            r'Handelstag\s*[:\s]\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
             # Mit Pipe-Separator
-            (r'Veräußerungsgewinn\s*\|\s*([-]?[\d.,]+)\s*€', 1.0),
-            (r'Veräußerungsverlust\s*\|\s*([-]?[\d.,]+)\s*€', -1.0),
-            # Spezielle Formate (Betrag in Klammern = negativ)
-            (r'Veräußerungsergebnis\s+\(([\d.,]+)\)\s*EUR', -1.0),  # In Klammern = Verlust
-            (r'Veräußerungsergebnis\s+([\d.,]+)\s*EUR', 1.0),       # Ohne Klammern = Gewinn
-            # Allgemeinere Patterns
-            (r'Gewinn/Verlust\s+([-]?[\d.,]+)\s*(?:EUR|€)', 1.0),
-            (r'Ergebnis\s+([-]?[\d.,]+)\s*(?:EUR|€)', 1.0)
+            r'Valuta\s*\|\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
+            r'Schlusstag\s*\|\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
+            r'Geschäftstag\s*\|\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
+            # Datum in Tabellen
+            r'\|\s*(\d{1,2})\.(\d{1,2})\.(\d{4})\s*\|.*(?:Valuta|Schlusstag)',
+            # Stichtag für Depotabschlüsse
+            r'Stichtag\s*[:\s]\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
+            r'per\s+(\d{1,2})\.(\d{1,2})\.(\d{4})',
+            r'Stand\s*[:\s]\s*(\d{1,2})\.(\d{1,2})\.(\d{4})',
+            # Fallback: Erstes Datum nach bestimmten Keywords
+            r'(?:Kauf|Verkauf|Order)\s+vom\s+(\d{1,2})\.(\d{1,2})\.(\d{4})'
         ]
         
-        for pattern, multiplier in profit_loss_patterns:
+        for pattern in stichtag_patterns:
             match = re.search(pattern, text)
             if match:
-                value = float(match.group(1).replace('.', '').replace(',', '.'))
-                details['profit_loss'] = value * multiplier
+                day, month, year = match.groups()
+                details['stichtag'] = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
                 break
-        
-        # Extrahiere Ausmachender Betrag (Netto)
-        ausmachend_match = re.search(r'Ausmachender Betrag\s+([\d.,]+)\s*EUR', text)
-        if ausmachend_match:
-            details['net_amount'] = float(ausmachend_match.group(1).replace('.', '').replace(',', '.'))
         
         return details
     
@@ -225,12 +460,16 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             if 'orderabrechnung' in filename_lower:
                 transaction_type = 'Orderabrechnung-Fehlgeschlagen'
             
+        # Bestimme Wertpapiertyp (Aktie oder Nicht-Aktie)
+        security_type = 'stock' if self.is_stock_isin(isin) else 'non-stock' if isin else None
+        
         # Kombiniere alle Daten
         result = {
             **base_data,
             'type': transaction_type,
             'period': period,
             'isin': isin,
+            'security_type': security_type,  # Neu: Typ des Wertpapiers
             'amounts': amounts,
             'max_amount': max(amounts) if amounts else 0,
             # Neue detaillierte Handelsdaten
@@ -661,7 +900,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         return cost_data_by_year
     
     def analyze_depot(self, depot_name: str) -> Dict[str, Any]:
-        """Analysiert alle Dateien eines Depots"""
+        """Analysiert alle Dateien eines Depots mit erweiterter Datenqualitätsprüfung"""
         depot_info = self.depots[depot_name]
         depot_path = self.base_path / depot_info['folder']
         
@@ -679,6 +918,18 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         statistics = defaultdict(int)
         isin_groups = defaultdict(list)
         
+        # Datenqualitäts-Statistiken
+        data_quality = {
+            'total_transactions': 0,
+            'with_fees': 0,
+            'without_fees': 0,
+            'with_execution_date': 0,
+            'with_profit_loss': 0,
+            'missing_isin': 0,
+            'missing_amounts': 0,
+            'suspicious_fees': 0  # Gebühren > 10% des Volumens
+        }
+        
         for file_path in thea_files:
             data = self.load_thea_extract(file_path)
             if data:
@@ -688,6 +939,39 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     statistics[transaction['type']] += 1
                     if transaction['isin']:
                         isin_groups[transaction['isin']].append(transaction)
+                    
+                    # Sammle Datenqualitäts-Statistiken
+                    data_quality['total_transactions'] += 1
+                    
+                    # Prüfe Gebühren
+                    if transaction.get('fees') and transaction['fees'] > 0:
+                        data_quality['with_fees'] += 1
+                        # Prüfe auf verdächtig hohe Gebühren (> 10% des Volumens)
+                        if transaction.get('gross_amount') and transaction['gross_amount'] > 0:
+                            fee_percentage = (transaction['fees'] / transaction['gross_amount']) * 100
+                            if fee_percentage > 10:
+                                data_quality['suspicious_fees'] += 1
+                    else:
+                        # Prüfe ob legitim keine Gebühren (Kurswert = Ausmachend)
+                        if transaction.get('gross_amount') and transaction.get('net_amount'):
+                            if abs(transaction['gross_amount'] - transaction['net_amount']) < 0.01:
+                                data_quality['without_fees'] += 1  # Legitim keine Gebühren
+                    
+                    # Prüfe Ausführungsdatum
+                    if transaction.get('stichtag') and transaction['stichtag'] != transaction.get('date'):
+                        data_quality['with_execution_date'] += 1
+                    
+                    # Prüfe Gewinn/Verlust bei Verkäufen
+                    if 'Verkauf' in transaction['type'] and transaction.get('profit_loss') is not None:
+                        data_quality['with_profit_loss'] += 1
+                    
+                    # Prüfe fehlende ISINs
+                    if not transaction.get('isin'):
+                        data_quality['missing_isin'] += 1
+                    
+                    # Prüfe fehlende Beträge
+                    if not transaction.get('gross_amount') and not transaction.get('net_amount'):
+                        data_quality['missing_amounts'] += 1
         
         # Sortiere Transaktionen nach Datum
         transactions.sort(key=lambda x: x['date'] if x['date'] else '0000-00-00')
@@ -697,6 +981,27 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         
         # Extrahiere Kosteninformationen
         cost_info = self.extract_cost_information(depot_path)
+        
+        # Ausgabe der Datenqualitäts-Statistiken
+        if data_quality['total_transactions'] > 0:
+            print(f"\n  Datenqualitäts-Statistiken für {depot_name}:")
+            print(f"  - Transaktionen mit Gebühren: {data_quality['with_fees']}/{data_quality['total_transactions']} ({data_quality['with_fees']*100/data_quality['total_transactions']:.1f}%)")
+            print(f"  - Transaktionen ohne Gebühren (legitim): {data_quality['without_fees']}/{data_quality['total_transactions']} ({data_quality['without_fees']*100/data_quality['total_transactions']:.1f}%)")
+            print(f"  - Mit explizitem Ausführungsdatum: {data_quality['with_execution_date']}/{data_quality['total_transactions']} ({data_quality['with_execution_date']*100/data_quality['total_transactions']:.1f}%)")
+            
+            # Warnungen für Datenqualitätsprobleme
+            if data_quality['suspicious_fees'] > 0:
+                print(f"  ⚠️  Verdächtig hohe Gebühren (>10%): {data_quality['suspicious_fees']} Transaktionen")
+            if data_quality['missing_isin'] > 0:
+                print(f"  ⚠️  Fehlende ISINs: {data_quality['missing_isin']} Transaktionen")
+            if data_quality['missing_amounts'] > 0:
+                print(f"  ⚠️  Fehlende Beträge: {data_quality['missing_amounts']} Transaktionen")
+            
+            # Erfolgsrate für Gewinn/Verlust bei Verkäufen
+            verkauf_count = sum(1 for t in transactions if 'Verkauf' in t['type'])
+            if verkauf_count > 0:
+                gv_rate = (data_quality['with_profit_loss'] / verkauf_count) * 100
+                print(f"  - Verkäufe mit G/V-Daten: {data_quality['with_profit_loss']}/{verkauf_count} ({gv_rate:.1f}%)")
         
         return {
             'depot_name': depot_name,
@@ -714,7 +1019,8 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             'quarterly_statements': balance_info['quarterly_statements'],
             'latest_balance': balance_info['latest_balance'],
             'latest_balance_date': balance_info['latest_balance_date'],
-            'cost_information': cost_info  # Füge Kosteninformationen hinzu
+            'cost_information': cost_info,  # Füge Kosteninformationen hinzu
+            'data_quality': data_quality  # Füge Datenqualitäts-Statistiken hinzu
         }
     
     def generate_markdown(self, analysis: Dict[str, Any]) -> str:
@@ -984,11 +1290,35 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         
         # Abschnitt 7: Detaillierter Transaktionsverlauf
         md.append(f"\n## Transaktionsverlauf (Detailliert)\n")
-        md.append("| Datum | Typ | ISIN | Stück | Kurs/Aktie | Brutto (EUR) | Gebühren | Gewinn/Verlust | Netto (EUR) | Dokument |")
-        md.append("|-------|-----|------|-------|------------|--------------|----------|----------------|-------------|----------|")
+        
+        # Legende der Spalten
+        md.append("### Legende der Spalten:")
+        md.append("- **Nr.**: Laufende Nummer der Transaktion")
+        md.append("- **Stichtag**: Valuta-/Ausführungsdatum der Transaktion")
+        md.append("- **Dok.datum**: Datum der Dokumenterstellung")
+        md.append("- **G/V Akt.**: Gewinn/Verlust aus Aktienverkäufen (EUR)")
+        md.append("- **Kum. Akt.**: Kumulierter Gewinn/Verlust Aktien (EUR)")
+        md.append("- **G/V N-Akt.**: Gewinn/Verlust aus Nicht-Aktien (Derivate, Zertifikate, strukturierte Produkte) (EUR)")
+        md.append("- **Kum. N-Akt.**: Kumulierter Gewinn/Verlust Nicht-Aktien (EUR)")
+        md.append("- **G/V Ges.**: Gewinn/Verlust Gesamt (EUR)")
+        md.append("- **Kum. Ges.**: Kumulierter Gewinn/Verlust Gesamt (EUR)")
+        md.append("")
+        
+        # Tabellenkopf (verkürzt wegen Platzmangel)
+        md.append("| Nr. | Stichtag | Dok.datum | Typ | ISIN | Stück | Kurs | Kurswert | Geb. | USt | Ausmach. | G/V Akt. | Kum. Akt. | G/V N-Akt. | Kum. N-Akt. | G/V Ges. | Kum. Ges. | Dokument |")
+        md.append("|-----|----------|-----------|-----|------|-------|------|----------|------|-----|----------|----------|-----------|------------|-------------|----------|-----------|----------|")
+        
+        # Variablen für kumulierte Gewinn/Verluste
+        cumulative_stock = 0.0
+        cumulative_non_stock = 0.0
+        cumulative_total = 0.0
+        transaction_number = 0  # Laufende Nummer für Transaktionen
         
         for trans in analysis['transactions']:
-            date = self.format_date_german(trans['date'] if trans['date'] else 'N/A')
+            transaction_number += 1  # Erhöhe die laufende Nummer
+            # Extrahiere Stichtag und Dokumentdatum
+            stichtag = self.format_date_german(trans.get('stichtag', trans.get('date', 'N/A')))
+            doc_date = self.format_date_german(trans['date'] if trans['date'] else 'N/A')
             trans_type = trans['type']
             
             # Kürze den Transaktionstyp für bessere Lesbarkeit
@@ -1022,48 +1352,120 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             # Handelsdaten formatieren
             shares = str(trans.get('shares', '')) if trans.get('shares') else '-'
             
-            # Kurs/Aktie - bei mehreren Kursen zeige Spanne
+            # Kurs - bei mehreren Kursen zeige Durchschnitt
             if trans.get('execution_price_min') and trans.get('execution_price_max'):
-                # Teilausführungen mit mehreren Kursen
-                price_str = f"{self.format_number_german(trans['execution_price_min'], 2)}-{self.format_number_german(trans['execution_price_max'], 2)} (⌀{self.format_number_german(trans['execution_price_avg'], 2)})"
+                # Teilausführungen mit mehreren Kursen - zeige Durchschnitt
+                price_str = self.format_number_german(trans.get('execution_price_avg', 0), 2)
             elif trans.get('execution_price'):
                 price_str = self.format_number_german(trans['execution_price'], 2)
-            elif trans.get('limit_price'):
-                price_str = f"Limit: {self.format_number_german(trans['limit_price'], 2)}"
             else:
                 price_str = '-'
             
-            # Brutto
-            gross = self.format_number_german(trans['gross_amount'], 2) if trans.get('gross_amount') else '-'
+            # Kurswert (netto - ohne Gebühren)
+            kurswert_netto = self.format_number_german(trans['gross_amount'], 2) if trans.get('gross_amount') else '-'
             
-            # Gebühren mit USt-Hinweis
+            # Gebühren und USt-Berechnung
             if trans.get('fees'):
-                # Berechne USt (19% sind in den Gebühren enthalten)
+                # Die Gebühren sind bereits brutto (inkl. 19% USt)
                 fees_gross = trans['fees']
                 fees_net = fees_gross / 1.19
                 fees_vat = fees_gross - fees_net
-                fees = f"-{self.format_number_german(fees_gross, 2)} (inkl. {self.format_number_german(fees_vat, 2)} USt)"
+                gebühren_netto_str = self.format_number_german(fees_net, 2)
+                ust_str = self.format_number_german(fees_vat, 2)
             else:
-                fees = '-'
+                gebühren_netto_str = '-'
+                ust_str = '-'
+                fees_gross = 0
+                fees_net = 0
+                fees_vat = 0
             
-            # Gewinn/Verlust mit Farbmarkierung
-            if trans.get('profit_loss') is not None:
-                if trans['profit_loss'] > 0:
-                    profit_loss = f'<span style="color: green; font-weight: bold;">{self.format_number_german(trans["profit_loss"], 2, show_sign=True)}</span>'
-                elif trans['profit_loss'] == 0:
-                    profit_loss = f'<span style="color: green;">0,00</span>'
-                else:
-                    profit_loss = f'<span style="color: red; font-weight: bold;">{self.format_number_german(trans["profit_loss"], 2)}</span>'
-            else:
-                profit_loss = '-'
-            
-            # Netto (oder Fallback auf max_amount)
+            # Ausmachender Betrag (brutto = Kurswert + Gebühren inkl. USt)
             if trans.get('net_amount'):
-                net = self.format_number_german(trans['net_amount'], 2)
-            elif trans.get('max_amount') and trans.get('max_amount') > 0:
-                net = self.format_number_german(trans['max_amount'], 2)
+                ausmachend_brutto = self.format_number_german(trans['net_amount'], 2)
+            elif trans.get('gross_amount'):
+                # Berechne Ausmachend = Kurswert + Gebühren (brutto)
+                ausmachend_val = trans['gross_amount'] + fees_gross
+                ausmachend_brutto = self.format_number_german(ausmachend_val, 2)
             else:
-                net = 'N/A'
+                ausmachend_brutto = '-'
+            
+            # Gewinn/Verlust aufgeteilt nach Aktien und Nicht-Aktien
+            gv_aktien_str = '-'
+            kum_aktien_str = '-'
+            gv_non_aktien_str = '-'
+            kum_non_aktien_str = '-'
+            gv_gesamt_str = '-'
+            kum_gesamt_str = '-'
+            
+            if trans.get('profit_loss') is not None:
+                profit_loss_val = trans['profit_loss']
+                is_stock = trans.get('security_type') == 'stock'
+                
+                # Aktualisiere kumulierte Werte basierend auf Wertpapiertyp
+                if is_stock:
+                    cumulative_stock += profit_loss_val
+                    # Formatiere Aktien G/V
+                    if profit_loss_val > 0:
+                        gv_aktien_str = f'<span style="color: green; font-weight: bold;">{self.format_number_german(profit_loss_val, 2, show_sign=True)}</span>'
+                    elif profit_loss_val == 0:
+                        gv_aktien_str = f'<span style="color: black;">0,00</span>'
+                    else:
+                        gv_aktien_str = f'<span style="color: red; font-weight: bold;">{self.format_number_german(profit_loss_val, 2)}</span>'
+                    
+                    # Formatiere kumulierten Aktien G/V
+                    if cumulative_stock > 0:
+                        kum_aktien_str = f'<span style="color: green; font-weight: bold;">{self.format_number_german(cumulative_stock, 2, show_sign=True)}</span>'
+                    elif cumulative_stock == 0:
+                        kum_aktien_str = f'<span style="color: black;">0,00</span>'
+                    else:
+                        kum_aktien_str = f'<span style="color: red; font-weight: bold;">{self.format_number_german(cumulative_stock, 2)}</span>'
+                    
+                    # Nicht-Aktien bleiben leer
+                    gv_non_aktien_str = '-'
+                    kum_non_aktien_str = self.format_number_german(cumulative_non_stock, 2) if cumulative_non_stock != 0 else '-'
+                    
+                else:
+                    cumulative_non_stock += profit_loss_val
+                    # Formatiere Nicht-Aktien G/V
+                    if profit_loss_val > 0:
+                        gv_non_aktien_str = f'<span style="color: green; font-weight: bold;">{self.format_number_german(profit_loss_val, 2, show_sign=True)}</span>'
+                    elif profit_loss_val == 0:
+                        gv_non_aktien_str = f'<span style="color: black;">0,00</span>'
+                    else:
+                        gv_non_aktien_str = f'<span style="color: red; font-weight: bold;">{self.format_number_german(profit_loss_val, 2)}</span>'
+                    
+                    # Formatiere kumulierten Nicht-Aktien G/V
+                    if cumulative_non_stock > 0:
+                        kum_non_aktien_str = f'<span style="color: green; font-weight: bold;">{self.format_number_german(cumulative_non_stock, 2, show_sign=True)}</span>'
+                    elif cumulative_non_stock == 0:
+                        kum_non_aktien_str = f'<span style="color: black;">0,00</span>'
+                    else:
+                        kum_non_aktien_str = f'<span style="color: red; font-weight: bold;">{self.format_number_german(cumulative_non_stock, 2)}</span>'
+                    
+                    # Aktien bleiben leer
+                    gv_aktien_str = '-'
+                    kum_aktien_str = self.format_number_german(cumulative_stock, 2) if cumulative_stock != 0 else '-'
+                
+                # Gesamt G/V immer berechnen
+                cumulative_total += profit_loss_val
+                
+                # Formatiere Gesamt G/V
+                if profit_loss_val > 0:
+                    gv_gesamt_str = f'<span style="color: green; font-weight: bold;">{self.format_number_german(profit_loss_val, 2, show_sign=True)}</span>'
+                elif profit_loss_val == 0:
+                    gv_gesamt_str = f'<span style="color: black;">0,00</span>'
+                else:
+                    gv_gesamt_str = f'<span style="color: red; font-weight: bold;">{self.format_number_german(profit_loss_val, 2)}</span>'
+                
+                # Formatiere kumulierten Gesamt G/V
+                if cumulative_total > 0:
+                    kum_gesamt_str = f'<span style="color: green; font-weight: bold;">{self.format_number_german(cumulative_total, 2, show_sign=True)}</span>'
+                elif cumulative_total == 0:
+                    kum_gesamt_str = f'<span style="color: black;">0,00</span>'
+                else:
+                    kum_gesamt_str = f'<span style="color: red; font-weight: bold;">{self.format_number_german(cumulative_total, 2)}</span>'
+            
+            # Entfernt - wird durch ausmachend_brutto ersetzt
             
             # Erstelle Link zum PDF-Dokument
             pdf_file = trans.get('original_file', '')
@@ -1082,8 +1484,8 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             else:
                 isin_display = isin
             
-            # Erstelle die detaillierte Tabellenzeile
-            md.append(f"| {date} | {display_type} | {isin_display} | {shares} | {price_str} | {gross} | {fees} | {profit_loss} | {net} | {pdf_link} |")
+            # Erstelle die detaillierte Tabellenzeile mit allen neuen Spalten
+            md.append(f"| {transaction_number} | {stichtag} | {doc_date} | {display_type} | {isin_display} | {shares} | {price_str} | {kurswert_netto} | {gebühren_netto_str} | {ust_str} | {ausmachend_brutto} | {gv_aktien_str} | {kum_aktien_str} | {gv_non_aktien_str} | {kum_non_aktien_str} | {gv_gesamt_str} | {kum_gesamt_str} | {pdf_link} |")
         
         # Zusammenfassung Transaktionsverlauf
         total_trans = len(analysis['transactions'])
@@ -1109,6 +1511,29 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             md.append(f"⚠️ **{failed_count} fehlgeschlagene Extraktionen**")
         if unknown_count > 0:
             md.append(f"⚠️ **{unknown_count} unbekannte Dokumente**")
+        
+        # Performance-Zusammenfassung
+        md.append(f"\n### Performance-Zusammenfassung:")
+        cumulative_stock_str = self.format_number_german(cumulative_stock, 2, show_sign=True)
+        cumulative_non_stock_str = self.format_number_german(cumulative_non_stock, 2, show_sign=True)
+        cumulative_total_str = self.format_number_german(cumulative_total, 2, show_sign=True)
+        
+        md.append(f"- **Aktien Gesamt:** {cumulative_stock_str} EUR (Kumuliert)")
+        md.append(f"- **Nicht-Aktien Gesamt:** {cumulative_non_stock_str} EUR (Kumuliert)")
+        md.append(f"- **Gesamtergebnis:** {cumulative_total_str} EUR")
+        
+        # Steuerliche Hinweise
+        md.append(f"\n### Steuerliche Hinweise:")
+        md.append("- **Aktiengewinne:** Unterliegen der Abgeltungssteuer (25% + SolZ + ggf. KiSt)")
+        md.append("- **Nicht-Aktien (Derivate/Zertifikate):** Verluste nur mit Gewinnen aus Termingeschäften verrechenbar (§ 20 Abs. 6 EStG)")
+        md.append("- **Verlustverrechnungstöpfe:** Aktien- und Derivatverluste werden steuerlich getrennt behandelt")
+        
+        # Farbcodierung-Legende
+        md.append(f"\n### Farbcodierung:")
+        md.append("- 🟢 **Grüne Schrift**: Gewinnbringende Verkäufe")
+        md.append("- 🔴 **Rote Schrift**: Verlustbehaftete Verkäufe")
+        md.append("- **Grüner Hintergrund**: Verkaufstransaktion mit Gewinn")
+        md.append("- **Roter Hintergrund**: Verkaufstransaktion mit Verlust")
         
         # Abschnitt 8: Zeitliche Verteilung
         md.append(f"\n## Zeitliche Verteilung\n")
