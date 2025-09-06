@@ -9,7 +9,7 @@ THEA is a comprehensive PDF processing and financial document analysis system th
 2. **AI-powered document analysis** using Ollama models with retry logic and pattern detection
 3. **Financial account analysis system** for processing bank statements and investment documents
 
-The system processes 618+ financial documents across 6 account types, extracting structured data and generating comprehensive markdown reports with German formatting standards.
+The system processes 618+ financial documents across 6 account types, extracting structured data and generating comprehensive markdown reports. Output files use the `.thea_extract` extension with additional sidecar files for metadata.
 
 ## Architecture
 
@@ -36,6 +36,36 @@ The modular pipeline architecture (`pipelines/` directory) consists of:
    - Falls back to gemma3:27b when confidence < 0.7
    - Requires: `pip install docling` (includes torch dependencies, ~3.5GB)
 
+### Text Extractors
+
+The text pipeline uses multiple extractors (`extractors/` directory):
+- **PyPDF2Extractor**: Basic text extraction, confidence ~0.8
+- **PdfPlumberExtractor**: Advanced extraction with table support, confidence ~0.9
+- **PyMuPDFExtractor**: Fast extraction with formatting, confidence ~1.0
+- **DoclingExtractor**: ML-based extraction for complex layouts
+
+### Account Document Analysis System
+
+The repository includes specialized scripts for analyzing financial documents:
+
+- **`Konten.py`** - Base library with shared functionality (320 lines)
+  - `BaseKontoAnalyzer` class for document processing
+  - Date extraction from various filename patterns
+  - Document type classification from docling metadata
+  - Markdown report generation utilities
+
+- **`Depotkonto.py`** - Analyzes depot/investment accounts
+  - Processes ISIN codes and transaction types
+  - Generates `BLUEITS-Depotkonto.md` and `Ramteid-Depotkonto.md`
+
+- **`Girokonto.py`** - Analyzes checking accounts
+  - Transaction categorization and balance tracking
+  - Generates `BLUEITS-Girokonto.md` and `Ramteid-Girokonto.md`
+
+- **`Geldmarktkonto.py`** - Analyzes money market accounts
+  - Interest rate analysis features
+  - Generates `BLUEITS-Geldmarktkonto.md` and `Ramteid-Geldmarktkonto.md`
+
 ### Core Processing Flow
 
 The main `process_with_model()` function in `thea.py:348` orchestrates:
@@ -44,8 +74,8 @@ The main `process_with_model()` function in `thea.py:348` orchestrates:
    - Normal mode: Checks for specific `.thea_extract` files
    - Sidecars-only mode: Broader pattern matching for ANY existing sidecar files
 2. **Pipeline Processing** - Runs selected pipeline to extract content
-3. **Ollama API Streaming** - Sends to model with chunk-by-chunk processing (endpoint: `https://b1s.hey.bahn.business/api/chat`)
-4. **Pattern Detection** - Monitors for stuck responses (1-100 char repetitions, `thea.py:688-750`)
+3. **Ollama API Streaming** - Sends to model with chunk-by-chunk processing
+4. **Pattern Detection** - Monitors for stuck responses (1-100 char repetitions)
 5. **Temperature Scaling** - Progressive increase (0.1→1.0) on retries
 6. **Thinking Tag Extraction** - `<thinking>` for gemma, `<think>` for qwen
 7. **JSON Response Cleaning** - Handles markdown blocks and validates JSON
@@ -128,6 +158,7 @@ npm run thea:sidecars:txt-force     # Force text extraction
 npm run thea:sidecars:docling-force # Force Docling extraction
 
 # Account documents processing (docs/ folder with 618 PDFs)
+# NOTE: Now uses --temperature 0.1 --max-attempts 10 for better reliability
 npm run thea:konten:docling      # Process all account PDFs (~2-3 hours)
 npm run thea:konten:docling-windows  # Windows version
 
@@ -240,19 +271,30 @@ This causes conflicts between models:
 - Multiple fallback strategies for JSON extraction
 - Critical for Gemma/Qwen model compatibility
 
+**`extract_thinking_content(text)`** (thea.py:240-276)
+- Extracts thinking tags from model responses
+- Supports both `<thinking>` and `<think>` formats
+- Handles multiple thinking blocks with separation
+
 **`process_with_model()`** (`thea.py:348`)
 - Core processing orchestrator
 - Handles retry logic with temperature scaling
 - Pattern detection for stuck responses (`thea.py:688-750`)
 - Streaming response handling
 
-**Pattern Detection Thresholds** (`thea.py:688-750`)
+**`BaseKontoAnalyzer`** (Konten.py:16)
+- Base class for account analysis scripts
+- Methods: `extract_date_from_filename()`, `extract_document_type_from_docling()`
+- Handles multiple date formats: YYYYMMDD, vom_DD_MM_YYYY, DD.MM.YYYY
+- Document type classification with fallback patterns
+
+### Pattern Detection Thresholds
 - 1-char: 50+ repetitions
 - 2-char: 25+ repetitions
 - 3-10 char: 10+ repetitions
 - Longer patterns: fewer repetitions needed
 
-**Temperature Scaling Formula**
+### Temperature Scaling Formula
 ```python
 temperature = initial_temp + (retry_count * (1.0 - initial_temp) / max_attempts)
 ```
@@ -275,6 +317,11 @@ cost_info['total_costs'] = cost_info['service_costs'] + cost_info['depot_fees']
 - Kurswert extraction with multiple patterns (lines 125-143)
 - Intelligent value assignment using proximity to gross amount
 - Debug logging for BLUEITS transactions
+- German thousand separator handling in shares extraction (line 100): Pattern `r'Stück\s+([\d.]+)'` with `.replace('.', '')`
+- Transaction type detection including:
+  - `Limit-Order-Vormerkung`: Limit order confirmations with reservation fees
+  - `Orderabrechnung-Stornierung`: Order cancellations  
+  - `Orderabrechnung-Verkauf/Kauf`: Executed buy/sell orders
 
 ### Pipeline Selection Priority
 1. Prompt file `settings.pipeline`
@@ -308,6 +355,13 @@ The `docs/` folder contains 618 PDF documents organized into 6 account folders:
 - **pdf-extract-txt**: ~5-10 seconds per PDF
 - **pdf-extract-docling**: ~37 seconds per PDF (1.6 files/minute)
 
+## Data Quality Achievements
+- **BLUEITS Depot**: 100% G/V extraction for 72 sales transactions
+- **Ramteid Depot**: 94.4% G/V extraction for 18 sales transactions
+- **Total Documents**: 618 PDFs across 6 account types successfully processed
+- **Transaction Types**: 8+ distinct types properly classified
+- **German Format Support**: Full support for DD.MM.YYYY dates, 1.234,56 numbers, trailing minus
+
 ## Environment Variables
 - `OLLAMA_API_URL`: Override default Ollama endpoint (default: https://b1s.hey.bahn.business/api/chat)
 - `THEA_DEFAULT_MODEL`: Default model if not specified (default: gemma3:27b)
@@ -334,3 +388,239 @@ The `docs/` folder contains 618 PDF documents organized into 6 account folders:
 - Windows filesystems may have uppercase extensions (.PDF)
 - Scripts handle both .pdf and .PDF patterns
 - Glob patterns include both cases: `*.pdf`, `*.PDF`
+
+## Sidecar-Only Mode
+
+The `--sidecars-only` flag enables extraction-only mode without sending data to Ollama models:
+
+**Use cases:**
+- Pre-process PDFs for later analysis
+- Quick text/image extraction without AI processing
+- Testing extraction quality before AI analysis
+
+**Behavior:**
+- Automatically enables `--save-sidecars`
+- Skips all model processing
+- Much faster than full processing (no API calls)
+- Skip mode checks for ANY existing sidecar files regardless of model/suffix
+
+## Docling Pipeline Details
+
+**When to use:**
+- Documents with complex tables or multi-column layouts
+- Scientific papers with formulas and equations
+- Financial statements with structured data
+
+**Features:**
+- Preserves document structure and reading order
+- Extracts tables with cell relationships intact
+- Confidence scoring for extraction quality
+- Automatic fallback to gemma3:27b when confidence < 0.7
+
+## Critical Prompt Settings
+
+### For Qwen Models
+```json
+{
+  "system_prompt": {
+    "suffix": "...Output ONLY valid JSON. Do NOT use thinking tags..."
+  },
+  "settings": {
+    "format": "json",
+    "temperature": 0.2
+  }
+}
+```
+
+### For Gemma Models
+```json
+{
+  "system_prompt": {
+    "suffix": "...Use <thinking> tags for analysis, then output JSON..."
+  },
+  "settings": {
+    "format": "json",
+    "temperature": 0.15
+  }
+}
+```
+
+## Processing Rates
+- **pdf-extract-png**: ~45-60 seconds per PDF
+- **pdf-extract-txt**: ~5-10 seconds per PDF
+- **pdf-extract-docling**: ~37 seconds per PDF (1.6 files/minute)
+
+## Recent Critical Fixes
+
+### German Thousand Separator Issue (Fixed)
+- **Problem**: Transactions with >1000 shares showed only 1 share (e.g., "Stück 1.565" parsed as 1)
+- **Root Cause**: Regex pattern `r'Stück\s+(\d+)'` didn't handle German thousand separators (dots)
+- **Fix**: Changed to `r'Stück\s+([\d.]+)'` and added `.replace('.', '')` at line 100 in `Depotkonto.py`
+- **Impact**: Transaction 34 now correctly shows 1565 shares instead of 1
+
+### Trailing Minus Sign in German Bookkeeping Format (Fixed)
+- **Problem**: Sales transactions with losses showed "-" instead of actual loss values
+- **Root Cause**: German bookkeeping format uses trailing minus (e.g., "199.440,70-") not matched by regex expecting leading minus
+- **Fix**: Added new patterns in `Depotkonto.py:272-313` to handle trailing minus:
+  ```python
+  (r'Veräußerungsverlust\s+([\d.,]+)-\s*EUR', -1.0),  # Trailing minus
+  ```
+- **Impact**: G/V extraction rate improved from 57.5% to 100% for BLUEITS sales (after excluding Kapitalmaßnahme)
+
+### Vertical Layout Detection for Losses (Fixed)
+- **Problem**: Vertical layout detection only worked for "Veräußerungsgewinn" not "Veräußerungsverlust"
+- **Fix**: Updated regex at line 193 to `r'Ermittlung steuerrelevante Erträge\s+Veräußerungs(?:gewinn|verlust)\s+Ausmachender Betrag'`
+- **Additional Fix**: Lines 204-234 now handle trailing minus in vertical layouts with proper sign detection
+- **Impact**: Transaction 38 now correctly shows -12.150,00 EUR loss
+
+### Transaction Type Classification (Enhanced)
+- **New Types Added** in `Depotkonto.py`:
+  - `Kapitalmaßnahme`: For stock splits and other corporate actions (line 427-432)
+  - `Limit-Order-Vormerkung`: For limit order confirmations with "Vormerkungsentgelt" 
+  - `Stornierung`: For order cancellations with "Streichungsbestätigung"
+- **Detection Priority**: Capital measures → Limit orders → Cancellations → Regular orders
+- **Statistics Exclusion**: Kapitalmaßnahme transactions excluded from G/V extraction rate (line 1041)
+- **Solution** (`Depotkonto.py:100`):
+  ```python
+  shares_match = re.search(r'Stück\s+([\d.]+)', text)
+  if shares_match:
+      shares_str = shares_match.group(1).replace('.', '')
+      details['shares'] = int(shares_str)
+  ```
+
+### Complete Transaction Type System
+- **Kapitalmaßnahme**: Stock splits, corporate actions (e.g., Tesla 3:1 split Aug 2022)
+- **Limit-Order-Vormerkung**: Limit order confirmations with "Vormerkungsentgelt"
+- **Orderabrechnung-Stornierung**: Order cancellations with "Streichungsbestätigung"
+- **Orderabrechnung-Verkauf/Kauf**: Executed buy/sell orders
+- **Kostenaufstellung**: MiFID II cost reports (Ex-Post)
+- **Depotabschluss**: Depot statements (annual/quarterly)
+- **Dividende**: Dividend payments
+- **Zinsen**: Interest payments
+
+### Line Ending Issues (Windows/WSL)
+- Create `.gitattributes` file with proper line ending configuration
+- Use `git checkout -- <path>` to reset files to repository state
+
+## Available Prompt Files
+
+- **`pdf-extract-png.prompt`** - Vision-based extraction with Gemma models
+- **`pdf-extract-txt.prompt`** - Text extraction for Qwen models  
+- **`pdf-extract-docling.prompt`** - Docling ML extraction
+- **`bank_gemma.prompt`** - Bank statement processing (Gemma)
+- **`bank_qwen.prompt`** - Bank statement processing (Qwen)
+- **`bank_konto_kontoauszuege.prompt`** - German bank account statements
+- **`bank_konto_kontoauszuege_v2.prompt`** - Enhanced with validation and cross-references
+- **`thinking_test.prompt`** - Testing thinking tag behavior
+
+## Key Processing Information
+
+### Processing Rates
+- **pdf-extract-png**: ~45-60 seconds per PDF
+- **pdf-extract-txt**: ~5-10 seconds per PDF
+- **pdf-extract-docling**: ~37 seconds per PDF (1.6 files/minute)
+
+### Batch Processing
+For overnight runs:
+```bash
+nohup python3 thea.py --pipeline pdf-extract-docling "Belege/*.pdf" > processing.log 2>&1 &
+tail -f processing.log  # Monitor progress
+```
+
+## Critical Issues and Solutions
+
+### Model outputs thinking tags instead of JSON
+- **Root cause**: Hardcoded system prompt prefix encourages thinking tags
+- **Qwen fix**: Explicitly add "Do NOT use thinking tags" in prompt file
+- **Gemma fix**: Ensure "Use thinking THEN output JSON separately"
+- **Always**: Set `"format": "json"` in settings
+
+### Poppler not found (required for PNG pipeline)
+- Linux/macOS: `sudo apt-get install poppler-utils` or `brew install poppler`
+- Windows: Download from GitHub, add bin folder to PATH
+- Verify: `pdftoppm -h`
+
+## Prompt File Development
+
+When creating new prompt files:
+1. Use existing prompts as templates (`prompts/pdf-extract-*.prompt`)
+2. For Qwen: Explicitly forbid thinking tags in JSON output
+3. For Gemma: Instruct to use thinking tags THEN output JSON
+4. Always include `format: "json"` in settings for JSON enforcement
+5. Use consistent schema field names (e.g., `three_word_description_*`)
+6. Include `document_type` field for classification
+7. Set appropriate temperature (0.15-0.2 recommended)
+8. Use `{{pdf_path}}` placeholder in user_prompt.template
+
+## Building Executables
+
+```bash
+npm run build-windows    # Creates thea-windows.exe
+npm run build-linux      # Creates thea-linux
+npm run build-macos      # Creates thea-macos
+```
+
+## Directory Structure
+
+```
+THEA/
+├── thea.py                 # Main entry point, CLI argument handling
+├── pipelines/              # Pipeline implementations
+│   ├── __init__.py
+│   ├── base.py            # BasePipeline abstract class
+│   ├── manager.py         # Pipeline selection and management
+│   ├── pdf_extract_png.py # Image extraction pipeline
+│   ├── pdf_extract_txt.py # Text extraction pipeline
+│   └── pdf_extract_docling.py # Docling ML pipeline
+├── extractors/            # Text extraction implementations
+│   ├── __init__.py
+│   ├── pypdf2_extractor.py
+│   ├── pdfplumber_extractor.py
+│   ├── pymupdf_extractor.py
+│   └── docling_extractor.py
+├── prompts/               # Prompt configuration files
+│   ├── pdf-extract-png.prompt
+│   ├── pdf-extract-txt.prompt
+│   ├── pdf-extract-docling.prompt
+│   ├── bank_gemma.prompt
+│   ├── bank_qwen.prompt
+│   ├── bank_konto_kontoauszuege.prompt
+│   ├── bank_konto_kontoauszuege_v2.prompt
+│   └── thinking_test.prompt
+├── docs/                  # Financial documents (618 PDFs)
+│   ├── BLUEITS-Depotkonto-7274079/     # 314 files
+│   ├── BLUEITS-Geldmarktkonto-21503990/ # 55 files
+│   ├── BLUEITS-Girokonto-200750750/    # 59 files
+│   ├── Ramteid-Depotkonto-7274087/     # 88 files
+│   ├── Ramteid-Geldmarktkonto-21504006/ # 43 files
+│   └── Ramteid-Girokonto-21377502/     # 59 files
+├── Konten.py              # Base account analyzer class
+├── Depotkonto.py          # Depot account analysis
+├── Girokonto.py           # Checking account analysis
+├── Geldmarktkonto.py      # Money market analysis
+├── test_thinking.py       # Test suite for thinking tags
+├── requirements.txt       # Python dependencies
+├── package.json          # NPM scripts and project metadata
+└── CLAUDE.md             # This documentation file
+```
+
+## Key Entry Points and Functions
+
+### Main Entry Point
+- `thea.py:main()` - CLI entry point, argument parsing
+- `thea.py:process_with_model()` (line 348) - Core processing orchestrator
+
+### Pipeline Functions
+- `pipelines/manager.py:PipelineManager.get_pipeline()` - Pipeline selection
+- `pipelines/base.py:Pipeline.process()` - Abstract pipeline interface
+- `pipelines/base.py:Pipeline.format_for_model()` - Model formatting
+
+### Prompt Loading
+- `thea.py:load_prompt_file()` (line 25) - Load JSON/text prompts
+- `thea.py:build_system_prompt()` (line 50) - Build system prompt
+- `thea.py:build_user_prompt()` (line 78) - Build user prompt with substitutions
+
+### Utility Functions
+- `thea.py:clean_thea_files()` (line 89) - Clean generated files
+- `thea.py:extract_thinking_content()` - Extract thinking tags
+- `thea.py:clean_json_response()` - Clean and validate JSON
