@@ -51,20 +51,36 @@ The main `process_with_model()` function in `thea.py:348` orchestrates:
 7. **JSON Response Cleaning** - Handles markdown blocks and validates JSON
 8. **Result Persistence** - Saves to `.thea_extract` files with v2.0 metadata format
 
-### Financial Account Analysis System
+### Financial Document Processing
 
-Specialized scripts for analyzing financial documents:
+#### Vertical Layout Detection (Sparkasse Format)
+Recent improvements in `Depotkonto.py:190-260` handle Sparkasse's vertical format where values appear on separate lines:
+```
+Ermittlung steuerrelevante Erträge Veräußerungsgewinn Ausmachender Betrag
+3.204,55 EUR
+52.354,50
+EUR
+```
+
+The extraction logic (`Depotkonto.py:195-260`):
+1. Detects vertical layout pattern
+2. Extracts numbers from subsequent lines (checks up to 2 lines ahead for EUR)
+3. Uses proximity to Kurswert (gross amount) to determine which value is profit/loss vs net amount
+4. Debug logging for BLUEITS transactions to track extraction accuracy
+
+#### Base Account Analysis System
 
 - **`Konten.py`** - Base library with shared functionality (320 lines)
   - `BaseKontoAnalyzer` class for document processing
-  - German date/number formatting utilities
+  - German formatting utilities: `format_number_german()`, `format_date_german()`
   - Document type classification from docling metadata
   - Markdown report generation
 
 - **`Depotkonto.py`** - Analyzes depot/investment accounts
   - MiFID II cost extraction logic (lines 586-608)
   - ISIN code processing and transaction categorization
-  - Color-coded sales transactions in markdown
+  - Color-coded sales transactions with profit/loss tracking
+  - Cumulative profit/loss columns for tax reporting
 
 - **`Girokonto.py`** - Analyzes checking accounts
   - Transaction categorization and balance tracking
@@ -254,6 +270,12 @@ cost_info['total_costs'] = cost_info['service_costs'] + cost_info['depot_fees']
 - `format_date_german()`: Converts YYYY-MM-DD to DD.MM.YYYY
 - Currency/percentage symbols only in table headers, never in cells
 
+**Transaction Processing** (`Depotkonto.py`)
+- Vertical layout detection for Sparkasse documents (lines 190-260)
+- Kurswert extraction with multiple patterns (lines 125-143)
+- Intelligent value assignment using proximity to gross amount
+- Debug logging for BLUEITS transactions
+
 ### Pipeline Selection Priority
 1. Prompt file `settings.pipeline`
 2. CLI `--pipeline` override
@@ -302,6 +324,11 @@ The `docs/` folder contains 618 PDF documents organized into 6 account folders:
 - Linux/macOS: `sudo apt-get install poppler-utils` or `brew install poppler`
 - Windows: Download from GitHub, add bin folder to PATH
 - Verify: `pdftoppm -h`
+
+### Vertical layout extraction issues (Sparkasse documents)
+- Check `Depotkonto.py:190-260` for vertical layout detection logic
+- Ensure EUR detection checks up to 2 lines ahead (lines 205-207)
+- Use debug output to verify value assignment (lines 223-226, 244-249)
 
 ### Case sensitivity in file patterns
 - Windows filesystems may have uppercase extensions (.PDF)
