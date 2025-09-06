@@ -16,7 +16,8 @@
       "Bash(do echo \"$dir:\")",
       "Bash(done)",
       "Bash(git diff:*)",
-      "Bash(git rev-parse:*)"
+      "Bash(git rev-parse:*)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []
