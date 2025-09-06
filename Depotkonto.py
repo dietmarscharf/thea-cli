@@ -424,8 +424,16 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         filename_lower = base_data.get('original_file', '').lower()
         date_str = base_data.get('date', '')
         
+        # Check for execution notices (preliminary confirmations)
+        if 'ausführungsanzeige' in extracted_lower:
+            if 'verkauf' in extracted_lower:
+                transaction_type = 'Ausführungsanzeige-Verkauf'
+            elif 'kauf' in extracted_lower:
+                transaction_type = 'Ausführungsanzeige-Kauf'
+            else:
+                transaction_type = 'Ausführungsanzeige'
         # Check for capital measures (stock splits, etc.)
-        if ('kapitalmaßnahme' in extracted_lower or 'kapitalmassnahme' in extracted_lower or
+        elif ('kapitalmaßnahme' in extracted_lower or 'kapitalmassnahme' in extracted_lower or
             'aktiensplit' in extracted_lower or 'stock split' in extracted_lower or
             'neueinteilung des grundkapitals' in extracted_lower or
             'kapitalmaßnahme' in filename_lower or 'kapitalmassnahme' in filename_lower):
@@ -1037,8 +1045,8 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             if data_quality['missing_amounts'] > 0:
                 print(f"  ⚠️  Fehlende Beträge: {data_quality['missing_amounts']} Transaktionen")
             
-            # Erfolgsrate für Gewinn/Verlust bei Verkäufen (ohne Kapitalmaßnahmen)
-            verkauf_count = sum(1 for t in transactions if 'Verkauf' in t['type'] and t['type'] != 'Kapitalmaßnahme')
+            # Erfolgsrate für Gewinn/Verlust bei Verkäufen (ohne Kapitalmaßnahmen und Ausführungsanzeigen)
+            verkauf_count = sum(1 for t in transactions if 'Verkauf' in t['type'] and t['type'] != 'Kapitalmaßnahme' and 'Ausführungsanzeige' not in t['type'])
             if verkauf_count > 0:
                 gv_rate = (data_quality['with_profit_loss'] / verkauf_count) * 100
                 print(f"  - Verkäufe mit G/V-Daten: {data_quality['with_profit_loss']}/{verkauf_count} ({gv_rate:.1f}%)")
@@ -1373,19 +1381,20 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             else:
                 display_type = trans_type
             
-            # Bestimme Farbmarkierung für Verkäufe
+            # Bestimme Farbmarkierung für Verkäufe (farbenblind-freundliche Palette)
+            # Ausführungsanzeigen nicht farbcodieren (vorläufige Dokumente)
             row_style = ""
-            if 'Verkauf' in trans_type:
+            if 'Verkauf' in trans_type and 'Ausführungsanzeige' not in trans_type:
                 if trans.get('profit_loss') is not None:
                     if trans['profit_loss'] > 0:
-                        # Gewinn - dunkelgrün
-                        row_style = ' style="background-color: #d4edda;"'
+                        # Gewinn - Blau (farbenblind-freundlich)
+                        row_style = ' style="background-color: #0173B2; color: white;"'
                     elif trans['profit_loss'] == 0:
-                        # Kein Gewinn/Verlust - auch grün
-                        row_style = ' style="background-color: #d4edda;"'
+                        # Kein Gewinn/Verlust - helles Grau
+                        row_style = ' style="background-color: #e9ecef;"'
                     else:
-                        # Verlust - rot
-                        row_style = ' style="background-color: #f8d7da;"'
+                        # Verlust - Orange (farbenblind-freundlich)
+                        row_style = ' style="background-color: #DE8F05; color: white;"'
             
             # Formatiere Typ mit Farbmarkierung
             if row_style:
