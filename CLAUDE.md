@@ -357,10 +357,21 @@ The `docs/` folder contains 618 PDF documents organized into 6 account folders:
 
 ## Data Quality Achievements
 - **BLUEITS Depot**: 100% G/V extraction for 72 sales transactions
-- **Ramteid Depot**: 94.4% G/V extraction for 18 sales transactions
+- **Ramteid Depot**: 100% G/V extraction for 17 sales transactions (excluding 1 Ausführungsanzeige)
 - **Total Documents**: 618 PDFs across 6 account types successfully processed
-- **Transaction Types**: 8+ distinct types properly classified
+- **Transaction Types**: 9+ distinct types properly classified
 - **German Format Support**: Full support for DD.MM.YYYY dates, 1.234,56 numbers, trailing minus
+
+## Visual Design Choices
+
+### Colorblind-Friendly Transaction Marking
+Sales transactions in depot reports use accessible colors (lines 1384-1397 in `Depotkonto.py`):
+- **Profit (Gewinn)**: Blue background (#0173B2) with white text
+- **Loss (Verlust)**: Orange background (#DE8F05) with white text  
+- **Neutral (0 EUR)**: Light gray background (#e9ecef)
+- **No coloring**: Ausführungsanzeige and other non-final transactions
+
+This color scheme is distinguishable for most types of color blindness (deuteranopia, protanopia).
 
 ## Environment Variables
 - `OLLAMA_API_URL`: Override default Ollama endpoint (default: https://b1s.hey.bahn.business/api/chat)
@@ -475,11 +486,12 @@ The `--sidecars-only` flag enables extraction-only mode without sending data to 
 
 ### Transaction Type Classification (Enhanced)
 - **New Types Added** in `Depotkonto.py`:
-  - `Kapitalmaßnahme`: For stock splits and other corporate actions (line 427-432)
+  - `Ausführungsanzeige`: Preliminary execution notices without final costs (line 427-434)
+  - `Kapitalmaßnahme`: For stock splits and other corporate actions (line 435-440)
   - `Limit-Order-Vormerkung`: For limit order confirmations with "Vormerkungsentgelt" 
   - `Stornierung`: For order cancellations with "Streichungsbestätigung"
-- **Detection Priority**: Capital measures → Limit orders → Cancellations → Regular orders
-- **Statistics Exclusion**: Kapitalmaßnahme transactions excluded from G/V extraction rate (line 1041)
+- **Detection Priority**: Execution notices → Capital measures → Limit orders → Cancellations → Regular orders
+- **Statistics Exclusion**: Kapitalmaßnahme and Ausführungsanzeige excluded from G/V extraction rate (line 1049)
 - **Solution** (`Depotkonto.py:100`):
   ```python
   shares_match = re.search(r'Stück\s+([\d.]+)', text)
@@ -489,6 +501,7 @@ The `--sidecars-only` flag enables extraction-only mode without sending data to 
   ```
 
 ### Complete Transaction Type System
+- **Ausführungsanzeige-Verkauf/Kauf**: Preliminary execution notices (line 427-434)
 - **Kapitalmaßnahme**: Stock splits, corporate actions (e.g., Tesla 3:1 split Aug 2022)
 - **Limit-Order-Vormerkung**: Limit order confirmations with "Vormerkungsentgelt"
 - **Orderabrechnung-Stornierung**: Order cancellations with "Streichungsbestätigung"
