@@ -1,0 +1,3381 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ramteid GmbH - Depotkonto 7274087</title>
+    <style>
+        /* Grundlegende Styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: white;
+            color: #333;
+            line-height: 1.6;
+            width: 100%;
+        }
+        
+        /* Überschriften */
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding: 20px 10px 10px 10px;
+            margin: 0 0 30px 0;
+        }
+        
+        h2 {
+            color: #34495e;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+            padding: 0 10px 8px 10px;
+        }
+        
+        h3 {
+            color: #7f8c8d;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            padding: 0 10px;
+        }
+        
+        p {
+            padding: 0 10px;
+        }
+        
+        ul, ol {
+            padding-left: 30px;
+            padding-right: 10px;
+        }
+        
+        /* Info-Box für Kontoübersicht */
+        .info-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 0;
+            margin: 0 0 30px 0;
+        }
+        
+        .info-box .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .info-box .info-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .info-box .info-label {
+            font-size: 0.85em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .info-box .info-value {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        /* Tabellen */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        
+        th {
+            background: #34495e;
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 500;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        /* Fee block visual separation */
+        .fee-block-start {
+            border-left: 2px solid #2c3e50 !important;
+        }
+        
+        .fee-block-end {
+            border-right: 2px solid #2c3e50 !important;
+        }
+        
+        td.fee-block-start {
+            border-left: 2px solid #dee2e6 !important;
+        }
+        
+        td.fee-block-end {
+            border-right: 2px solid #dee2e6 !important;
+        }
+        
+        /* Non-stock block visual separation */
+        .non-stock-block-start {
+            border-left: 2px solid #2c3e50 !important;
+        }
+        
+        .non-stock-block-end {
+            border-right: 2px solid #2c3e50 !important;
+        }
+        
+        td.non-stock-block-start {
+            border-left: 2px solid #dee2e6 !important;
+        }
+        
+        td.non-stock-block-end {
+            border-right: 2px solid #dee2e6 !important;
+        }
+        
+        /* Type column visual separation */
+        .type-column {
+            border-left: 2px solid #2c3e50 !important;
+            border-right: 2px solid #2c3e50 !important;
+        }
+        
+        td.type-column {
+            border-left: 1px solid #dee2e6 !important;
+            border-right: 1px solid #dee2e6 !important;
+        }
+        
+        /* Type column borders for colored rows */
+        .depot-statement-row td.type-column,
+        .profit-row td.type-column,
+        .loss-row td.type-column {
+            border-left: 2px solid rgba(255,255,255,0.5) !important;
+            border-right: 2px solid rgba(255,255,255,0.5) !important;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        /* Alternating row colors for better readability */
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        /* Prevent line breaks in all table cells */
+        td {
+            white-space: nowrap;
+        }
+        
+        /* Bold styling for cumulative values in year summary rows */
+        .bold-value {
+            font-weight: bold;
+        }
+        
+        /* Spezielle Zeilen-Styles für Transaktionen */
+        .profit-row {
+            background-color: #28a745 !important;  /* Grün für Gewinn */
+            color: white !important;
+        }
+        
+        .profit-row td {
+            color: white !important;
+        }
+        
+        .loss-row {
+            background-color: #dc3545 !important;  /* Rot für Verlust */
+            color: white !important;
+        }
+        
+        .loss-row td {
+            color: white !important;
+        }
+        
+        .depot-statement-row {
+            background-color: #6c757d !important;  /* Mittleres Grau für normale Depotabschlüsse */
+            color: white !important;
+        }
+        
+        .depot-statement-row td {
+            color: white !important;
+        }
+        
+        /* Nr. column and Document column should have white background */
+        .profit-row td:first-child,
+        .loss-row td:first-child,
+        .depot-statement-row td:first-child,
+        .depot-statement-year-end td:first-child,
+        .capital-action-row td:first-child,
+        .profit-row td:last-child,
+        .loss-row td:last-child,
+        .depot-statement-row td:last-child,
+        .depot-statement-year-end td:last-child,
+        .capital-action-row td:last-child {
+            background-color: white !important;
+            color: black !important;
+        }
+        
+        /* All document links should be black */
+        .depot-statement-row a {
+            color: black !important;
+            text-decoration: underline !important;
+        }
+        
+        .depot-statement-year-end {
+            background-color: #000000 !important;  /* Schwarz für Jahresende */
+            color: white !important;
+        }
+        
+        .depot-statement-year-end td {
+            color: white !important;
+            border-bottom: none !important;
+        }
+        
+        .depot-statement-year-end a {
+            color: black !important;
+            text-decoration: underline !important;
+        }
+        
+        .misc-row {
+            color: #6c757d !important;
+        }
+        
+        .misc-row td {
+            color: #6c757d !important;
+        }
+        
+        .neutral-row {
+            background-color: #e9ecef !important;
+        }
+        
+        /* Capital actions (stock splits, etc.) */
+        .capital-action-row {
+            background-color: #9c27b0 !important;  /* Purple for stock splits */
+            color: white !important;
+        }
+        
+        .capital-action-row td {
+            color: white !important;
+        }
+        
+        .capital-action-row a {
+            color: #3498db !important;
+            text-decoration: underline !important;
+        }
+        
+        /* Links */
+        a {
+            color: #3498db;
+            text-decoration: underline;
+        }
+        
+        /* Document column links - consistent style */
+        td:last-child a {
+            color: black !important;
+            text-decoration: underline !important;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        
+        /* Zahlen-Formatierung */
+        .number {
+            text-align: right;
+            font-family: "Courier New", monospace;
+        }
+        
+        .positive {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .negative {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        /* Statistik-Boxen */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .stat-card h4 {
+            margin: 0 0 10px 0;
+            color: #34495e;
+        }
+        
+        .stat-card ul {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        /* Warnungen */
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .warning strong {
+            color: #856404;
+        }
+        
+        /* Erläuterungen */
+        .explanation-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        /* Jahresübergangs-Saldenzeilen */
+        .year-summary-row {
+            background-color: #ffd700 !important;  /* Gold/Gelb */
+            color: #000000 !important;
+        }
+        
+        .year-summary-row td {
+            color: #000000 !important;
+        }
+        
+        .year-start-row {
+            background-color: #ffeb3b !important;  /* Helleres Gelb */
+            font-style: italic;
+            color: #000000 !important;
+        }
+        
+        .year-separator {
+            border-bottom: 3px solid #000000 !important;
+        }
+        
+        /* Calendar year transitions (blue) - only for FY != CY */
+        .calendar-year-summary-row {
+            background-color: #1976d2 !important;  /* Blue */
+            color: #ffffff !important;  /* White text */
+        }
+        
+        .calendar-year-start-row {
+            background-color: #1565c0 !important;  /* Slightly darker blue */
+            font-style: italic;
+            color: #ffffff !important;  /* White text */
+        }
+        
+        .calendar-year-separator {
+            border-bottom: 3px solid #000000 !important;  /* Black border like FY separator */
+        }
+        
+        /* Column coloring for FY and CY columns */
+        td.fy-column, .fy-column {
+            background-color: #ffd700 !important;  /* Gold/Gelb - same as year-summary-row */
+            color: #000000 !important;  /* Black text */
+        }
+        
+        td.cy-column, .cy-column {
+            background-color: #1976d2 !important;  /* Blue - same as calendar-year-summary-row */
+            color: #ffffff !important;  /* White text */
+        }
+        
+        /* Row color takes precedence over column color */
+        .year-summary-row td.cy-column {
+            background-color: #ffd700 !important;  /* Keep yellow in yellow rows */
+            color: #000000 !important;  /* Black text */
+        }
+        
+        .calendar-year-summary-row td.fy-column {
+            background-color: #1976d2 !important;  /* Keep blue in blue rows */
+            color: #ffffff !important;  /* White text */
+        }
+        
+        .explanation-box h4 {
+            margin-top: 0;
+            color: #1565c0;
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            table {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 6px 4px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .page-break {
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Ramteid GmbH - Depotkonto 7274087</h1>
+    
+    <div class="info-box">
+        <h2 style="color: white; border: none; margin: 0;">Kontoübersicht</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Kontoinhaber</div>
+                <div class="info-value">Ramteid GmbH</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Depotnummer</div>
+                <div class="info-value">7274087</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">PDF-Dokumente</div>
+                <div class="info-value">88</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">THEA-Analysen</div>
+                <div class="info-value">88</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Geschäftsjahr</div>
+                <div class="info-value">Kalenderjahr</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Letzter Depotbestand</div>
+                <div class="info-value">58.150,00 EUR</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Stand</div>
+                <div class="info-value">30.09.2023</div>
+            </div>
+        </div>
+    </div>
+<h2>Depotabschluss-Übersicht</h2>
+    <h3>Alle Depotabschlüsse (chronologisch)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Typ</th>
+                <th>Stichtag</th>
+                <th>Dokumentdatum</th>
+                <th>Stück</th>
+                <th>ISIN</th>
+                <th>Kurs (EUR)</th>
+                <th>Depotbestand (EUR)</th>
+                <th>Gebühren netto</th>
+                <th>USt %</th>
+                <th>USt (EUR)</th>
+                <th>Gebühren brutto</th>
+                <th>Dokument</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <tr>
+                <td>Jahresabschluss</td>
+                <td>31.12.2020</td>
+                <td>26.01.2021</td>
+                <td class="number">-</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">0,00</td>
+                <td class="number">5,00</td>
+                <td class="number">16%</td>
+                <td class="number">0,80</td>
+                <td class="number">5,80</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210126_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_12_01_2021.pdf">20210126_Depotabschluss_Ex-Post-Rep_D...</a></td>
+            </tr>
+            <tr>
+                <td>Quartalsabschluss</td>
+                <td>31.03.2021</td>
+                <td>16.04.2021</td>
+                <td class="number">80</td>
+                <td>US88160R1014</td>
+                <td class="number">533,70</td>
+                <td class="number">42.696,00</td>
+                <td class="number">5,00</td>
+                <td class="number">19%</td>
+                <td class="number">0,95</td>
+                <td class="number">5,95</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210416_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2021.pdf">20210416_Depotabschluss_Ex-Post-Rep_D...</a></td>
+            </tr>
+            <tr>
+                <td>Quartalsabschluss</td>
+                <td>30.06.2021</td>
+                <td>16.07.2021</td>
+                <td class="number">-</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">0,00</td>
+                <td class="number">5,00</td>
+                <td class="number">19%</td>
+                <td class="number">0,95</td>
+                <td class="number">5,95</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210716_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2021.pdf">20210716_Depotabschluss_Ex-Post-Rep_D...</a></td>
+            </tr>
+            <tr>
+                <td>Quartalsabschluss</td>
+                <td>30.09.2021</td>
+                <td>18.10.2021</td>
+                <td class="number">-</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">0,00</td>
+                <td class="number">5,00</td>
+                <td class="number">19%</td>
+                <td class="number">0,95</td>
+                <td class="number">5,95</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20211018_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2021.pdf">20211018_Depotabschluss_Ex-Post-Rep_D...</a></td>
+            </tr>
+            <tr>
+                <td>Jahresabschluss</td>
+                <td>31.12.2021</td>
+                <td>25.01.2022</td>
+                <td class="number">-</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">0,00</td>
+                <td class="number">5,00</td>
+                <td class="number">19%</td>
+                <td class="number">0,95</td>
+                <td class="number">5,95</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf">20220125_Depotabschluss_Ex-Post-Rep_D...</a></td>
+            </tr>
+            <tr>
+                <td>Quartalsabschluss</td>
+                <td>31.03.2022</td>
+                <td>01.04.2022</td>
+                <td class="number">-</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">0,00</td>
+                <td class="number">5,00</td>
+                <td class="number">19%</td>
+                <td class="number">0,95</td>
+                <td class="number">5,95</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF">Depotabschluss_Ex-Post-Rep_Depot_7274...</a></td>
+            </tr>
+            <tr>
+                <td>Quartalsabschluss</td>
+                <td>30.06.2022</td>
+                <td>01.07.2022</td>
+                <td class="number">-</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">0,00</td>
+                <td class="number">5,00</td>
+                <td class="number">19%</td>
+                <td class="number">0,95</td>
+                <td class="number">5,95</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2022.PDF">Depotabschluss_Ex-Post-Rep_Depot_7274...</a></td>
+            </tr>
+            <tr>
+                <td>Quartalsabschluss</td>
+                <td>30.09.2022</td>
+                <td>03.10.2022</td>
+                <td class="number">-</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">0,00</td>
+                <td class="number">5,00</td>
+                <td class="number">19%</td>
+                <td class="number">0,95</td>
+                <td class="number">5,95</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_10_2022.PDF">Depotabschluss_Ex-Post-Rep_Depot_7274...</a></td>
+            </tr>
+            <tr>
+                <td>Jahresabschluss</td>
+                <td>31.12.2022</td>
+                <td>10.01.2023</td>
+                <td class="number">-</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">0,00</td>
+                <td class="number">5,00</td>
+                <td class="number">19%</td>
+                <td class="number">0,95</td>
+                <td class="number">5,95</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2023.PDF">Depotabschluss_Ex-Post-Rep_Depot_7274...</a></td>
+            </tr>
+            <tr>
+                <td>Quartalsabschluss</td>
+                <td>31.03.2023</td>
+                <td>03.04.2023</td>
+                <td class="number">-</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">0,00</td>
+                <td class="number">5,00</td>
+                <td class="number">19%</td>
+                <td class="number">0,95</td>
+                <td class="number">5,95</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_04_2023.PDF">Depotabschluss_Ex-Post-Rep_Depot_7274...</a></td>
+            </tr>
+            <tr>
+                <td>Quartalsabschluss</td>
+                <td>30.06.2023</td>
+                <td>03.07.2023</td>
+                <td class="number">350</td>
+                <td>US88160R1014</td>
+                <td class="number">236,50</td>
+                <td class="number">82.775,00</td>
+                <td class="number">8,02</td>
+                <td class="number">19%</td>
+                <td class="number">1,52</td>
+                <td class="number">9,54</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_07_2023.PDF">Depotabschluss_Ex-Post-Rep_Depot_7274...</a></td>
+            </tr>
+            <tr>
+                <td>Quartalsabschluss</td>
+                <td>30.09.2023</td>
+                <td>02.10.2023</td>
+                <td class="number">250</td>
+                <td>US88160R1014</td>
+                <td class="number">232,60</td>
+                <td class="number">58.150,00</td>
+                <td class="number">5,63</td>
+                <td class="number">19%</td>
+                <td class="number">1,07</td>
+                <td class="number">6,70</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_10_2023.PDF">Depotabschluss_Ex-Post-Rep_Depot_7274...</a></td>
+            </tr>
+            <tr>
+                <td>Jahresabschluss</td>
+                <td>31.12.2023</td>
+                <td>10.01.2024</td>
+                <td class="number">-</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">0,00</td>
+                <td class="number">5,00</td>
+                <td class="number">19%</td>
+                <td class="number">0,95</td>
+                <td class="number">5,95</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2024.PDF">Depotabschluss_Ex-Post-Rep_Depot_7274...</a></td>
+            </tr>
+            <tr>
+                <td>Quartalsabschluss</td>
+                <td>31.03.2024</td>
+                <td>02.04.2024</td>
+                <td class="number">-</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">0,00</td>
+                <td class="number">5,00</td>
+                <td class="number">19%</td>
+                <td class="number">0,95</td>
+                <td class="number">5,95</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_04_2024.PDF">Depotabschluss_Ex-Post-Rep_Depot_7274...</a></td>
+            </tr>
+            <tr>
+                <td>Quartalsabschluss</td>
+                <td>30.06.2024</td>
+                <td>01.07.2024</td>
+                <td class="number">-</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">0,00</td>
+                <td class="number">5,00</td>
+                <td class="number">19%</td>
+                <td class="number">0,95</td>
+                <td class="number">5,95</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2024.PDF">Depotabschluss_Ex-Post-Rep_Depot_7274...</a></td>
+            </tr>
+            <tr>
+                <td>Quartalsabschluss</td>
+                <td>30.09.2024</td>
+                <td>01.10.2024</td>
+                <td class="number">-</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">0,00</td>
+                <td class="number">5,00</td>
+                <td class="number">19%</td>
+                <td class="number">0,95</td>
+                <td class="number">5,95</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2024.PDF">Depotabschluss_Ex-Post-Rep_Depot_7274...</a></td>
+            </tr>
+            <tr>
+                <td>Jahresabschluss</td>
+                <td>31.12.2024</td>
+                <td>10.01.2025</td>
+                <td class="number">-</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">0,00</td>
+                <td class="number">5,00</td>
+                <td class="number">19%</td>
+                <td class="number">0,95</td>
+                <td class="number">5,95</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF">Depotabschluss_Ex-Post-Rep_Depot_7274...</a></td>
+            </tr>
+            <tr>
+                <td>Quartalsabschluss</td>
+                <td>31.03.2025</td>
+                <td>01.04.2025</td>
+                <td class="number">-</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">0,00</td>
+                <td class="number">5,00</td>
+                <td class="number">19%</td>
+                <td class="number">0,95</td>
+                <td class="number">5,95</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2025.PDF">Depotabschluss_Ex-Post-Rep_Depot_7274...</a></td>
+            </tr>
+            <tr>
+                <td>Quartalsabschluss</td>
+                <td>30.06.2025</td>
+                <td>01.07.2025</td>
+                <td class="number">-</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">0,00</td>
+                <td class="number">5,00</td>
+                <td class="number">19%</td>
+                <td class="number">0,95</td>
+                <td class="number">5,95</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2025.PDF">Depotabschluss_Ex-Post-Rep_Depot_7274...</a></td>
+            </tr>
+        </tbody>
+    </table>
+<p><em>Gesamt: 5 Jahresabschlüsse und 14 Quartalsabschlüsse</em></p><p><strong>Letzter bekannter Depotbestand: 58.150,00 EUR</strong> (Stand: 30.09.2023)</p><p><em>Gesamtzeitraum: 31.12.2020 bis 30.06.2025</em></p>
+    <h2>Jährliche Kostenanalyse (MiFID II)</h2>
+    <p>Gesetzlich vorgeschriebene Kostenaufstellung gemäß Art. 50 der Verordnung (EU) 2017/565:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Jahr</th>
+                <th>Dokumentdatum</th>
+                <th>Dienstleistungskosten (netto)</th>
+                <th>Depotentgelte (netto)</th>
+                <th>Zwischensumme (netto)</th>
+                <th>USt (19%)</th>
+                <th>Gesamtkosten (brutto)</th>
+                <th>Umsatzvolumen</th>
+                <th>Ø Depotbestand</th>
+                <th>Kostenquote</th>
+                <th>Dokument</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <tr>
+                <td>2020</td>
+                <td>13.05.2021</td>
+                <td class="number">271,78</td>
+                <td class="number">4,87</td>
+                <td class="number">276,66</td>
+                <td class="number">52,56</td>
+                <td class="number"><strong>329,22</strong></td>
+                <td class="number">425.926,60</td>
+                <td class="number">104.338,30</td>
+                <td class="number">0,32%</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210513_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_22_04_2021.pdf">20210513_Depotabschluss_Ex-Post-Rep_D...</a></td>
+            </tr>
+            <tr>
+                <td>2021</td>
+                <td>28.04.2022</td>
+                <td class="number">1.557,61</td>
+                <td class="number">20,00</td>
+                <td class="number">1.577,61</td>
+                <td class="number">299,75</td>
+                <td class="number"><strong>1.877,36</strong></td>
+                <td class="number">2.378.049,10</td>
+                <td class="number">166.642,44</td>
+                <td class="number">1,13%</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2022.PDF">Depotabschluss_Ex-Post-Rep_Depot_7274...</a></td>
+            </tr>
+            <tr>
+                <td>2022</td>
+                <td>15.05.2023</td>
+                <td class="number">0,00</td>
+                <td class="number">20,00</td>
+                <td class="number">20,00</td>
+                <td class="number">3,80</td>
+                <td class="number"><strong>23,80</strong></td>
+                <td class="number">-</td>
+                <td class="number">-</td>
+                <td class="number">-</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_15_05_2023.PDF">Depotabschluss_Ex-Post-Rep_Depot_7274...</a></td>
+            </tr>
+            <tr>
+                <td>2023</td>
+                <td>24.04.2024</td>
+                <td class="number">188,38</td>
+                <td class="number">23,65</td>
+                <td class="number">212,03</td>
+                <td class="number">40,28</td>
+                <td class="number"><strong>252,31</strong></td>
+                <td class="number">221.054,00</td>
+                <td class="number">62.774,30</td>
+                <td class="number">0,40%</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_24_04_2024.PDF">Depotabschluss_Ex-Post-Rep_Depot_7274...</a></td>
+            </tr>
+            <tr>
+                <td>2024</td>
+                <td>28.04.2025</td>
+                <td class="number">495,60</td>
+                <td class="number">20,00</td>
+                <td class="number">515,60</td>
+                <td class="number">97,96</td>
+                <td class="number"><strong>613,56</strong></td>
+                <td class="number">789.101,60</td>
+                <td class="number">101.458,05</td>
+                <td class="number">0,60%</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2025.PDF">Depotabschluss_Ex-Post-Rep_Depot_7274...</a></td>
+            </tr>
+        </tbody>
+    </table>
+<p><strong>Gesamtkosten 2020-2024: 3.096,25 €</strong></p><p><em>Gesamtes Handelsvolumen: 3.814.131,30 €</em></p>
+    <div class="explanation-box">
+        <h3>Erläuterungen zur Kostenberechnung:</h3>
+        <h4>Kostenzusammensetzung:</h4>
+        <ul>
+            <li><strong>Dienstleistungskosten:</strong> Beinhalten alle Kosten für Wertpapiergeschäfte (Kauf/Verkauf), Ordergebühren und sonstige Transaktionskosten</li>
+            <li><strong>Depotentgelte:</strong> Jährliche Verwahrungsgebühren für die Führung des Depotkontos (übergreifende Kosten)</li>
+            <li><strong>Zwischensumme (netto):</strong> Summe aus Dienstleistungskosten und Depotentgelten ohne Umsatzsteuer</li>
+            <li><strong>USt (19%):</strong> Gesetzliche Umsatzsteuer auf alle Kosten</li>
+            <li><strong>Gesamtkosten (brutto):</strong> Vollständige Kosten inklusive 19% Umsatzsteuer</li>
+        </ul>
+        <h4>Wichtige Hinweise:</h4>
+        <ul>
+            <li>✓ Die Depotentgelte sind <strong>in den Gesamtkosten enthalten</strong></li>
+            <li>✓ Alle Beträge in den verlinkten Dokumenten sind <strong>Bruttobeträge</strong> (bereits inkl. 19% USt)</li>
+            <li>✓ Die Nettobeträge werden berechnet: Netto = Brutto ÷ 1,19</li>
+        </ul>
+        <p><em>Diese Aufstellung entspricht den gesetzlichen Anforderungen gemäß Art. 50 der Verordnung (EU) 2017/565 (MiFID II).</em></p>
+    </div>
+<h2>Transaktionsstatistik</h2><div class="stats-grid"><div class="stat-card"><h4>Depotabschluss</h4><ul><li>Depotabschluss: 11</li><li>Jahresabschluss: 5</li><li>Quartal: 3</li></ul></div><div class="stat-card"><h4>Orderabrechnung</h4><ul><li>Kauf: 34</li><li>Stornierung: 2</li><li>Verkauf: 23</li></ul></div><div class="stat-card"><h4>Kostenaufstellung</h4><ul><li>Kostenaufstellung: 5</li></ul></div><div class="stat-card"><h4>Sonstige</h4><ul><li>Ausführungsanzeige-Verkauf: 1</li><li>Limit-Order-Vormerkung: 3</li><li>⚠️ EXTRAKTION-FEHLGESCHLAGEN: 1</li></ul></div></div><h2>Wertpapiere (nach ISIN)</h2><h3>US88160R1014</h3><p><strong>Anzahl Transaktionen:</strong> 65</p><p><strong>Verkaufssumme:</strong> 1.502.409,44 EUR</p><p><strong>Kaufsumme:</strong> 1.609.946,00 EUR</p><h3>DE000JN9UFS3</h3><p><strong>Anzahl Transaktionen:</strong> 5</p><p><strong>Verkaufssumme:</strong> 193.600,07 EUR</p><p><strong>Kaufsumme:</strong> 147.650,00 EUR</p>
+    <h2>Transaktionsverlauf (Detailliert)</h2>
+    
+    <h3>Legende der Spalten:</h3>
+    <ul>
+        <li><strong>Nr.:</strong> Laufende Nummer der Transaktion</li>
+        <li><strong>Transaktion:</strong> Transaktionsdatum/Handelstag (Ausführung)</li>
+        <li><strong>Referenz:</strong> Auftragsnummer/Referenznummer</li>
+        <li><strong>Wertst.:</strong> Wertstellungsdatum/Valuta (Settlement)</li>
+        <li><strong>Dokument:</strong> Dokumenterstellungsdatum</li>
+        <li><strong>Gebühren:</strong> Nettogebühren ohne Umsatzsteuer (EUR)</li>
+        <li><strong>USt %:</strong> Umsatzsteuersatz (0% für umsatzsteuerfreie Gebühren, 19% für normale Gebühren)</li>
+        <li><strong>USt:</strong> Umsatzsteuerbetrag (EUR)</li>
+        <li><strong>Geb. Brutto:</strong> Bruttogebühren inklusive Umsatzsteuer (EUR)</li>
+        <li><strong>Ausmach.:</strong> Ausmachender Betrag = Kurswert + Gebühren Brutto (EUR)</li>
+        <li><strong>Kum. Geb.:</strong> Kumulierte Nettogebühren (EUR)</li>
+        <li><strong>Kum. USt:</strong> Kumulierte Umsatzsteuer (EUR)</li>
+        <li><strong>G/V Akt.:</strong> Gewinn/Verlust aus Aktienverkäufen (EUR)</li>
+        <li><strong>Kum. Akt.:</strong> Kumulierter Gewinn/Verlust Aktien (EUR)</li>
+        <li><strong>G/V N-Akt.:</strong> Gewinn/Verlust aus Nicht-Aktien (Derivate, Zertifikate, strukturierte Produkte) (EUR)</li>
+        <li><strong>Kum. N-Akt.:</strong> Kumulierter Gewinn/Verlust Nicht-Aktien (EUR)</li>
+
+    </ul>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Nr.</th>
+                <th>Transaktion</th>
+                <th>Referenz</th>
+                <th>Wertst.</th>
+                <th>Dokument</th>
+                <th class="type-column">Typ</th>
+                <th>ISIN</th>
+                <th>Bestand</th>
+                <th>Veränderung</th>
+                <th>Kurs</th>
+                <th>Kurswert</th>
+                <th class="fee-block-start">Gebühren</th>
+                <th>USt %</th>
+                <th>USt</th>
+                <th>Geb. Brutto</th>
+                <th>Ausmach.</th>
+                <th>Kum. Geb.</th>
+                <th class="fee-block-end">Kum. USt</th>
+                <th>G/V Akt.</th>
+                <th>Kum. Akt.</th>
+                <th class="non-stock-block-start">G/V N-Akt.</th>
+                <th class="non-stock-block-end">Kum. N-Akt.</th>
+                <th>Dokument</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <tr class="misc-row">
+                <td>FY0000-001</td>
+                <td>N/A</td>
+                <td>•</td>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td class="type-column">⚠️ EXTRAKTION-FEHLGESCHLAGEN</td>
+                <td>None</td>
+                <td class="number">-</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/"></a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2020-001</td>
+                <td>21.12.2020</td>
+                <td>606434/29.00</td>
+                <td>23.12.2020</td>
+                <td>22.12.2020</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">?</td>
+                <td class="number">-11</td>
+                <td class="number">548,00</td>
+                <td class="number">+6.028,00</td>
+                <td class="number fee-block-start">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">+6.028,00</td>
+                <td class="number fy-column">•</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">+316,90</td>
+                <td class="number fy-column">+316,90</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20201222_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_21_12_2020_2.pdf">20201222_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2020-002</td>
+                <td>21.12.2020</td>
+                <td>606434/29.01</td>
+                <td>23.12.2020</td>
+                <td>22.12.2020</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">?</td>
+                <td class="number">-83</td>
+                <td class="number">548,00</td>
+                <td class="number">+45.484,00</td>
+                <td class="number fee-block-start">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">+45.484,00</td>
+                <td class="number fy-column">•</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">+2.429,84</td>
+                <td class="number fy-column">+2.746,74</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20201222_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_21_12_2020_1.pdf">20201222_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2020-003</td>
+                <td>21.12.2020</td>
+                <td>606434/29.02</td>
+                <td>23.12.2020</td>
+                <td>22.12.2020</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">?</td>
+                <td class="number">-100</td>
+                <td class="number">548,00</td>
+                <td class="number">+54.800,00</td>
+                <td class="number fee-block-start">-77,08</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-77,08</td>
+                <td class="number">+54.722,92</td>
+                <td class="number fy-column">-77,08</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">+2.910,60</td>
+                <td class="number fy-column">+5.657,34</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20201222_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_21_12_2020.pdf">20201222_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2020-004</td>
+                <td>22.12.2020</td>
+                <td>606833/57.00</td>
+                <td>24.12.2020</td>
+                <td>23.12.2020</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">?</td>
+                <td class="number">+5</td>
+                <td class="number">519,50</td>
+                <td class="number">-2.597,50</td>
+                <td class="number fee-block-start">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">-2.597,50</td>
+                <td class="number fy-column">-77,08</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+5.657,34</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20201223_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_22_12_2020_1.pdf">20201223_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2020-005</td>
+                <td>22.12.2020</td>
+                <td>606833/57.01</td>
+                <td>24.12.2020</td>
+                <td>23.12.2020</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">?</td>
+                <td class="number">+200</td>
+                <td class="number">519,50</td>
+                <td class="number">-103.900,00</td>
+                <td class="number fee-block-start">-77,21</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-77,21</td>
+                <td class="number">-103.977,21</td>
+                <td class="number fy-column">-154,29</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+5.657,34</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20201223_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_22_12_2020.pdf">20201223_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2020-006</td>
+                <td>28.12.2020</td>
+                <td>610412/77.00</td>
+                <td>30.12.2020</td>
+                <td>29.12.2020</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">?</td>
+                <td class="number">-205</td>
+                <td class="number">549,40</td>
+                <td class="number">+112.627,00</td>
+                <td class="number fee-block-start">-81,65</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-81,65</td>
+                <td class="number">+112.545,35</td>
+                <td class="number fy-column">-235,94</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">+5.970,64</td>
+                <td class="number fy-column">+11.627,98</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20201229_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_28_12_2020.pdf">20201229_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="depot-statement-year-end">
+                <td>FY2020-007</td>
+                <td>31.12.2020</td>
+                <td>•</td>
+                <td>05.02.2021</td>
+                <td>26.01.2021</td>
+                <td class="type-column">Depotabschluss</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-4,87</td>
+                <td class="number">19</td>
+                <td class="number">-0,93</td>
+                <td class="number">-5,80</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-240,81</td>
+                <td class="number fee-block-end fy-column">-0,93</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+11.627,98</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210126_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_12_01_2021.pdf">20210126_Depotabschluss_Ex-...</a></td>
+            </tr>
+            <tr class="year-summary-row">
+                <td>FY2020-008</td>
+                <td colspan="5" style="text-align: center;">
+                    === JAHRESSALDO FY2020 ===
+                </td>
+                <td></td>
+                <td class="number">•</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="number fee-block-start"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="number bold-value">-240,81</td>
+                <td class="number fee-block-end bold-value">-0,93</td>
+                <td></td>
+                <td class="number bold-value">+11.627,98</td>
+                <td class="non-stock-block-start"></td>
+                <td class="number bold-value non-stock-block-end">0,00</td>
+            </tr>
+            <tr class="">
+                <td>FY2021-001</td>
+                <td>06.01.2021</td>
+                <td>622853/83.00</td>
+                <td>08.01.2021</td>
+                <td>07.01.2021</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">0</td>
+                <td class="number">+395</td>
+                <td class="number">609,50</td>
+                <td class="number">-240.752,50</td>
+                <td class="number fee-block-start">-174,55</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-174,55</td>
+                <td class="number">-240.927,05</td>
+                <td class="number fy-column">-174,55</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210107_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_06_01_2021.pdf">20210107_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2021-002</td>
+                <td>12.01.2021</td>
+                <td>634618/55.00</td>
+                <td>14.01.2021</td>
+                <td>13.01.2021</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">395</td>
+                <td class="number">+56</td>
+                <td class="number">684,00</td>
+                <td class="number">-38.304,00</td>
+                <td class="number fee-block-start">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">-38.304,00</td>
+                <td class="number fy-column">-174,55</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021_3.pdf">20210113_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2021-003</td>
+                <td>12.01.2021</td>
+                <td>634618/55.01</td>
+                <td>14.01.2021</td>
+                <td>13.01.2021</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">451</td>
+                <td class="number">+100</td>
+                <td class="number">679,90</td>
+                <td class="number">-67.990,00</td>
+                <td class="number fee-block-start">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">-67.990,00</td>
+                <td class="number fy-column">-174,55</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021_2.pdf">20210113_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2021-004</td>
+                <td>12.01.2021</td>
+                <td>634618/55.02</td>
+                <td>14.01.2021</td>
+                <td>13.01.2021</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">551</td>
+                <td class="number">+134</td>
+                <td class="number">680,00</td>
+                <td class="number">-91.120,00</td>
+                <td class="number fee-block-start">-172,77</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-172,77</td>
+                <td class="number">-91.292,77</td>
+                <td class="number fy-column">-347,32</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021_1.pdf">20210113_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2021-005</td>
+                <td>12.01.2021</td>
+                <td>634618/55.03</td>
+                <td>14.01.2021</td>
+                <td>13.01.2021</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">685</td>
+                <td class="number">+60</td>
+                <td class="number">681,50</td>
+                <td class="number">-40.890,00</td>
+                <td class="number fee-block-start">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">-40.890,00</td>
+                <td class="number fy-column">-347,32</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021.pdf">20210113_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2021-006</td>
+                <td>12.01.2021</td>
+                <td>634725/05.00</td>
+                <td>14.01.2021</td>
+                <td>13.01.2021</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">745</td>
+                <td class="number">+33</td>
+                <td class="number">680,80</td>
+                <td class="number">-22.466,40</td>
+                <td class="number fee-block-start">-21,90</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-21,90</td>
+                <td class="number">-22.488,30</td>
+                <td class="number fy-column">-369,22</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210113_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_12_01_2021_4.pdf">20210113_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2021-007</td>
+                <td>14.01.2021</td>
+                <td>636507/92.00</td>
+                <td>18.01.2021</td>
+                <td>16.01.2021</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">778</td>
+                <td class="number">+28</td>
+                <td class="number">691,00</td>
+                <td class="number">-19.348,00</td>
+                <td class="number fee-block-start">-18,86</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-18,86</td>
+                <td class="number">-19.366,86</td>
+                <td class="number fy-column">-388,08</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210116_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_14_01_2021.pdf">20210116_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2021-008</td>
+                <td>10.02.2021</td>
+                <td>683681/15.00</td>
+                <td>12.02.2021</td>
+                <td>11.02.2021</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">806</td>
+                <td class="number">+50</td>
+                <td class="number">670,00</td>
+                <td class="number">-33.500,00</td>
+                <td class="number fee-block-start">-24,29</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-24,29</td>
+                <td class="number">-33.524,29</td>
+                <td class="number fy-column">-412,37</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210211_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_10_02_2021.pdf">20210211_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="loss-row">
+                <td>FY2021-009</td>
+                <td>23.02.2021</td>
+                <td>696549/39.00</td>
+                <td>25.02.2021</td>
+                <td>24.02.2021</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">856</td>
+                <td class="number">-461</td>
+                <td class="number">550,20</td>
+                <td class="number">+253.642,20</td>
+                <td class="number fee-block-start">-183,89</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-183,89</td>
+                <td class="number">+253.458,31</td>
+                <td class="number fy-column">-596,26</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">-60.397,91</td>
+                <td class="number fy-column">-60.397,91</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210224_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_23_02_2021.pdf">20210224_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2021-010</td>
+                <td>04.03.2021</td>
+                <td>711700/90.00</td>
+                <td>08.03.2021</td>
+                <td>05.03.2021</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">395</td>
+                <td class="number">+55</td>
+                <td class="number">538,90</td>
+                <td class="number">-29.639,50</td>
+                <td class="number fee-block-start">-21,49</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-21,49</td>
+                <td class="number">-29.660,99</td>
+                <td class="number fy-column">-617,75</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-60.397,91</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210305_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_04_03_2021.pdf">20210305_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2021-011</td>
+                <td>09.03.2021</td>
+                <td>724160/71.00</td>
+                <td>11.03.2021</td>
+                <td>10.03.2021</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">450</td>
+                <td class="number">-55</td>
+                <td class="number">567,30</td>
+                <td class="number">+31.201,50</td>
+                <td class="number fee-block-start">-22,62</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-22,62</td>
+                <td class="number">+31.178,88</td>
+                <td class="number fy-column">-640,37</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">+1.517,89</td>
+                <td class="number fy-column">-58.880,02</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210310_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_09_03_2021.pdf">20210310_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2021-012</td>
+                <td>17.03.2021</td>
+                <td>731711/33.00</td>
+                <td>19.03.2021</td>
+                <td>18.03.2021</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">395</td>
+                <td class="number">+80</td>
+                <td class="number">549,00</td>
+                <td class="number">-43.920,00</td>
+                <td class="number fee-block-start">-31,84</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-31,84</td>
+                <td class="number">-43.951,84</td>
+                <td class="number fy-column">-672,21</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-58.880,02</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210318_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_17_03_2021.pdf">20210318_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="depot-statement-row">
+                <td>FY2021-013</td>
+                <td>31.03.2021</td>
+                <td>•</td>
+                <td>14.04.2021</td>
+                <td>16.04.2021</td>
+                <td class="type-column">Depotabschluss</td>
+                <td>US88160R1014</td>
+                <td class="number">80</td>
+                <td class="number">•</td>
+                <td class="number">533,70</td>
+                <td class="number">42.696,00</td>
+                <td class="number fee-block-start">-5,00</td>
+                <td class="number">19</td>
+                <td class="number">-0,95</td>
+                <td class="number">-5,95</td>
+                <td class="number">42.690,05</td>
+                <td class="number fy-column">-677,21</td>
+                <td class="number fee-block-end fy-column">-0,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-58.880,02</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210416_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2021.pdf">20210416_Depotabschluss_Ex-...</a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2021-014</td>
+                <td>13.04.2021</td>
+                <td>760264/67.00</td>
+                <td>15.04.2021</td>
+                <td>14.04.2021</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">80</td>
+                <td class="number">-80</td>
+                <td class="number">619,10</td>
+                <td class="number">+49.528,00</td>
+                <td class="number fee-block-start">-35,91</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-35,91</td>
+                <td class="number">+49.492,09</td>
+                <td class="number fy-column">-713,12</td>
+                <td class="number fee-block-end fy-column">-0,95</td>
+                <td class="number">+5.540,25</td>
+                <td class="number fy-column">-53.339,77</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210414_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_13_04_2021.pdf">20210414_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="misc-row">
+                <td>FY2021-015</td>
+                <td>13.05.2021</td>
+                <td>•</td>
+                <td>13.05.2021</td>
+                <td>13.05.2021</td>
+                <td class="type-column">Kostenaufstellung</td>
+                <td>None</td>
+                <td class="number">-</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-323,42</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-323,42</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-1.036,54</td>
+                <td class="number fee-block-end fy-column">-0,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-53.339,77</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210513_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_22_04_2021.pdf">20210513_Depotabschluss_Ex-...</a></td>
+            </tr>
+            <tr class="depot-statement-row">
+                <td>FY2021-016</td>
+                <td>30.06.2021</td>
+                <td>•</td>
+                <td>14.07.2021</td>
+                <td>16.07.2021</td>
+                <td class="type-column">Depotabschluss</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-5,00</td>
+                <td class="number">19</td>
+                <td class="number">-0,95</td>
+                <td class="number">-5,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-1.041,54</td>
+                <td class="number fee-block-end fy-column">-1,90</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-53.339,77</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20210716_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2021.pdf">20210716_Depotabschluss_Ex-...</a></td>
+            </tr>
+            <tr class="depot-statement-row">
+                <td>FY2021-017</td>
+                <td>30.09.2021</td>
+                <td>•</td>
+                <td>14.10.2021</td>
+                <td>18.10.2021</td>
+                <td class="type-column">Depotabschluss</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-5,00</td>
+                <td class="number">19</td>
+                <td class="number">-0,95</td>
+                <td class="number">-5,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-1.046,54</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-53.339,77</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20211018_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2021.pdf">20211018_Depotabschluss_Ex-...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2021-018</td>
+                <td>05.10.2021</td>
+                <td>293238/67.00</td>
+                <td>07.10.2021</td>
+                <td>06.10.2021</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">0</td>
+                <td class="number">+50</td>
+                <td class="number">678,30</td>
+                <td class="number">-33.915,00</td>
+                <td class="number fee-block-start">-24,59</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-24,59</td>
+                <td class="number">-33.939,59</td>
+                <td class="number fy-column">-1.071,13</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-53.339,77</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20211006_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_05_10_2021.pdf">20211006_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2021-019</td>
+                <td>11.10.2021</td>
+                <td>299531/21.00</td>
+                <td>13.10.2021</td>
+                <td>12.10.2021</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">50</td>
+                <td class="number">+25</td>
+                <td class="number">678,10</td>
+                <td class="number">-16.952,50</td>
+                <td class="number fee-block-start">-16,53</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-16,53</td>
+                <td class="number">-16.969,03</td>
+                <td class="number fy-column">-1.087,66</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-53.339,77</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20211012_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_11_10_2021.pdf">20211012_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2021-020</td>
+                <td>14.10.2021</td>
+                <td>301819/04.00</td>
+                <td>18.10.2021</td>
+                <td>15.10.2021</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">75</td>
+                <td class="number">+25</td>
+                <td class="number">703,70</td>
+                <td class="number">-17.592,50</td>
+                <td class="number fee-block-start">-17,15</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-17,15</td>
+                <td class="number">-17.609,65</td>
+                <td class="number fy-column">-1.104,81</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-53.339,77</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20211015_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_14_10_2021_1.pdf">20211015_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2021-021</td>
+                <td>14.10.2021</td>
+                <td>303070/46.00</td>
+                <td>18.10.2021</td>
+                <td>15.10.2021</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">100</td>
+                <td class="number">+60</td>
+                <td class="number">704,70</td>
+                <td class="number">-42.282,00</td>
+                <td class="number fee-block-start">-30,65</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-30,65</td>
+                <td class="number">-42.312,65</td>
+                <td class="number fy-column">-1.135,46</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-53.339,77</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20211015_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_14_10_2021.pdf">20211015_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2021-022</td>
+                <td>19.10.2021</td>
+                <td>308855/32.00</td>
+                <td>21.10.2021</td>
+                <td>20.10.2021</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">160</td>
+                <td class="number">+50</td>
+                <td class="number">752,90</td>
+                <td class="number">-37.645,00</td>
+                <td class="number fee-block-start">-27,29</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-27,29</td>
+                <td class="number">-37.672,29</td>
+                <td class="number fy-column">-1.162,75</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-53.339,77</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20211020_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_19_10_2021.pdf">20211020_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2021-023</td>
+                <td>25.10.2021</td>
+                <td>315769/93.00</td>
+                <td>27.10.2021</td>
+                <td>27.10.2021</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">210</td>
+                <td class="number">-210</td>
+                <td class="number">854,60</td>
+                <td class="number">+179.466,00</td>
+                <td class="number fee-block-start">-205,12</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-205,12</td>
+                <td class="number">+179.260,88</td>
+                <td class="number fy-column">-1.367,87</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">+30.757,67</td>
+                <td class="number fy-column">-22.582,10</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021.pdf">20211027_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="misc-row">
+                <td>FY2021-024</td>
+                <td>25.10.2021</td>
+                <td>315769/93.00</td>
+                <td>25.10.2021</td>
+                <td>26.10.2021</td>
+                <td class="type-column">Ausführungsanzeige-Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">0</td>
+                <td class="number">-210</td>
+                <td class="number">854,60</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-1.367,87</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-22.582,10</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20211026_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_25_10_2021.pdf">20211026_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="misc-row">
+                <td>FY2021-025</td>
+                <td>27.10.2021</td>
+                <td>316274/62.00</td>
+                <td>27.10.2021</td>
+                <td>27.10.2021</td>
+                <td class="type-column">Limit-Order-Vormerkung</td>
+                <td>US88160R1014</td>
+                <td class="number">0</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-3,50</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-3,50</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-1.371,37</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-22.582,10</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20211027_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_10_2021_1.pdf">20211027_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2021-026</td>
+                <td>28.10.2021</td>
+                <td>317885/10.00</td>
+                <td>01.11.2021</td>
+                <td>29.10.2021</td>
+                <td class="type-column">Kauf</td>
+                <td>DE000JN9UFS3</td>
+                <td class="number">0</td>
+                <td class="number">+85000</td>
+                <td class="number">1,13</td>
+                <td class="number">-96.050,00</td>
+                <td class="number fee-block-start">-69,64</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-69,64</td>
+                <td class="number">-96.119,64</td>
+                <td class="number fy-column">-1.441,01</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-22.582,10</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20211029_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_28_10_2021.pdf">20211029_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2021-027</td>
+                <td>29.10.2021</td>
+                <td>318032/84.00</td>
+                <td>02.11.2021</td>
+                <td>30.10.2021</td>
+                <td class="type-column">Kauf</td>
+                <td>DE000JN9UFS3</td>
+                <td class="number">85000</td>
+                <td class="number">+40000</td>
+                <td class="number">1,29</td>
+                <td class="number">-51.600,00</td>
+                <td class="number fee-block-start">-37,41</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-37,41</td>
+                <td class="number">-51.637,41</td>
+                <td class="number fy-column">-1.478,42</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-22.582,10</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20211030_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_29_10_2021_2.pdf">20211030_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2021-028</td>
+                <td>29.10.2021</td>
+                <td>319350/80.01</td>
+                <td>02.11.2021</td>
+                <td>30.10.2021</td>
+                <td class="type-column">Verkauf</td>
+                <td>DE000JN9UFS3</td>
+                <td class="number">125000</td>
+                <td class="number">-100000</td>
+                <td class="number">1,55</td>
+                <td class="number">+155.000,00</td>
+                <td class="number fee-block-start">-112,38</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-112,38</td>
+                <td class="number">+154.878,16</td>
+                <td class="number fy-column">-1.590,80</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-22.582,10</td>
+                <td class="number non-stock-block-start">+39.381,48</td>
+                <td class="number non-stock-block-end fy-column">+39.381,48</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20211030_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_29_10_2021_1.pdf">20211030_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2021-029</td>
+                <td>29.10.2021</td>
+                <td>319350/80.00</td>
+                <td>02.11.2021</td>
+                <td>02.11.2021</td>
+                <td class="type-column">Verkauf</td>
+                <td>DE000JN9UFS3</td>
+                <td class="number">25000</td>
+                <td class="number">-25000</td>
+                <td class="number">1,55</td>
+                <td class="number">+38.750,00</td>
+                <td class="number fee-block-start">-28,09</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-28,09</td>
+                <td class="number">+38.721,91</td>
+                <td class="number fy-column">-1.618,89</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-22.582,10</td>
+                <td class="number non-stock-block-start">+6.439,12</td>
+                <td class="number non-stock-block-end fy-column">+45.820,60</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20211102_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_01_11_2021.pdf">20211102_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="misc-row">
+                <td>FY2021-030</td>
+                <td>29.10.2021</td>
+                <td>316274/62.00</td>
+                <td>29.10.2021</td>
+                <td>29.10.2021</td>
+                <td class="type-column">Stornierung</td>
+                <td>US88160R1014</td>
+                <td class="number">0</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-1.618,89</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-22.582,10</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">+45.820,60</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20211029_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_28_10_2021.pdf">20211029_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="misc-row">
+                <td>FY2021-031</td>
+                <td>30.10.2021</td>
+                <td>319350/80.00</td>
+                <td>30.10.2021</td>
+                <td>30.10.2021</td>
+                <td class="type-column">Limit-Order-Vormerkung</td>
+                <td>DE000JN9UFS3</td>
+                <td class="number">0</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-3,50</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-3,50</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-1.622,39</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-22.582,10</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">+45.820,60</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20211030_Orderabrechnung_-bestaetigung_ISIN_DE000JN9UFS3_J_P_MORGAN_STRUCT_vom_29_10_2021.pdf">20211030_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2021-032</td>
+                <td>01.11.2021</td>
+                <td>323064/16.00</td>
+                <td>03.11.2021</td>
+                <td>02.11.2021</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">0</td>
+                <td class="number">+245</td>
+                <td class="number">981,90</td>
+                <td class="number">-240.565,50</td>
+                <td class="number fee-block-start">-174,41</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-174,41</td>
+                <td class="number">-240.739,91</td>
+                <td class="number fy-column">-1.796,80</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-22.582,10</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">+45.820,60</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20211102_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_01_11_2021.pdf">20211102_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2021-033</td>
+                <td>02.11.2021</td>
+                <td>329895/15.00</td>
+                <td>04.11.2021</td>
+                <td>03.11.2021</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">245</td>
+                <td class="number">-195</td>
+                <td class="number">1.005,20</td>
+                <td class="number">+196.014,00</td>
+                <td class="number fee-block-start">-178,62</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-178,62</td>
+                <td class="number">+195.835,38</td>
+                <td class="number fy-column">-1.975,42</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">+4.226,06</td>
+                <td class="number fy-column">-18.356,04</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">+45.820,60</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20211103_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_02_11_2021.pdf">20211103_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2021-034</td>
+                <td>02.11.2021</td>
+                <td>329895/15.01</td>
+                <td>04.11.2021</td>
+                <td>03.11.2021</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">50</td>
+                <td class="number">-50</td>
+                <td class="number">1.007,20</td>
+                <td class="number">+50.360,00</td>
+                <td class="number fee-block-start">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">+50.360,00</td>
+                <td class="number fy-column">-1.975,42</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">+1.229,41</td>
+                <td class="number fy-column">-17.126,63</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">+45.820,60</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20211103_Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_02_11_2021_1.pdf">20211103_Orderabrechnung_-b...</a></td>
+            </tr>
+            <tr class="depot-statement-year-end">
+                <td>FY2021-035</td>
+                <td>31.12.2021</td>
+                <td>•</td>
+                <td>07.02.2022</td>
+                <td>25.01.2022</td>
+                <td class="type-column">Depotabschluss</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-5,00</td>
+                <td class="number">19</td>
+                <td class="number">-0,95</td>
+                <td class="number">-5,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-1.980,42</td>
+                <td class="number fee-block-end fy-column">-3,80</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-17.126,63</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">+45.820,60</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/20220125_Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_11_01_2022.pdf">20220125_Depotabschluss_Ex-...</a></td>
+            </tr>
+            <tr class="year-summary-row">
+                <td>FY2021-036</td>
+                <td colspan="5" style="text-align: center;">
+                    === JAHRESSALDO FY2021 ===
+                </td>
+                <td></td>
+                <td class="number">•</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="number fee-block-start"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="number bold-value">-1.980,42</td>
+                <td class="number fee-block-end bold-value">-3,80</td>
+                <td></td>
+                <td class="number bold-value">-17.126,63</td>
+                <td class="non-stock-block-start"></td>
+                <td class="number bold-value non-stock-block-end">+45.820,60</td>
+            </tr>
+            <tr class="depot-statement-row">
+                <td>FY2022-001</td>
+                <td>31.03.2022</td>
+                <td>•</td>
+                <td>14.04.2022</td>
+                <td>01.04.2022</td>
+                <td class="type-column">Depotabschluss</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-5,00</td>
+                <td class="number">19</td>
+                <td class="number">-0,95</td>
+                <td class="number">-5,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-5,00</td>
+                <td class="number fee-block-end fy-column">-0,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2022.PDF">Depotabschluss_Ex-Post-Rep_...</a></td>
+            </tr>
+            <tr class="misc-row">
+                <td>FY2022-002</td>
+                <td>28.04.2022</td>
+                <td>•</td>
+                <td>28.04.2022</td>
+                <td>28.04.2022</td>
+                <td class="type-column">Kostenaufstellung</td>
+                <td>US88160R1014</td>
+                <td class="number">0</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-1.853,56</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-1.853,56</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-1.858,56</td>
+                <td class="number fee-block-end fy-column">-0,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2022.PDF">Depotabschluss_Ex-Post-Rep_...</a></td>
+            </tr>
+            <tr class="depot-statement-row">
+                <td>FY2022-003</td>
+                <td>30.06.2022</td>
+                <td>•</td>
+                <td>14.07.2022</td>
+                <td>01.07.2022</td>
+                <td class="type-column">Depotabschluss</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-5,00</td>
+                <td class="number">19</td>
+                <td class="number">-0,95</td>
+                <td class="number">-5,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-1.863,56</td>
+                <td class="number fee-block-end fy-column">-1,90</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2022.PDF">Depotabschluss_Ex-Post-Rep_...</a></td>
+            </tr>
+            <tr class="depot-statement-row">
+                <td>FY2022-004</td>
+                <td>30.09.2022</td>
+                <td>•</td>
+                <td>14.10.2022</td>
+                <td>03.10.2022</td>
+                <td class="type-column">Depotabschluss</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-5,00</td>
+                <td class="number">19</td>
+                <td class="number">-0,95</td>
+                <td class="number">-5,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-1.868,56</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_10_2022.PDF">Depotabschluss_Ex-Post-Rep_...</a></td>
+            </tr>
+            <tr class="depot-statement-year-end">
+                <td>FY2022-005</td>
+                <td>31.12.2022</td>
+                <td>•</td>
+                <td>07.02.2023</td>
+                <td>10.01.2023</td>
+                <td class="type-column">Depotabschluss</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-5,00</td>
+                <td class="number">19</td>
+                <td class="number">-0,95</td>
+                <td class="number">-5,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-1.873,56</td>
+                <td class="number fee-block-end fy-column">-3,80</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2023.PDF">Depotabschluss_Ex-Post-Rep_...</a></td>
+            </tr>
+            <tr class="year-summary-row">
+                <td>FY2022-006</td>
+                <td colspan="5" style="text-align: center;">
+                    === JAHRESSALDO FY2022 ===
+                </td>
+                <td></td>
+                <td class="number">•</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="number fee-block-start"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="number bold-value">-1.873,56</td>
+                <td class="number fee-block-end bold-value">-3,80</td>
+                <td></td>
+                <td class="number bold-value">0,00</td>
+                <td class="non-stock-block-start"></td>
+                <td class="number bold-value non-stock-block-end">0,00</td>
+            </tr>
+            <tr class="">
+                <td>FY2023-001</td>
+                <td>08.03.2023</td>
+                <td>194587/80.00</td>
+                <td>10.03.2023</td>
+                <td>08.03.2023</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">0</td>
+                <td class="number">+100</td>
+                <td class="number">172,46</td>
+                <td class="number">-17.246,00</td>
+                <td class="number fee-block-start">-16,81</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-16,81</td>
+                <td class="number">-17.262,81</td>
+                <td class="number fy-column">-16,81</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_08_03_2023.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2023-002</td>
+                <td>15.03.2023</td>
+                <td>377536/48.00</td>
+                <td>17.03.2023</td>
+                <td>15.03.2023</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">100</td>
+                <td class="number">-100</td>
+                <td class="number">174,48</td>
+                <td class="number">+17.448,00</td>
+                <td class="number fee-block-start">-17,01</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-17,01</td>
+                <td class="number">+17.430,99</td>
+                <td class="number fy-column">-33,82</td>
+                <td class="number fee-block-end fy-column">•</td>
+                <td class="number">+168,18</td>
+                <td class="number fy-column">+168,18</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_15_03_2023.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="depot-statement-row">
+                <td>FY2023-003</td>
+                <td>31.03.2023</td>
+                <td>•</td>
+                <td>14.04.2023</td>
+                <td>03.04.2023</td>
+                <td class="type-column">Depotabschluss</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-5,00</td>
+                <td class="number">19</td>
+                <td class="number">-0,95</td>
+                <td class="number">-5,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-38,82</td>
+                <td class="number fee-block-end fy-column">-0,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+168,18</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_04_2023.PDF">Depotabschluss_Ex-Post-Rep_...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2023-004</td>
+                <td>11.04.2023</td>
+                <td>396987/78.00</td>
+                <td>13.04.2023</td>
+                <td>11.04.2023</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">0</td>
+                <td class="number">+100</td>
+                <td class="number">173,24</td>
+                <td class="number">-17.324,00</td>
+                <td class="number fee-block-start">-16,89</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-16,89</td>
+                <td class="number">-17.340,89</td>
+                <td class="number fy-column">-55,71</td>
+                <td class="number fee-block-end fy-column">-0,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+168,18</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_11_04_2023.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2023-005</td>
+                <td>20.04.2023</td>
+                <td>270735/50.00</td>
+                <td>24.04.2023</td>
+                <td>20.04.2023</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">100</td>
+                <td class="number">+75</td>
+                <td class="number">155,28</td>
+                <td class="number">-11.646,00</td>
+                <td class="number fee-block-start">-15,00</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-15,00</td>
+                <td class="number">-11.661,00</td>
+                <td class="number fy-column">-70,71</td>
+                <td class="number fee-block-end fy-column">-0,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+168,18</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_20_04_2023.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2023-006</td>
+                <td>21.04.2023</td>
+                <td>272464/79.00</td>
+                <td>25.04.2023</td>
+                <td>21.04.2023</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">175</td>
+                <td class="number">+25</td>
+                <td class="number">150,88</td>
+                <td class="number">-3.772,00</td>
+                <td class="number fee-block-start">-15,00</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-15,00</td>
+                <td class="number">-3.787,00</td>
+                <td class="number fy-column">-85,71</td>
+                <td class="number fee-block-end fy-column">-0,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+168,18</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_21_04_2023.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2023-007</td>
+                <td>04.05.2023</td>
+                <td>290653/20.00</td>
+                <td>08.05.2023</td>
+                <td>04.05.2023</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">200</td>
+                <td class="number">+150</td>
+                <td class="number">146,12</td>
+                <td class="number">-21.918,00</td>
+                <td class="number fee-block-start">-21,37</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-21,37</td>
+                <td class="number">-21.939,37</td>
+                <td class="number fy-column">-107,08</td>
+                <td class="number fee-block-end fy-column">-0,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+168,18</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_04_05_2023.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="misc-row">
+                <td>FY2023-008</td>
+                <td>15.05.2023</td>
+                <td>•</td>
+                <td>15.05.2023</td>
+                <td>15.05.2023</td>
+                <td class="type-column">Kostenaufstellung</td>
+                <td>None</td>
+                <td class="number">-</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-23,80</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-23,80</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-130,88</td>
+                <td class="number fee-block-end fy-column">-0,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+168,18</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_15_05_2023.PDF">Depotabschluss_Ex-Post-Rep_...</a></td>
+            </tr>
+            <tr class="depot-statement-row">
+                <td>FY2023-009</td>
+                <td>30.06.2023</td>
+                <td>•</td>
+                <td>14.07.2023</td>
+                <td>03.07.2023</td>
+                <td class="type-column">Depotabschluss</td>
+                <td>US88160R1014</td>
+                <td class="number">350</td>
+                <td class="number">•</td>
+                <td class="number">236,50</td>
+                <td class="number">82.775,00</td>
+                <td class="number fee-block-start">-8,02</td>
+                <td class="number">19</td>
+                <td class="number">-1,52</td>
+                <td class="number">-9,54</td>
+                <td class="number">82.765,46</td>
+                <td class="number fy-column">-138,90</td>
+                <td class="number fee-block-end fy-column">-2,47</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+168,18</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_03_07_2023.PDF">Depotabschluss_Ex-Post-Rep_...</a></td>
+            </tr>
+            <tr class="misc-row">
+                <td>FY2023-010</td>
+                <td>17.07.2023</td>
+                <td>420370/94.00</td>
+                <td>17.07.2023</td>
+                <td>17.07.2023</td>
+                <td class="type-column">Limit-Order-Vormerkung</td>
+                <td>US88160R1014</td>
+                <td class="number">350</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-3,50</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-3,50</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-142,40</td>
+                <td class="number fee-block-end fy-column">-2,47</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+168,18</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_17_07_2023.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="misc-row">
+                <td>FY2023-011</td>
+                <td>19.07.2023</td>
+                <td>420370/94.00</td>
+                <td>19.07.2023</td>
+                <td>19.07.2023</td>
+                <td class="type-column">Stornierung</td>
+                <td>US88160R1014</td>
+                <td class="number">350</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-142,40</td>
+                <td class="number fee-block-end fy-column">-2,47</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+168,18</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_19_07_2023.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2023-012</td>
+                <td>11.09.2023</td>
+                <td>502965/90.00</td>
+                <td>13.09.2023</td>
+                <td>11.09.2023</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">350</td>
+                <td class="number">-50</td>
+                <td class="number">246,45</td>
+                <td class="number">+12.322,50</td>
+                <td class="number fee-block-start">-15,00</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-15,00</td>
+                <td class="number">+12.307,50</td>
+                <td class="number fy-column">-157,40</td>
+                <td class="number fee-block-end fy-column">-2,47</td>
+                <td class="number">+3.637,05</td>
+                <td class="number fy-column">+3.805,23</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_11_09_2023_1.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2023-013</td>
+                <td>11.09.2023</td>
+                <td>522013/56.00</td>
+                <td>13.09.2023</td>
+                <td>11.09.2023</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">300</td>
+                <td class="number">-50</td>
+                <td class="number">251,20</td>
+                <td class="number">+12.560,00</td>
+                <td class="number fee-block-start">-15,00</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-15,00</td>
+                <td class="number">+12.545,00</td>
+                <td class="number fy-column">-172,40</td>
+                <td class="number fee-block-end fy-column">-2,47</td>
+                <td class="number">+3.874,56</td>
+                <td class="number fy-column">+7.679,79</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_11_09_2023.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="depot-statement-row">
+                <td>FY2023-014</td>
+                <td>30.09.2023</td>
+                <td>•</td>
+                <td>16.10.2023</td>
+                <td>02.10.2023</td>
+                <td class="type-column">Depotabschluss</td>
+                <td>US88160R1014</td>
+                <td class="number">250</td>
+                <td class="number">•</td>
+                <td class="number">232,60</td>
+                <td class="number">58.150,00</td>
+                <td class="number fee-block-start">-5,63</td>
+                <td class="number">19</td>
+                <td class="number">-1,07</td>
+                <td class="number">-6,70</td>
+                <td class="number">58.143,30</td>
+                <td class="number fy-column">-178,03</td>
+                <td class="number fee-block-end fy-column">-3,54</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+7.679,79</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_10_2023.PDF">Depotabschluss_Ex-Post-Rep_...</a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2023-015</td>
+                <td>10.10.2023</td>
+                <td>554836/86.00</td>
+                <td>12.10.2023</td>
+                <td>10.10.2023</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">250</td>
+                <td class="number">-80</td>
+                <td class="number">252,20</td>
+                <td class="number">+20.176,00</td>
+                <td class="number fee-block-start">-19,67</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-19,67</td>
+                <td class="number">+20.156,33</td>
+                <td class="number fy-column">-197,70</td>
+                <td class="number fee-block-end fy-column">-3,54</td>
+                <td class="number">+7.737,93</td>
+                <td class="number fy-column">+15.417,72</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_10_10_2023.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2023-016</td>
+                <td>13.10.2023</td>
+                <td>558346/98.00</td>
+                <td>17.10.2023</td>
+                <td>13.10.2023</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">170</td>
+                <td class="number">+100</td>
+                <td class="number">244,20</td>
+                <td class="number">-24.420,00</td>
+                <td class="number fee-block-start">-23,81</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-23,81</td>
+                <td class="number">-24.443,81</td>
+                <td class="number fy-column">-221,51</td>
+                <td class="number fee-block-end fy-column">-3,54</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+15.417,72</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_13_10_2023.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="loss-row">
+                <td>FY2023-017</td>
+                <td>15.12.2023</td>
+                <td>619504/51.00</td>
+                <td>19.12.2023</td>
+                <td>15.12.2023</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">270</td>
+                <td class="number">-270</td>
+                <td class="number">230,45</td>
+                <td class="number">+62.221,50</td>
+                <td class="number fee-block-start">-45,11</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-45,11</td>
+                <td class="number">+62.176,39</td>
+                <td class="number fy-column">-266,62</td>
+                <td class="number fee-block-end fy-column">-3,54</td>
+                <td class="number">-1.415,52</td>
+                <td class="number fy-column">+14.002,20</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_15_12_2023.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="depot-statement-year-end">
+                <td>FY2023-018</td>
+                <td>31.12.2023</td>
+                <td>•</td>
+                <td>07.02.2024</td>
+                <td>10.01.2024</td>
+                <td class="type-column">Depotabschluss</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-5,00</td>
+                <td class="number">19</td>
+                <td class="number">-0,95</td>
+                <td class="number">-5,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-271,62</td>
+                <td class="number fee-block-end fy-column">-4,49</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+14.002,20</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2024.PDF">Depotabschluss_Ex-Post-Rep_...</a></td>
+            </tr>
+            <tr class="year-summary-row">
+                <td>FY2023-019</td>
+                <td colspan="5" style="text-align: center;">
+                    === JAHRESSALDO FY2023 ===
+                </td>
+                <td></td>
+                <td class="number">•</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="number fee-block-start"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="number bold-value">-271,62</td>
+                <td class="number fee-block-end bold-value">-4,49</td>
+                <td></td>
+                <td class="number bold-value">+14.002,20</td>
+                <td class="non-stock-block-start"></td>
+                <td class="number bold-value non-stock-block-end">0,00</td>
+            </tr>
+            <tr class="depot-statement-row">
+                <td>FY2024-001</td>
+                <td>31.03.2024</td>
+                <td>•</td>
+                <td>16.04.2024</td>
+                <td>02.04.2024</td>
+                <td class="type-column">Depotabschluss</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-5,00</td>
+                <td class="number">19</td>
+                <td class="number">-0,95</td>
+                <td class="number">-5,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-5,00</td>
+                <td class="number fee-block-end fy-column">-0,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_02_04_2024.PDF">Depotabschluss_Ex-Post-Rep_...</a></td>
+            </tr>
+            <tr class="misc-row">
+                <td>FY2024-002</td>
+                <td>24.04.2024</td>
+                <td>•</td>
+                <td>24.04.2024</td>
+                <td>24.04.2024</td>
+                <td class="type-column">Kostenaufstellung</td>
+                <td>US88160R1014</td>
+                <td class="number">0</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-224,17</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-224,17</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-229,17</td>
+                <td class="number fee-block-end fy-column">-0,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_24_04_2024.PDF">Depotabschluss_Ex-Post-Rep_...</a></td>
+            </tr>
+            <tr class="depot-statement-row">
+                <td>FY2024-003</td>
+                <td>30.06.2024</td>
+                <td>•</td>
+                <td>16.07.2024</td>
+                <td>01.07.2024</td>
+                <td class="type-column">Depotabschluss</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-5,00</td>
+                <td class="number">19</td>
+                <td class="number">-0,95</td>
+                <td class="number">-5,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-234,17</td>
+                <td class="number fee-block-end fy-column">-1,90</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2024.PDF">Depotabschluss_Ex-Post-Rep_...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2024-004</td>
+                <td>05.07.2024</td>
+                <td>167081/69.00</td>
+                <td>09.07.2024</td>
+                <td>05.07.2024</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">0</td>
+                <td class="number">+70</td>
+                <td class="number">232,10</td>
+                <td class="number">-16.247,00</td>
+                <td class="number fee-block-start">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">-16.247,00</td>
+                <td class="number fy-column">-234,17</td>
+                <td class="number fee-block-end fy-column">-1,90</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_05_07_2024_1.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2024-005</td>
+                <td>05.07.2024</td>
+                <td>167081/69.01</td>
+                <td>09.07.2024</td>
+                <td>05.07.2024</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">70</td>
+                <td class="number">+300</td>
+                <td class="number">232,10</td>
+                <td class="number">-69.630,00</td>
+                <td class="number fee-block-start">-62,26</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-62,26</td>
+                <td class="number">-69.692,26</td>
+                <td class="number fy-column">-296,43</td>
+                <td class="number fee-block-end fy-column">-1,90</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_05_07_2024.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2024-006</td>
+                <td>15.07.2024</td>
+                <td>270097/93.00</td>
+                <td>17.07.2024</td>
+                <td>15.07.2024</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">370</td>
+                <td class="number">-170</td>
+                <td class="number">241,95</td>
+                <td class="number">+41.131,50</td>
+                <td class="number fee-block-start">-29,82</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-29,82</td>
+                <td class="number">+41.101,68</td>
+                <td class="number fy-column">-326,25</td>
+                <td class="number fee-block-end fy-column">-1,90</td>
+                <td class="number">+1.609,40</td>
+                <td class="number fy-column">+1.609,40</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_15_07_2024.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2024-007</td>
+                <td>16.07.2024</td>
+                <td>271143/47.00</td>
+                <td>18.07.2024</td>
+                <td>16.07.2024</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">200</td>
+                <td class="number">+200</td>
+                <td class="number">229,45</td>
+                <td class="number">-45.890,00</td>
+                <td class="number fee-block-start">-33,27</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-33,27</td>
+                <td class="number">-45.923,27</td>
+                <td class="number fy-column">-359,52</td>
+                <td class="number fee-block-end fy-column">-1,90</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+1.609,40</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_16_07_2024.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2024-008</td>
+                <td>19.07.2024</td>
+                <td>274005/35.00</td>
+                <td>23.07.2024</td>
+                <td>19.07.2024</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">400</td>
+                <td class="number">+60</td>
+                <td class="number">228,80</td>
+                <td class="number">-13.728,00</td>
+                <td class="number fee-block-start">-15,00</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-15,00</td>
+                <td class="number">-13.743,00</td>
+                <td class="number fy-column">-374,52</td>
+                <td class="number fee-block-end fy-column">-1,90</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+1.609,40</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_19_07_2024.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2024-009</td>
+                <td>01.08.2024</td>
+                <td>213587/01.00</td>
+                <td>05.08.2024</td>
+                <td>02.08.2024</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">460</td>
+                <td class="number">+70</td>
+                <td class="number">202,80</td>
+                <td class="number">-14.196,00</td>
+                <td class="number fee-block-start">-15,00</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-15,00</td>
+                <td class="number">-14.211,00</td>
+                <td class="number fy-column">-389,52</td>
+                <td class="number fee-block-end fy-column">-1,90</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+1.609,40</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_02_08_2024.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2024-010</td>
+                <td>03.09.2024</td>
+                <td>276915/41.00</td>
+                <td>05.09.2024</td>
+                <td>03.09.2024</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">530</td>
+                <td class="number">+50</td>
+                <td class="number">195,94</td>
+                <td class="number">-9.797,00</td>
+                <td class="number fee-block-start">-15,00</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-15,00</td>
+                <td class="number">-9.812,00</td>
+                <td class="number fy-column">-404,52</td>
+                <td class="number fee-block-end fy-column">-1,90</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+1.609,40</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_03_09_2024.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2024-011</td>
+                <td>17.09.2024</td>
+                <td>303875/54.00</td>
+                <td>19.09.2024</td>
+                <td>17.09.2024</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">580</td>
+                <td class="number">+500</td>
+                <td class="number">206,50</td>
+                <td class="number">-103.250,00</td>
+                <td class="number fee-block-start">-74,86</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-74,86</td>
+                <td class="number">-103.324,86</td>
+                <td class="number fy-column">-479,38</td>
+                <td class="number fee-block-end fy-column">-1,90</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+1.609,40</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_17_09_2024_1.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="loss-row">
+                <td>FY2024-012</td>
+                <td>17.09.2024</td>
+                <td>321099/03.00</td>
+                <td>19.09.2024</td>
+                <td>17.09.2024</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">1080</td>
+                <td class="number">-580</td>
+                <td class="number">209,00</td>
+                <td class="number">+121.220,00</td>
+                <td class="number fee-block-start">-87,88</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-87,88</td>
+                <td class="number">+121.132,12</td>
+                <td class="number fy-column">-567,26</td>
+                <td class="number fee-block-end fy-column">-1,90</td>
+                <td class="number">-1.038,82</td>
+                <td class="number fy-column">+570,58</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_17_09_2024.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="">
+                <td>FY2024-013</td>
+                <td>26.09.2024</td>
+                <td>314023/24.00</td>
+                <td>30.09.2024</td>
+                <td>26.09.2024</td>
+                <td class="type-column">Kauf</td>
+                <td>US88160R1014</td>
+                <td class="number">500</td>
+                <td class="number">+519</td>
+                <td class="number">226,40</td>
+                <td class="number">-117.501,60</td>
+                <td class="number fee-block-start">-85,19</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-85,19</td>
+                <td class="number">-117.586,79</td>
+                <td class="number fy-column">-652,45</td>
+                <td class="number fee-block-end fy-column">-1,90</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+570,58</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_09_2024_2.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2024-014</td>
+                <td>26.09.2024</td>
+                <td>331130/33.00</td>
+                <td>30.09.2024</td>
+                <td>26.09.2024</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">1019</td>
+                <td class="number">-200</td>
+                <td class="number">234,80</td>
+                <td class="number">+46.960,00</td>
+                <td class="number fee-block-start">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">+46.960,00</td>
+                <td class="number fy-column">-652,45</td>
+                <td class="number fee-block-end fy-column">-1,90</td>
+                <td class="number">+5.630,06</td>
+                <td class="number fy-column">+6.200,64</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_09_2024_1.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2024-015</td>
+                <td>26.09.2024</td>
+                <td>331130/33.01</td>
+                <td>30.09.2024</td>
+                <td>26.09.2024</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">819</td>
+                <td class="number">-300</td>
+                <td class="number">234,80</td>
+                <td class="number">+70.440,00</td>
+                <td class="number fee-block-start">-85,12</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-85,12</td>
+                <td class="number">+70.354,88</td>
+                <td class="number fy-column">-737,57</td>
+                <td class="number fee-block-end fy-column">-1,90</td>
+                <td class="number">+8.359,96</td>
+                <td class="number fy-column">+14.560,60</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_26_09_2024.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2024-016</td>
+                <td>27.09.2024</td>
+                <td>332204/52.00</td>
+                <td>01.10.2024</td>
+                <td>27.09.2024</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">519</td>
+                <td class="number">-219</td>
+                <td class="number">229,50</td>
+                <td class="number">+50.260,50</td>
+                <td class="number fee-block-start">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">+50.260,50</td>
+                <td class="number fy-column">-737,57</td>
+                <td class="number fee-block-end fy-column">-1,90</td>
+                <td class="number">+642,95</td>
+                <td class="number fy-column">+15.203,55</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_27_09_2024_1.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="profit-row">
+                <td>FY2024-017</td>
+                <td>27.09.2024</td>
+                <td>332204/52.01</td>
+                <td>01.10.2024</td>
+                <td>27.09.2024</td>
+                <td class="type-column">Verkauf</td>
+                <td>US88160R1014</td>
+                <td class="number">300</td>
+                <td class="number">-300</td>
+                <td class="number">229,50</td>
+                <td class="number">+68.850,00</td>
+                <td class="number fee-block-start">-86,36</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-86,36</td>
+                <td class="number">+68.763,64</td>
+                <td class="number fy-column">-823,93</td>
+                <td class="number fee-block-end fy-column">-1,90</td>
+                <td class="number">+794,40</td>
+                <td class="number fy-column">+15.997,95</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Orderabrechnung_-bestaetigung_ISIN_US88160R1014_TESLA_INC_vom_27_09_2024.PDF">Orderabrechnung_-bestaetigu...</a></td>
+            </tr>
+            <tr class="depot-statement-row">
+                <td>FY2024-018</td>
+                <td>27.09.2024</td>
+                <td>•</td>
+                <td>16.10.2024</td>
+                <td>01.10.2024</td>
+                <td class="type-column">Depotabschluss</td>
+                <td>US88160R1014</td>
+                <td class="number">0</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-5,00</td>
+                <td class="number">19</td>
+                <td class="number">-0,95</td>
+                <td class="number">-5,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-828,93</td>
+                <td class="number fee-block-end fy-column">-2,85</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+15.997,95</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_10_2024.PDF">Depotabschluss_Ex-Post-Rep_...</a></td>
+            </tr>
+            <tr class="depot-statement-year-end">
+                <td>FY2024-019</td>
+                <td>31.12.2024</td>
+                <td>•</td>
+                <td>07.02.2025</td>
+                <td>10.01.2025</td>
+                <td class="type-column">Depotabschluss</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-5,00</td>
+                <td class="number">19</td>
+                <td class="number">-0,95</td>
+                <td class="number">-5,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-833,93</td>
+                <td class="number fee-block-end fy-column">-3,80</td>
+                <td class="number">•</td>
+                <td class="number fy-column">+15.997,95</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_10_01_2025.PDF">Depotabschluss_Ex-Post-Rep_...</a></td>
+            </tr>
+            <tr class="year-summary-row">
+                <td>FY2024-020</td>
+                <td colspan="5" style="text-align: center;">
+                    === JAHRESSALDO FY2024 ===
+                </td>
+                <td></td>
+                <td class="number">•</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="number fee-block-start"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="number bold-value">-833,93</td>
+                <td class="number fee-block-end bold-value">-3,80</td>
+                <td></td>
+                <td class="number bold-value">+15.997,95</td>
+                <td class="non-stock-block-start"></td>
+                <td class="number bold-value non-stock-block-end">0,00</td>
+            </tr>
+            <tr class="depot-statement-row">
+                <td>FY2025-001</td>
+                <td>31.03.2025</td>
+                <td>•</td>
+                <td>16.04.2025</td>
+                <td>01.04.2025</td>
+                <td class="type-column">Depotabschluss</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-5,00</td>
+                <td class="number">19</td>
+                <td class="number">-0,95</td>
+                <td class="number">-5,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-5,00</td>
+                <td class="number fee-block-end fy-column">-0,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_04_2025.PDF">Depotabschluss_Ex-Post-Rep_...</a></td>
+            </tr>
+            <tr class="misc-row">
+                <td>FY2025-002</td>
+                <td>28.04.2025</td>
+                <td>•</td>
+                <td>28.04.2025</td>
+                <td>28.04.2025</td>
+                <td class="type-column">Kostenaufstellung</td>
+                <td>US88160R1014</td>
+                <td class="number">0</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-589,76</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">-589,76</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-594,76</td>
+                <td class="number fee-block-end fy-column">-0,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_28_04_2025.PDF">Depotabschluss_Ex-Post-Rep_...</a></td>
+            </tr>
+            <tr class="depot-statement-year-end">
+                <td>FY2025-003</td>
+                <td>30.06.2025</td>
+                <td>•</td>
+                <td>16.07.2025</td>
+                <td>01.07.2025</td>
+                <td class="type-column">Depotabschluss</td>
+                <td>None</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number">•</td>
+                <td class="number fee-block-start">-5,00</td>
+                <td class="number">19</td>
+                <td class="number">-0,95</td>
+                <td class="number">-5,95</td>
+                <td class="number">•</td>
+                <td class="number fy-column">-599,76</td>
+                <td class="number fee-block-end fy-column">-1,90</td>
+                <td class="number">•</td>
+                <td class="number fy-column">•</td>
+                <td class="number non-stock-block-start">•</td>
+                <td class="number non-stock-block-end fy-column">•</td>
+                <td><a href="docs/Ramteid-Depotkonto-7274087/Depotabschluss_Ex-Post-Rep_Depot_7274087_vom_01_07_2025.PDF">Depotabschluss_Ex-Post-Rep_...</a></td>
+            </tr>
+            <tr class="year-summary-row">
+                <td>FY2025-004</td>
+                <td colspan="5" style="text-align: center;">
+                    === JAHRESSALDO FY2025 ===
+                </td>
+                <td></td>
+                <td class="number">•</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="number fee-block-start"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="number bold-value">-599,76</td>
+                <td class="number fee-block-end bold-value">-1,90</td>
+                <td></td>
+                <td class="number bold-value">0,00</td>
+                <td class="non-stock-block-start"></td>
+                <td class="number bold-value non-stock-block-end">0,00</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Performance-Übersicht</h3>
+    <table style="width: auto;">
+        <thead>
+            <tr>
+                <th>Jahr</th>
+                <th>Käufe<br>Anz.</th>
+                <th>Käufe<br>Volumen</th>
+                <th>Verkäufe<br>Anz.</th>
+                <th>Verkäufe<br>Volumen</th>
+                <th>G/V<br>Aktien</th>
+                <th>G/V<br>Nicht-Aktien</th>
+                <th>G/V<br>Gesamt</th>
+                <th>Gebühren<br>(netto)</th>
+                <th>USt</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>2020</td>
+                <td class="number">2</td>
+                <td class="number">106.497,50</td>
+                <td class="number">4</td>
+                <td class="number">218.939,00</td>
+                <td class="number positive">+11.627,98</td>
+                <td class="number positive">0,00</td>
+                <td class="number positive">+11.627,98</td>
+                <td class="number negative">-240,81</td>
+                <td class="number negative">-0,93</td>
+            </tr>
+            <tr>
+                <td>2021</td>
+                <td class="number">18</td>
+                <td class="number">1.164.532,90</td>
+                <td class="number">9</td>
+                <td class="number">953.961,70</td>
+                <td class="number negative">-17.126,63</td>
+                <td class="number positive">+45.820,60</td>
+                <td class="number positive">+28.693,97</td>
+                <td class="number negative">-1.980,42</td>
+                <td class="number negative">-3,80</td>
+            </tr>
+            <tr>
+                <td>2022</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number positive">0,00</td>
+                <td class="number positive">0,00</td>
+                <td class="number positive">0,00</td>
+                <td class="number negative">-1.873,56</td>
+                <td class="number negative">-3,80</td>
+            </tr>
+            <tr>
+                <td>2023</td>
+                <td class="number">6</td>
+                <td class="number">96.326,00</td>
+                <td class="number">5</td>
+                <td class="number">124.728,00</td>
+                <td class="number positive">+14.002,20</td>
+                <td class="number positive">0,00</td>
+                <td class="number positive">+14.002,20</td>
+                <td class="number negative">-271,62</td>
+                <td class="number negative">-4,49</td>
+            </tr>
+            <tr>
+                <td>2024</td>
+                <td class="number">8</td>
+                <td class="number">390.239,60</td>
+                <td class="number">6</td>
+                <td class="number">398.862,00</td>
+                <td class="number positive">+15.997,95</td>
+                <td class="number positive">0,00</td>
+                <td class="number positive">+15.997,95</td>
+                <td class="number negative">-833,93</td>
+                <td class="number negative">-3,80</td>
+            </tr>
+            <tr>
+                <td>2025</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number">0</td>
+                <td class="number">0,00</td>
+                <td class="number positive">0,00</td>
+                <td class="number positive">0,00</td>
+                <td class="number positive">0,00</td>
+                <td class="number negative">-0,00</td>
+                <td class="number negative">-0,00</td>
+            </tr>
+            <tr class="summary-row" style="border-top: 2px solid #333; font-weight: bold;">
+                <td>Gesamt</td>
+                <td class="number">34</td>
+                <td class="number">1.757.596,00</td>
+                <td class="number">24</td>
+                <td class="number">1.696.490,70</td>
+                <td class="number positive">+24.501,50</td>
+                <td class="number positive">+45.820,60</td>
+                <td class="number positive">+70.322,10</td>
+                <td class="number negative">-5.800,10</td>
+                <td class="number negative">-18,72</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p>Erstellt am 06.09.2025 23:52 mit THEA Document Analysis System</p>
+    </div>
+</body>
+</html>

@@ -845,6 +845,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             'isin': None,
             'shares': None,
             'kurswert': None,
+            'price_per_share': None,  # Add price per share
             'has_table': False
         }
         
@@ -872,21 +873,36 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                             except ValueError:
                                 pass
                         
-                        # Look for ISIN in next line
+                        # Look for ISIN and price info in next line
                         if i + 1 < len(lines):
                             next_line = lines[i + 1]
                             isin_match = re.search(r'([A-Z]{2}[A-Z0-9]{10})', next_line)
                             if isin_match:
                                 result['isin'] = isin_match.group(1)
                             
-                            # Extract Kurswert
-                            kurswert_match = re.search(r'([\d]{1,3}(?:\.[\d]{3})*,[\d]{2})', next_line)
-                            if kurswert_match:
-                                kurswert_str = kurswert_match.group(1).replace('.', '').replace(',', '.')
+                            # Extract price per share (e.g., "533,70 EUR")
+                            # Pattern: number with comma decimal, followed by EUR
+                            price_match = re.search(r'([\d]{1,3}(?:\.[\d]{3})*,[\d]{2})\s*EUR', next_line)
+                            if price_match:
+                                price_str = price_match.group(1).replace('.', '').replace(',', '.')
                                 try:
-                                    result['kurswert'] = float(kurswert_str)
+                                    price_val = float(price_str)
+                                    # Check if this is likely the price per share (not the total)
+                                    # Price per share is typically < 10000
+                                    if price_val < 10000:
+                                        result['price_per_share'] = price_val
                                 except ValueError:
                                     pass
+                            
+                            # Extract Kurswert (total value - typically larger number)
+                            # Look for the larger number that's likely the total
+                            all_numbers = re.findall(r'([\d]{1,3}(?:\.[\d]{3})*,[\d]{2})', next_line)
+                            if all_numbers:
+                                for num_str in all_numbers:
+                                    value = float(num_str.replace('.', '').replace(',', '.'))
+                                    # Kurswert is typically the larger value
+                                    if value > 10000 and (not result['kurswert'] or value > result['kurswert']):
+                                        result['kurswert'] = value
                 
                 # Alternative: Look for ISIN pattern anywhere in content
                 if not result['isin']:
@@ -1224,6 +1240,30 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                                 closing_balance = docling_data['kurswert']
                                 print(f"  Found Kurswert {closing_balance:.2f} EUR from docling table")
                 
+                # Try to get parsed price per share from docling, calculate as fallback
+                price_per_share = None
+                price_per_share_parsed = None
+                
+                # Check if we got a parsed price from docling
+                if 'docling_data' in locals() and docling_data.get('price_per_share'):
+                    price_per_share_parsed = docling_data['price_per_share']
+                    price_per_share = price_per_share_parsed
+                    print(f"  Found parsed price per share: {price_per_share:.2f} EUR")
+                
+                # Calculate price per share as cross-check or fallback
+                if shares and shares > 0 and closing_balance and closing_balance > 0:
+                    calculated_price = closing_balance / shares
+                    
+                    # If we have a parsed price, cross-check it
+                    if price_per_share_parsed:
+                        # Check if they match within 1% tolerance
+                        if abs(price_per_share_parsed - calculated_price) / calculated_price > 0.01:
+                            print(f"  ⚠️ Price mismatch: Parsed={price_per_share_parsed:.2f}, Calculated={calculated_price:.2f}")
+                    else:
+                        # Use calculated price if no parsed price available
+                        price_per_share = calculated_price
+                        print(f"  Calculated price per share: {price_per_share:.2f} EUR")
+                
                 depot_statements.append({
                     'doc_date': doc_date,
                     'balance_date': balance_date if balance_date else doc_date,
@@ -1231,6 +1271,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     'shares': shares,
                     'isin': isin,
                     'security_name': security_name,
+                    'price_per_share': price_per_share,  # Price per share
                     'file': file_name,
                     'type': statement_type,
                     'pdf_path': file_path,
@@ -1504,6 +1545,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 'isin': stmt.get('isin'),
                 'shares': stmt.get('shares'),
                 'balance': stmt.get('closing_balance'),
+                'price_per_share': stmt.get('price_per_share'),  # Price per share
                 'depot_fees': stmt.get('depot_fees'),        # Depot-Gebühren (brutto)
                 'depot_fee_net': stmt.get('depot_fee_net'),  # Depot-Gebühren (netto)
                 'vat_rate': stmt.get('vat_rate'),           # USt-Satz
@@ -1837,6 +1879,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         
         .depot-statement-year-end td {{
             color: white !important;
+            border-bottom: none !important;
         }}
         
         .depot-statement-year-end a {{
@@ -1954,13 +1997,11 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         /* Jahresübergangs-Saldenzeilen */
         .year-summary-row {{
             background-color: #ffd700 !important;  /* Gold/Gelb */
-            font-weight: bold;
             color: #000000 !important;
         }}
         
         .year-summary-row td {{
             color: #000000 !important;
-            border-top: 2px solid #000000;
         }}
         
         .year-start-row {{
@@ -1976,7 +2017,6 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         /* Calendar year transitions (blue) - only for FY != CY */
         .calendar-year-summary-row {{
             background-color: #1976d2 !important;  /* Blue */
-            font-weight: bold;
             color: #ffffff !important;  /* White text */
         }}
         
@@ -1988,6 +2028,28 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         
         .calendar-year-separator {{
             border-bottom: 3px solid #000000 !important;  /* Black border like FY separator */
+        }}
+        
+        /* Column coloring for FY and CY columns */
+        td.fy-column, .fy-column {{
+            background-color: #ffd700 !important;  /* Gold/Gelb - same as year-summary-row */
+            color: #000000 !important;  /* Black text */
+        }}
+        
+        td.cy-column, .cy-column {{
+            background-color: #1976d2 !important;  /* Blue - same as calendar-year-summary-row */
+            color: #ffffff !important;  /* White text */
+        }}
+        
+        /* Row color takes precedence over column color */
+        .year-summary-row td.cy-column {{
+            background-color: #ffd700 !important;  /* Keep yellow in yellow rows */
+            color: #000000 !important;  /* Black text */
+        }}
+        
+        .calendar-year-summary-row td.fy-column {{
+            background-color: #1976d2 !important;  /* Keep blue in blue rows */
+            color: #ffffff !important;  /* White text */
         }}
         
         .explanation-box h4 {{
@@ -2140,6 +2202,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 <th>Dokumentdatum</th>
                 <th>Stück</th>
                 <th>ISIN</th>
+                <th>Kurs (EUR)</th>
                 <th>Depotbestand (EUR)</th>
                 <th>Gebühren netto</th>
                 <th>USt %</th>
@@ -2181,6 +2244,11 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     if statement.get('depot_fees') is not None:
                         depot_fees_str = self.format_number_german(statement['depot_fees'], 2)
                     
+                    # Format price per share
+                    price_per_share_str = EMPTY_VALUE
+                    if statement.get('price_per_share') is not None:
+                        price_per_share_str = self.format_number_german(statement['price_per_share'], 2)
+                    
                     html += f"""
             <tr>
                 <td>{type_display}</td>
@@ -2188,6 +2256,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 <td>{doc_date}</td>
                 <td class="number">{shares_str}</td>
                 <td>{isin_str}</td>
+                <td class="number">{price_per_share_str}</td>
                 <td class="number">{closing}</td>
                 <td class="number">{depot_fee_net_str}</td>
                 <td class="number">{vat_rate_str}</td>
@@ -2484,6 +2553,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     'isin': stmt.get('isin'),
                     'shares': stmt.get('shares'),
                     'balance': stmt.get('closing_balance'),
+                    'price_per_share': stmt.get('price_per_share'),  # Price per share
                     'depot_fees': stmt.get('depot_fees'),        # Depot-Gebühren (brutto)
                     'depot_fee_net': stmt.get('depot_fee_net'),  # Depot-Gebühren (netto)
                     'vat_rate': stmt.get('vat_rate'),           # USt-Satz
@@ -2672,6 +2742,11 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                         stmt_data = depot_statement_lookup[file_key]
                         trans['isin'] = trans.get('isin') or stmt_data.get('isin')
                         trans['shares'] = trans.get('shares') or stmt_data.get('shares')
+                        # Add price per share and kurswert for depot statements
+                        if not trans.get('execution_price') and stmt_data.get('price_per_share'):
+                            trans['execution_price'] = stmt_data['price_per_share']
+                        if not trans.get('gross_amount') and stmt_data.get('balance'):
+                            trans['gross_amount'] = stmt_data['balance']
                         # Übernehme Depot-Gebühren aus Depotabschluss
                         if stmt_data.get('depot_fees') is not None and not trans.get('fees'):
                             trans['fees'] = stmt_data['depot_fees']  # Brutto
@@ -3059,24 +3134,24 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 # Add cumulative columns based on fiscal type
                 if is_dual_tracking:
                     html += f"""
-                <td class="number">{kum_geb_str}</td>
-                <td class="number">{kum_cy_geb_str}</td>
-                <td class="number">{kum_ust_str}</td>
-                <td class="number fee-block-end">{kum_cy_ust_str}</td>
+                <td class="number fy-column">{kum_geb_str}</td>
+                <td class="number cy-column">{kum_cy_geb_str}</td>
+                <td class="number fy-column">{kum_ust_str}</td>
+                <td class="number fee-block-end cy-column">{kum_cy_ust_str}</td>
                 <td class="number">{gv_aktien_str}</td>
-                <td class="number">{kum_aktien_str}</td>
-                <td class="number">{kum_cy_aktien_str}</td>
+                <td class="number fy-column">{kum_aktien_str}</td>
+                <td class="number cy-column">{kum_cy_aktien_str}</td>
                 <td class="number non-stock-block-start">{gv_non_aktien_str}</td>
-                <td class="number">{kum_non_aktien_str}</td>
-                <td class="number non-stock-block-end">{kum_cy_non_aktien_str}</td>"""
+                <td class="number fy-column">{kum_non_aktien_str}</td>
+                <td class="number non-stock-block-end cy-column">{kum_cy_non_aktien_str}</td>"""
                 else:
                     html += f"""
-                <td class="number">{kum_geb_str}</td>
-                <td class="number fee-block-end">{kum_ust_str}</td>
+                <td class="number fy-column">{kum_geb_str}</td>
+                <td class="number fee-block-end fy-column">{kum_ust_str}</td>
                 <td class="number">{gv_aktien_str}</td>
-                <td class="number">{kum_aktien_str}</td>
+                <td class="number fy-column">{kum_aktien_str}</td>
                 <td class="number non-stock-block-start">{gv_non_aktien_str}</td>
-                <td class="number non-stock-block-end">{kum_non_aktien_str}</td>"""
+                <td class="number non-stock-block-end fy-column">{kum_non_aktien_str}</td>"""
                 
                 html += f"""
                 <td>{doc_link}</td>
@@ -3105,9 +3180,9 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     
                     # Insert year-end summary row
                     html += f"""
-            <tr class="year-summary-row year-separator">
+            <tr class="year-summary-row">
                 <td>{fiscal_year}-{str(last_fy_number + 1).zfill(3)}</td>
-                <td colspan="5" style="text-align: center; font-weight: bold;">
+                <td colspan="5" style="text-align: center;">
                     === JAHRESSALDO {fiscal_year} ===
                 </td>
                 <td>{depot_isin}</td>
@@ -3147,47 +3222,48 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             </tr>"""
                     
                     # Insert year-start row for new fiscal year
-                    html += f"""
-            <tr class="year-start-row">
-                <td>{next_fiscal_year}-000</td>
-                <td colspan="5" style="text-align: center; font-style: italic;">
-                    === JAHRESANFANG {next_fiscal_year} ===
-                </td>
-                <td>{depot_isin}</td>
-                <td class="number">{depot_shares}</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="number fee-block-start"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>"""
-                    
-                    # Add reset columns - only FY columns for FY transition rows
-                    if is_dual_tracking:
-                        html += f"""
-                <td class="number bold-value">0,00</td>
-                <td></td>
-                <td class="number bold-value">0,00</td>
-                <td class="number fee-block-end"></td>
-                <td></td>
-                <td class="number bold-value">0,00</td>
-                <td></td>
-                <td class="non-stock-block-start"></td>
-                <td class="number bold-value">0,00</td>
-                <td class="non-stock-block-end"></td>"""
-                    else:
-                        html += f"""
-                <td class="number bold-value">0,00</td>
-                <td class="number fee-block-end bold-value">0,00</td>
-                <td></td>
-                <td class="number bold-value">0,00</td>
-                <td class="non-stock-block-start"></td>
-                <td class="number bold-value non-stock-block-end">0,00</td>"""
-                    
-                    html += """
-            </tr>"""
+                    # COMMENTED OUT FOR NOW - can be re-enabled later
+                    # html += f"""
+            # <tr class="year-start-row">
+            #     <td>{next_fiscal_year}-000</td>
+            #     <td colspan="5" style="text-align: center; font-style: italic;">
+            #         === JAHRESANFANG {next_fiscal_year} ===
+            #     </td>
+            #     <td>{depot_isin}</td>
+            #     <td class="number">{depot_shares}</td>
+            #     <td></td>
+            #     <td></td>
+            #     <td></td>
+            #     <td class="number fee-block-start"></td>
+            #     <td></td>
+            #     <td></td>
+            #     <td></td>
+            #     <td></td>"""
+                    #
+                    # # Add reset columns - only FY columns for FY transition rows
+                    # if is_dual_tracking:
+                    #     html += f"""
+            #     <td class="number bold-value">0,00</td>
+            #     <td></td>
+            #     <td class="number bold-value">0,00</td>
+            #     <td class="number fee-block-end"></td>
+            #     <td></td>
+            #     <td class="number bold-value">0,00</td>
+            #     <td></td>
+            #     <td class="non-stock-block-start"></td>
+            #     <td class="number bold-value">0,00</td>
+            #     <td class="non-stock-block-end"></td>"""
+                    # else:
+                    #     html += f"""
+            #     <td class="number bold-value">0,00</td>
+            #     <td class="number fee-block-end bold-value">0,00</td>
+            #     <td></td>
+            #     <td class="number bold-value">0,00</td>
+            #     <td class="non-stock-block-start"></td>
+            #     <td class="number bold-value non-stock-block-end">0,00</td>"""
+                    #
+                    # html += """
+            # </tr>"""
                     
                     # Save fiscal year summary before resetting
                     fiscal_year_summaries[fiscal_year] = {
@@ -3259,9 +3335,9 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                     
                     # Insert calendar year-end summary row (blue)
                     html += f"""
-            <tr class="calendar-year-summary-row calendar-year-separator">
+            <tr class="calendar-year-summary-row">
                 <td>{calendar_year}-001</td>
-                <td colspan="5" style="text-align: center; font-weight: bold;">
+                <td colspan="5" style="text-align: center;">
                     === KALENDERJAHR {calendar_year.replace('CY', '')} ENDE ===
                 </td>
                 <td>{isin if isin not in ['N/A', 'None', None, ''] else ''}</td>
@@ -3290,36 +3366,37 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             </tr>"""
                     
                     # Insert calendar year-start row for new year
-                    html += f"""
-            <tr class="calendar-year-start-row">
-                <td>{next_calendar_year}-000</td>
-                <td colspan="5" style="text-align: center; font-style: italic;">
-                    === KALENDERJAHR {next_calendar_year.replace('CY', '')} ANFANG ===
-                </td>
-                <td>{isin if isin not in ['N/A', 'None', None, ''] else ''}</td>
-                <td class="number">{shares_balance if shares_balance not in ['?', '-'] else ''}</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="number fee-block-start"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>"""
-                    
-                    # Add reset cumulative columns - only CY columns for CY transition rows (white text on blue background)
-                    html += f"""
-                <td></td>
-                <td class="number bold-value">0,00</td>
-                <td></td>
-                <td class="number fee-block-end bold-value">0,00</td>
-                <td></td>
-                <td></td>
-                <td class="number bold-value">0,00</td>
-                <td class="number non-stock-block-start"></td>
-                <td></td>
-                <td class="number non-stock-block-end bold-value">0,00</td>
-            </tr>"""
+                    # COMMENTED OUT FOR NOW - can be re-enabled later
+                    # html += f"""
+            # <tr class="calendar-year-start-row">
+            #     <td>{next_calendar_year}-000</td>
+            #     <td colspan="5" style="text-align: center; font-style: italic;">
+            #         === KALENDERJAHR {next_calendar_year.replace('CY', '')} ANFANG ===
+            #     </td>
+            #     <td>{isin if isin not in ['N/A', 'None', None, ''] else ''}</td>
+            #     <td class="number">{shares_balance if shares_balance not in ['?', '-'] else ''}</td>
+            #     <td></td>
+            #     <td></td>
+            #     <td></td>
+            #     <td class="number fee-block-start"></td>
+            #     <td></td>
+            #     <td></td>
+            #     <td></td>
+            #     <td></td>"""
+                    #
+                    # # Add reset cumulative columns - only CY columns for CY transition rows (white text on blue background)
+                    # html += f"""
+            #     <td></td>
+            #     <td class="number bold-value">0,00</td>
+            #     <td></td>
+            #     <td class="number fee-block-end bold-value">0,00</td>
+            #     <td></td>
+            #     <td></td>
+            #     <td class="number bold-value">0,00</td>
+            #     <td class="number non-stock-block-start"></td>
+            #     <td></td>
+            #     <td class="number non-stock-block-end bold-value">0,00</td>
+            # </tr>"""
                     
                     # Note: CY cumulative values are now reset at the beginning of the next transaction
                     # when we detect a calendar year change
