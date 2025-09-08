@@ -702,19 +702,19 @@ def process_with_model(model_name, pipeline_data, pdf_path, system_prompt, user_
                                     # For shorter patterns, require more repetitions
                                     # For longer patterns, require fewer repetitions but at least 10
                                     if pattern_length == 1:
-                                        min_repetitions = 50  # Single chunk needs 50 repetitions
+                                        min_repetitions = 100  # Single chunk needs 100 repetitions (doubled from 50)
                                     elif pattern_length == 2:
-                                        min_repetitions = 25  # 2-chunk pattern needs 25 cycles (50 chunks)
+                                        min_repetitions = 50  # 2-chunk pattern needs 50 cycles (doubled from 25)
                                     elif pattern_length <= 10:
-                                        # For 3-10 chunk patterns, require at least 10 repetitions
-                                        # or enough to fill 60 chunks, whichever is less
-                                        min_repetitions = max(10, 60 // pattern_length)
+                                        # For 3-10 chunk patterns, require at least 20 repetitions
+                                        # or enough to fill 120 chunks, whichever is less (doubled from 10/60)
+                                        min_repetitions = max(20, 120 // pattern_length)
                                     elif pattern_length <= 30:
-                                        min_repetitions = 8  # Medium patterns need 8 repetitions
+                                        min_repetitions = 16  # Medium patterns need 16 repetitions (doubled from 8)
                                     elif pattern_length <= 60:
-                                        min_repetitions = 5  # Longer patterns need 5 repetitions
+                                        min_repetitions = 10  # Longer patterns need 10 repetitions (doubled from 5)
                                     else:  # pattern_length <= 100
-                                        min_repetitions = 3  # Very long patterns need only 3 repetitions
+                                        min_repetitions = 6  # Very long patterns need 6 repetitions (doubled from 3)
                                     
                                     required_chunks = pattern_length * min_repetitions
                                     
