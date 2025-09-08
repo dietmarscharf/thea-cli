@@ -606,6 +606,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 'file_date': base_data.get('file_date'),
                 'file': base_data.get('file'),
                 'pdf_path': base_data.get('pdf_path'),
+                'original_file': base_data.get('original_file'),  # Include original filename for HTML link
                 'date': base_data.get('doc_date'),
                 'isin': None,
                 'shares': None,
