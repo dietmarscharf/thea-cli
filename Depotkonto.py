@@ -9,6 +9,10 @@ import re
 from pathlib import Path
 from typing import Dict, List, Any
 from collections import defaultdict
+import openpyxl
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.utils import get_column_letter
+from datetime import datetime
 
 from Konten import BaseKontoAnalyzer, calculate_monthly_aggregates
 
@@ -1597,7 +1601,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 gv_rate = (data_quality['with_profit_loss'] / verkauf_count) * 100
                 print(f"  - Verkäufe mit G/V-Daten: {data_quality['with_profit_loss']}/{verkauf_count} ({gv_rate:.1f}%)")
         
-        return {
+        analysis = {
             'depot_name': depot_name,
             'depot_number': depot_info['depot_number'],
             'company_name': depot_info['company_name'],
@@ -1617,6 +1621,233 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             'cost_information': cost_info,  # Füge Kosteninformationen hinzu
             'data_quality': data_quality  # Füge Datenqualitäts-Statistiken hinzu
         }
+        
+        # Enrich transactions with cumulative data
+        analysis['enriched_transactions'] = self.enrich_transactions_with_cumulative_data(analysis)
+        
+        return analysis
+    
+    def enrich_transactions_with_cumulative_data(self, analysis: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """
+        Reichert Transaktionen mit kumulativen Berechnungen an (G/V, Gebühren, etc.)
+        Diese Methode führt die gleichen Berechnungen durch wie in der HTML-Generierung,
+        speichert sie aber direkt in den Transaktions-Dictionaries für Excel-Export.
+        """
+        transactions = analysis.get('transactions', [])
+        if not transactions:
+            return []
+        
+        enriched_transactions = []
+        fiscal_type = analysis.get('fiscal_year', {}).get('type', 'calendar')
+        is_dual_tracking = fiscal_type == 'april_march'
+        
+        # Kumulative Tracker
+        transaction_number = 0
+        cumulative_stock_pnl = 0.0
+        cumulative_non_stock_pnl = 0.0
+        cumulative_fees_net = 0.0
+        cumulative_fees_vat = 0.0
+        previous_fiscal_year = None
+        
+        # Calendar year tracking (only when FY != CY)
+        if is_dual_tracking:
+            cumulative_cy_stock_pnl = 0.0
+            cumulative_cy_non_stock_pnl = 0.0
+            cumulative_cy_fees_net = 0.0
+            cumulative_cy_fees_vat = 0.0
+            previous_calendar_year = None
+        
+        # Depot statement lookup for enrichment
+        depot_statement_lookup = {}
+        for stmt in analysis.get('depot_statements', []):
+            file_key = os.path.basename(stmt['file'])
+            depot_statement_lookup[file_key] = {
+                'isin': stmt.get('isin'),
+                'shares': stmt.get('shares'),
+                'balance': stmt.get('closing_balance'),
+                'price_per_share': stmt.get('price_per_share'),
+                'depot_fees': stmt.get('depot_fees'),
+                'depot_fee_net': stmt.get('depot_fee_net'),
+                'vat_rate': stmt.get('vat_rate'),
+                'vat_amount': stmt.get('vat_amount')
+            }
+        
+        # Track share balances per ISIN
+        isin_balances = {}
+        
+        for idx, trans in enumerate(transactions):
+            transaction_number += 1
+            enriched = trans.copy()  # Create a copy to avoid modifying original
+            
+            # Add transaction number
+            enriched['nr'] = transaction_number
+            
+            # Map execution_price to price for Excel compatibility
+            if 'execution_price' in trans and trans['execution_price'] is not None:
+                enriched['price'] = trans['execution_price']
+            elif 'execution_price_avg' in trans and trans['execution_price_avg'] is not None:
+                enriched['price'] = trans['execution_price_avg']
+            elif not enriched.get('price'):
+                enriched['price'] = None
+            
+            # Date handling
+            value_date = trans.get('value_date')
+            execution_date = trans.get('execution_date')
+            doc_date = trans.get('date')
+            
+            if not value_date:
+                value_date = execution_date or trans.get('stichtag') or doc_date
+            if not execution_date:
+                execution_date = trans.get('stichtag') or doc_date
+            
+            enriched['execution_date'] = execution_date
+            enriched['value_date'] = value_date
+            enriched['doc_date'] = doc_date
+            
+            # Determine fiscal year
+            trans_type = trans.get('type', '')
+            if 'Depotabschluss' in trans_type:
+                fy_date = trans.get('stichtag') or value_date
+            else:
+                fy_date = execution_date or value_date
+            
+            fiscal_year = self.get_fiscal_year(fy_date, fiscal_type)
+            enriched['fiscal_year'] = fiscal_year
+            
+            # Check for fiscal year transition
+            if previous_fiscal_year and fiscal_year != previous_fiscal_year:
+                cumulative_stock_pnl = 0.0
+                cumulative_non_stock_pnl = 0.0
+                cumulative_fees_net = 0.0
+                cumulative_fees_vat = 0.0
+            previous_fiscal_year = fiscal_year
+            
+            # Calendar year tracking for dual mode
+            if is_dual_tracking:
+                if 'Depotabschluss' in trans_type:
+                    stichtag = trans.get('stichtag')
+                    calendar_year = self.get_calendar_year(stichtag) if stichtag else self.get_calendar_year(value_date)
+                else:
+                    calendar_year = self.get_calendar_year(fy_date)
+                enriched['calendar_year'] = calendar_year
+                
+                # Check for calendar year transition
+                if previous_calendar_year and calendar_year != previous_calendar_year:
+                    cumulative_cy_stock_pnl = 0.0
+                    cumulative_cy_non_stock_pnl = 0.0
+                    cumulative_cy_fees_net = 0.0
+                    cumulative_cy_fees_vat = 0.0
+                previous_calendar_year = calendar_year
+            
+            # Handle share balance tracking
+            trans_isin = trans.get('isin')
+            if trans_isin:
+                # Update balance tracking
+                if 'Depotabschluss' in trans_type:
+                    # Depot statement sets the balance
+                    if trans.get('shares') is not None:
+                        isin_balances[trans_isin] = trans['shares']
+                        enriched['balance'] = trans['shares']
+                        enriched['shares_change'] = 0
+                elif trans.get('shares') is not None:
+                    # Regular transaction changes the balance
+                    previous_balance = isin_balances.get(trans_isin, 0) or 0
+                    shares_change = trans['shares']
+                    
+                    if 'Kauf' in trans_type:
+                        new_balance = previous_balance + shares_change
+                        enriched['shares_change'] = shares_change
+                    elif 'Verkauf' in trans_type:
+                        new_balance = previous_balance - shares_change
+                        enriched['shares_change'] = -shares_change
+                    else:
+                        new_balance = previous_balance
+                        enriched['shares_change'] = 0
+                    
+                    isin_balances[trans_isin] = new_balance
+                    enriched['balance'] = new_balance
+            
+            # Extract and accumulate P&L
+            stock_pnl = 0.0
+            non_stock_pnl = 0.0
+            
+            if 'Verkauf' in trans_type and trans.get('profit_loss') is not None:
+                # Determine if stock or non-stock based on ISIN
+                if trans_isin and self.is_stock_isin(trans_isin):
+                    stock_pnl = trans['profit_loss']
+                    enriched['stock_pnl'] = stock_pnl
+                    enriched['non_stock_pnl'] = 0.0
+                else:
+                    non_stock_pnl = trans['profit_loss']
+                    enriched['non_stock_pnl'] = non_stock_pnl
+                    enriched['stock_pnl'] = 0.0
+            else:
+                enriched['stock_pnl'] = 0.0
+                enriched['non_stock_pnl'] = 0.0
+            
+            # Accumulate P&L
+            cumulative_stock_pnl += stock_pnl
+            cumulative_non_stock_pnl += non_stock_pnl
+            
+            # Store FY cumulative values
+            enriched['cum_stock_pnl_fy'] = round(cumulative_stock_pnl, 2)
+            enriched['cum_non_stock_pnl_fy'] = round(cumulative_non_stock_pnl, 2)
+            enriched['cum_total_pnl_fy'] = round(cumulative_stock_pnl + cumulative_non_stock_pnl, 2)
+            
+            # CY cumulative values (if dual tracking)
+            if is_dual_tracking:
+                cumulative_cy_stock_pnl += stock_pnl
+                cumulative_cy_non_stock_pnl += non_stock_pnl
+                enriched['cum_stock_pnl_cy'] = round(cumulative_cy_stock_pnl, 2)
+                enriched['cum_non_stock_pnl_cy'] = round(cumulative_cy_non_stock_pnl, 2)
+                enriched['cum_total_pnl_cy'] = round(cumulative_cy_stock_pnl + cumulative_cy_non_stock_pnl, 2)
+            
+            # Extract and accumulate fees
+            fees_net = 0.0
+            fees_vat = 0.0
+            
+            if trans.get('fees'):
+                fees_gross = trans['fees']
+                # Calculate net and VAT
+                if trans.get('is_vat_free'):
+                    fees_net = fees_gross
+                    fees_vat = 0.0
+                    enriched['vat_rate'] = 0
+                else:
+                    # Standard 19% VAT
+                    fees_net = round(fees_gross / 1.19, 2)
+                    fees_vat = round(fees_gross - fees_net, 2)
+                    enriched['vat_rate'] = 19
+                
+                enriched['fees_net'] = fees_net
+                enriched['fees_vat'] = fees_vat
+            else:
+                enriched['fees_net'] = 0.0
+                enriched['fees_vat'] = 0.0
+                enriched['vat_rate'] = 0
+            
+            # Accumulate fees
+            cumulative_fees_net += fees_net
+            cumulative_fees_vat += fees_vat
+            
+            # Store FY cumulative fees (use gross for display)
+            enriched['cum_fees_fy'] = round(cumulative_fees_net + cumulative_fees_vat, 2)  # Gross cumulative
+            enriched['cum_vat_fy'] = round(cumulative_fees_vat, 2)
+            
+            # CY cumulative fees (if dual tracking)
+            if is_dual_tracking:
+                cumulative_cy_fees_net += fees_net
+                cumulative_cy_fees_vat += fees_vat
+                enriched['cum_fees_cy'] = round(cumulative_cy_fees_net + cumulative_cy_fees_vat, 2)  # Gross cumulative
+                enriched['cum_vat_cy'] = round(cumulative_cy_fees_vat, 2)
+            
+            # Calculate derived fields
+            enriched['total_pnl'] = stock_pnl + non_stock_pnl
+            
+            # Add to enriched list
+            enriched_transactions.append(enriched)
+        
+        return enriched_transactions
     
     def _create_error_html(self) -> str:
         """Erstellt eine Fehler-HTML-Seite"""
@@ -2083,6 +2314,67 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             }}
         }}
         
+        /* Navigation TOC styles */
+        .nav-toc {{
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            position: sticky;
+            top: 10px;
+            z-index: 5;
+        }}
+        
+        .nav-toc h2 {{
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.2em;
+        }}
+        
+        .nav-toc ul {{
+            list-style: none;
+            padding-left: 0;
+        }}
+        
+        .nav-toc li {{
+            margin: 8px 0;
+        }}
+        
+        .nav-toc a {{
+            color: #3498db;
+            text-decoration: none;
+            padding: 5px 10px;
+            display: block;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }}
+        
+        .nav-toc a:hover {{
+            background: #e9ecef;
+        }}
+        
+        /* Toggle button for MiFID section */
+        .toggle-btn {{
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+            font-size: 14px;
+        }}
+        
+        .toggle-btn:hover {{
+            background: #5a6268;
+        }}
+        
+        /* Hidden section */
+        .hidden-section {{
+            display: none;
+        }}
+        
         /* Print styles */
         @media print {{
             body {{
@@ -2092,8 +2384,41 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             .page-break {{
                 page-break-after: always;
             }}
+            
+            .nav-toc {{
+                display: none;
+            }}
         }}
     </style>
+    <script>
+        function toggleMiFID() {{
+            const section = document.getElementById('mifid-section');
+            const btn = document.getElementById('mifid-toggle');
+            if (section.style.display === 'none' || section.style.display === '') {{
+                section.style.display = 'block';
+                btn.textContent = 'MiFID-Kosten ausblenden';
+            }} else {{
+                section.style.display = 'none';
+                btn.textContent = 'MiFID-Kosten anzeigen';
+            }}
+        }}
+        
+        // Smooth scroll for navigation
+        document.addEventListener('DOMContentLoaded', function() {{
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {{
+                anchor.addEventListener('click', function(e) {{
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {{
+                        target.scrollIntoView({{
+                            behavior: 'smooth',
+                            block: 'start'
+                        }});
+                    }}
+                }});
+            }});
+        }});
+    </script>
 </head>
 <body>
 """
@@ -2292,7 +2617,9 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         # SECTION 2: Jährliche Kostenanalyse (MiFID II)
         if analysis.get('cost_information'):
             html += """
-    <h2>Jährliche Kostenanalyse (MiFID II)</h2>
+    <button id="mifid-toggle" class="toggle-btn" style="display: none;" onclick="toggleMiFID()">MiFID-Kosten anzeigen</button>
+    <div id="mifid-section" class="hidden-section" style="display: none;">
+    <h2 id="mifid-costs">Jährliche Kostenanalyse (MiFID II)</h2>
     <p>Gesetzlich vorgeschriebene Kostenaufstellung gemäß Art. 50 der Verordnung (EU) 2017/565:</p>
     <table>
         <thead>
@@ -2392,6 +2719,7 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
             <li>✓ Die Nettobeträge werden berechnet: Netto = Brutto ÷ 1,19</li>
         </ul>
         <p><em>Diese Aufstellung entspricht den gesetzlichen Anforderungen gemäß Art. 50 der Verordnung (EU) 2017/565 (MiFID II).</em></p>
+    </div>
     </div>
 """
         
@@ -3660,6 +3988,297 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
         
         return html
     
+    def generate_excel(self, analysis: Dict[str, Any], output_file: str) -> None:
+        """Generiert Excel-Datei mit allen Analysedaten auf separaten Tabellenblättern"""
+        wb = openpyxl.Workbook()
+        
+        # Styles definieren
+        header_font = Font(bold=True, color="FFFFFF")
+        header_fill = PatternFill(start_color="34495E", end_color="34495E", fill_type="solid")
+        header_alignment = Alignment(horizontal="center", vertical="center")
+        
+        subheader_font = Font(bold=True)
+        subheader_fill = PatternFill(start_color="ECF0F1", end_color="ECF0F1", fill_type="solid")
+        
+        border = Border(
+            left=Side(style='thin'),
+            right=Side(style='thin'),
+            top=Side(style='thin'),
+            bottom=Side(style='thin')
+        )
+        
+        # 1. Übersicht Sheet
+        ws_overview = wb.active
+        ws_overview.title = "Übersicht"
+        
+        # Kontoinfos
+        depot_info = analysis.get('depot_info', {})
+        company_name = analysis.get('company_name', depot_info.get('company', 'Unbekannt'))
+        depot_number = analysis.get('depot_number', depot_info.get('account_number', 'N/A'))
+        
+        ws_overview['A1'] = f"{company_name} - Depotkonto {depot_number}"
+        ws_overview['A1'].font = Font(bold=True, size=14)
+        ws_overview.merge_cells('A1:D1')
+        
+        ws_overview['A3'] = "Kontonummer:"
+        ws_overview['B3'] = depot_number
+        ws_overview['A4'] = "Inhaber:"
+        ws_overview['B4'] = company_name
+        
+        # Zusammenfassung
+        ws_overview['A6'] = "Zusammenfassung"
+        ws_overview['A6'].font = subheader_font
+        ws_overview['A7'] = "Anzahl Transaktionen:"
+        ws_overview['B7'] = len(analysis['transactions'])
+        ws_overview['A8'] = "Anzahl Depotabschlüsse:"
+        ws_overview['B8'] = len(analysis.get('depot_statements', []))
+        
+        if analysis.get('isins'):
+            for idx, (isin, data) in enumerate(analysis['isins'].items(), start=10):
+                ws_overview[f'A{idx}'] = f"ISIN {isin}:"
+                ws_overview[f'B{idx}'] = f"{data['count']} Transaktionen"
+                if data.get('total_sales_value'):
+                    ws_overview[f'C{idx}'] = f"Verkaufssumme: {self.format_number_german(data['total_sales_value'], 2)} EUR"
+                if data.get('total_purchase_value'):
+                    ws_overview[f'D{idx}'] = f"Kaufsumme: {self.format_number_german(data['total_purchase_value'], 2)} EUR"
+        
+        # 2. Performance FY Sheet
+        if analysis.get('fiscal_years'):
+            ws_fy = wb.create_sheet("Performance FY")
+            
+            # Headers
+            headers_fy = ["Geschäftsjahr", "Käufe", "Kaufvolumen", "Verkäufe", "Verkaufsvolumen", 
+                         "G/V Aktien", "G/V Nicht-Aktien", "G/V Gesamt", "Gebühren netto", "USt"]
+            for col, header in enumerate(headers_fy, 1):
+                cell = ws_fy.cell(row=1, column=col, value=header)
+                cell.font = header_font
+                cell.fill = header_fill
+                cell.alignment = header_alignment
+            
+            # Data
+            row = 2
+            for fy_year, fy_data in sorted(analysis['fiscal_years'].items()):
+                ws_fy.cell(row=row, column=1, value=fy_year)
+                ws_fy.cell(row=row, column=2, value=fy_data.get('purchases', 0))
+                ws_fy.cell(row=row, column=3, value=fy_data.get('purchases_volume', 0))
+                ws_fy.cell(row=row, column=4, value=fy_data.get('sales', 0))
+                ws_fy.cell(row=row, column=5, value=fy_data.get('sales_volume', 0))
+                ws_fy.cell(row=row, column=6, value=fy_data.get('stock_pnl', 0))
+                ws_fy.cell(row=row, column=7, value=fy_data.get('non_stock_pnl', 0))
+                ws_fy.cell(row=row, column=8, value=fy_data.get('total_pnl', 0))
+                ws_fy.cell(row=row, column=9, value=-fy_data.get('fees_net', 0) if fy_data.get('fees_net', 0) > 0 else 0)
+                ws_fy.cell(row=row, column=10, value=-fy_data.get('fees_vat', 0) if fy_data.get('fees_vat', 0) > 0 else 0)
+                row += 1
+            
+            # Spaltenbreite anpassen
+            for col in range(1, 11):
+                ws_fy.column_dimensions[get_column_letter(col)].width = 15
+        
+        # 3. Performance CY Sheet
+        if analysis.get('calendar_years'):
+            ws_cy = wb.create_sheet("Performance CY")
+            
+            # Headers
+            headers_cy = ["Kalenderjahr", "Käufe", "Kaufvolumen", "Verkäufe", "Verkaufsvolumen",
+                         "G/V Aktien", "G/V Nicht-Aktien", "G/V Gesamt", "Gebühren netto", "USt"]
+            for col, header in enumerate(headers_cy, 1):
+                cell = ws_cy.cell(row=1, column=col, value=header)
+                cell.font = header_font
+                cell.fill = header_fill
+                cell.alignment = header_alignment
+            
+            # Data
+            row = 2
+            for cy_year, cy_data in sorted(analysis['calendar_years'].items()):
+                ws_cy.cell(row=row, column=1, value=cy_year)
+                ws_cy.cell(row=row, column=2, value=cy_data.get('purchases', 0))
+                ws_cy.cell(row=row, column=3, value=cy_data.get('purchases_volume', 0))
+                ws_cy.cell(row=row, column=4, value=cy_data.get('sales', 0))
+                ws_cy.cell(row=row, column=5, value=cy_data.get('sales_volume', 0))
+                ws_cy.cell(row=row, column=6, value=cy_data.get('stock_pnl', 0))
+                ws_cy.cell(row=row, column=7, value=cy_data.get('non_stock_pnl', 0))
+                ws_cy.cell(row=row, column=8, value=cy_data.get('total_pnl', 0))
+                ws_cy.cell(row=row, column=9, value=-cy_data.get('fees_net', 0) if cy_data.get('fees_net', 0) > 0 else 0)
+                ws_cy.cell(row=row, column=10, value=-cy_data.get('fees_vat', 0) if cy_data.get('fees_vat', 0) > 0 else 0)
+                row += 1
+            
+            # Spaltenbreite anpassen
+            for col in range(1, 11):
+                ws_cy.column_dimensions[get_column_letter(col)].width = 15
+        
+        # 4. Depotabschlüsse Sheet
+        if analysis.get('depot_statements'):
+            ws_depot = wb.create_sheet("Depotabschlüsse")
+            
+            # Headers
+            headers_depot = ["Typ", "Stichtag", "Dokumentdatum", "Stück", "ISIN", "Kurs (EUR)",
+                           "Depotbestand (EUR)", "Gebühren netto", "USt %", "USt (EUR)", 
+                           "Gebühren brutto", "Dokument"]
+            for col, header in enumerate(headers_depot, 1):
+                cell = ws_depot.cell(row=1, column=col, value=header)
+                cell.font = header_font
+                cell.fill = header_fill
+                cell.alignment = header_alignment
+            
+            # Data
+            row = 2
+            for statement in analysis['depot_statements']:
+                ws_depot.cell(row=row, column=1, value=statement.get('type_display', ''))
+                ws_depot.cell(row=row, column=2, value=statement.get('balance_date', ''))
+                ws_depot.cell(row=row, column=3, value=statement.get('doc_date', ''))
+                ws_depot.cell(row=row, column=4, value=statement.get('shares', ''))
+                ws_depot.cell(row=row, column=5, value=statement.get('isin', ''))
+                ws_depot.cell(row=row, column=6, value=statement.get('price_per_share', ''))
+                ws_depot.cell(row=row, column=7, value=statement.get('closing_balance', ''))
+                ws_depot.cell(row=row, column=8, value=statement.get('depot_fee_net', ''))
+                ws_depot.cell(row=row, column=9, value=statement.get('vat_rate', ''))
+                ws_depot.cell(row=row, column=10, value=statement.get('vat_amount', ''))
+                ws_depot.cell(row=row, column=11, value=statement.get('depot_fees', ''))
+                ws_depot.cell(row=row, column=12, value=statement.get('file', ''))
+                row += 1
+            
+            # Spaltenbreite anpassen
+            for col in range(1, 13):
+                ws_depot.column_dimensions[get_column_letter(col)].width = 15
+        
+        # 5. Transaktionen Sheet (Haupttabelle mit 27 Spalten)
+        ws_trans = wb.create_sheet("Transaktionen")
+        
+        # Determine if we have dual tracking (FY != CY)
+        fiscal_type = analysis.get('fiscal_year', {}).get('type', 'calendar')
+        is_dual_tracking = fiscal_type == 'april_march'
+        
+        # Headers für 27-Spalten-Tabelle (angepasst an HTML-Tabelle)
+        if is_dual_tracking:
+            headers_trans = [
+                "Nr", "Transaktion", "Referenz", "Wertst.", "Dokument", "Typ", "ISIN", 
+                "Bestand", "Veränderung", "Kurs", "Kurswert",
+                "Gebühren", "USt %", "USt", "Geb. Brutto", "Ausmach.",
+                "Kum. Geb. (FY)", "Kum. Geb. (CY)", "Kum. USt (FY)", "Kum. USt (CY)",
+                "G/V Akt.", "Kum. Akt. (FY)", "Kum. Akt. (CY)",
+                "G/V N-Akt.", "Kum. N-Akt. (FY)", "Kum. N-Akt. (CY)", "Dokument"
+            ]
+        else:
+            headers_trans = [
+                "Nr", "Transaktion", "Referenz", "Wertst.", "Dokument", "Typ", "ISIN", 
+                "Bestand", "Veränderung", "Kurs", "Kurswert",
+                "Gebühren", "USt %", "USt", "Geb. Brutto", "Ausmach.",
+                "Kum. Geb.", "Kum. USt",
+                "G/V Akt.", "Kum. Akt.",
+                "G/V N-Akt.", "Kum. N-Akt.", 
+                "", "", "", "", "Dokument"  # Empty columns to maintain 27 column structure
+            ]
+        
+        for col, header in enumerate(headers_trans, 1):
+            cell = ws_trans.cell(row=1, column=col, value=header)
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = header_alignment
+        
+        # Use enriched transaction data
+        row = 2
+        enriched_trans = analysis.get('enriched_transactions', [])
+        if not enriched_trans:
+            # Fallback to regular transactions if enriched not available
+            enriched_trans = analysis.get('transactions', [])
+        
+        for trans in enriched_trans:
+            # Format dates for display
+            exec_date = trans.get('execution_date', trans.get('date', ''))
+            if exec_date and isinstance(exec_date, str) and len(exec_date) >= 10:
+                exec_date = exec_date[:10]  # Extract YYYY-MM-DD
+            
+            value_date = trans.get('value_date', '')
+            if value_date and isinstance(value_date, str) and len(value_date) >= 10:
+                value_date = value_date[:10]
+            
+            doc_date = trans.get('doc_date', trans.get('date', ''))
+            if doc_date and isinstance(doc_date, str) and len(doc_date) >= 10:
+                doc_date = doc_date[:10]
+            
+            # Write data based on dual tracking mode
+            ws_trans.cell(row=row, column=1, value=trans.get('nr', row-1))
+            ws_trans.cell(row=row, column=2, value=exec_date)
+            ws_trans.cell(row=row, column=3, value=trans.get('order_number', ''))
+            ws_trans.cell(row=row, column=4, value=value_date)
+            ws_trans.cell(row=row, column=5, value=doc_date)
+            ws_trans.cell(row=row, column=6, value=trans.get('type', ''))
+            ws_trans.cell(row=row, column=7, value=trans.get('isin', ''))
+            ws_trans.cell(row=row, column=8, value=trans.get('balance', ''))
+            ws_trans.cell(row=row, column=9, value=trans.get('shares_change', trans.get('shares', '')))
+            ws_trans.cell(row=row, column=10, value=trans.get('price', ''))
+            ws_trans.cell(row=row, column=11, value=trans.get('net_amount', ''))
+            ws_trans.cell(row=row, column=12, value=trans.get('fees_net', ''))
+            ws_trans.cell(row=row, column=13, value=trans.get('vat_rate', ''))
+            ws_trans.cell(row=row, column=14, value=trans.get('fees_vat', ''))
+            ws_trans.cell(row=row, column=15, value=trans.get('fees', ''))
+            ws_trans.cell(row=row, column=16, value=trans.get('gross_amount', ''))
+            
+            if is_dual_tracking:
+                ws_trans.cell(row=row, column=17, value=trans.get('cum_fees_fy', ''))
+                ws_trans.cell(row=row, column=18, value=trans.get('cum_fees_cy', ''))
+                ws_trans.cell(row=row, column=19, value=trans.get('cum_vat_fy', ''))
+                ws_trans.cell(row=row, column=20, value=trans.get('cum_vat_cy', ''))
+                ws_trans.cell(row=row, column=21, value=trans.get('stock_pnl', ''))
+                ws_trans.cell(row=row, column=22, value=trans.get('cum_stock_pnl_fy', ''))
+                ws_trans.cell(row=row, column=23, value=trans.get('cum_stock_pnl_cy', ''))
+                ws_trans.cell(row=row, column=24, value=trans.get('non_stock_pnl', ''))
+                ws_trans.cell(row=row, column=25, value=trans.get('cum_non_stock_pnl_fy', ''))
+                ws_trans.cell(row=row, column=26, value=trans.get('cum_non_stock_pnl_cy', ''))
+            else:
+                ws_trans.cell(row=row, column=17, value=trans.get('cum_fees_fy', ''))
+                ws_trans.cell(row=row, column=18, value=trans.get('cum_vat_fy', ''))
+                ws_trans.cell(row=row, column=19, value=trans.get('stock_pnl', ''))
+                ws_trans.cell(row=row, column=20, value=trans.get('cum_stock_pnl_fy', ''))
+                ws_trans.cell(row=row, column=21, value=trans.get('non_stock_pnl', ''))
+                ws_trans.cell(row=row, column=22, value=trans.get('cum_non_stock_pnl_fy', ''))
+                # Empty columns 23-26 for non-dual tracking
+                ws_trans.cell(row=row, column=23, value='')
+                ws_trans.cell(row=row, column=24, value='')
+                ws_trans.cell(row=row, column=25, value='')
+                ws_trans.cell(row=row, column=26, value='')
+            
+            ws_trans.cell(row=row, column=27, value=trans.get('original_file', trans.get('file', '')))
+            row += 1
+        
+        # Spaltenbreite anpassen
+        for col in range(1, 28):
+            if col in [1, 3, 7]:  # Schmalere Spalten
+                ws_trans.column_dimensions[get_column_letter(col)].width = 8
+            elif col in [5, 6, 27]:  # Breitere Spalten
+                ws_trans.column_dimensions[get_column_letter(col)].width = 20
+            else:
+                ws_trans.column_dimensions[get_column_letter(col)].width = 12
+        
+        # 6. Statistik Sheet
+        ws_stats = wb.create_sheet("Statistik")
+        
+        # Transaction type statistics
+        ws_stats['A1'] = "Transaktionsstatistik"
+        ws_stats['A1'].font = Font(bold=True, size=14)
+        ws_stats.merge_cells('A1:C1')
+        
+        row = 3
+        ws_stats['A3'] = "Transaktionstyp"
+        ws_stats['B3'] = "Anzahl"
+        ws_stats['A3'].font = subheader_font
+        ws_stats['B3'].font = subheader_font
+        
+        row = 4
+        transaction_types = analysis.get('transaction_types', {})
+        for type_name, count in transaction_types.items():
+            ws_stats.cell(row=row, column=1, value=type_name)
+            ws_stats.cell(row=row, column=2, value=count)
+            row += 1
+        
+        # Spaltenbreite anpassen
+        ws_stats.column_dimensions['A'].width = 30
+        ws_stats.column_dimensions['B'].width = 15
+        
+        # Save Excel file
+        wb.save(output_file)
+        print(f"✓ Excel-Datei erstellt: {output_file}")
+    
     def run(self):
         """Hauptfunktion - analysiert beide Depots und generiert Markdown-Dateien"""
         for depot_name in self.depots.keys():
@@ -3671,6 +4290,11 @@ class DepotkontoAnalyzer(BaseKontoAnalyzer):
                 output_file = self.depots[depot_name]['output_file']
                 
                 self.save_html(html_content, output_file)
+                
+                # Generate Excel file
+                excel_file = output_file.replace('.html', '.xlsx')
+                self.generate_excel(analysis, excel_file)
+                
                 self.print_summary(output_file, analysis)
                 print(f"  - {len(analysis['transactions'])} Transaktionen analysiert")
             else:
