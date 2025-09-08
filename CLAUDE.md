@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 THEA is a comprehensive PDF processing and financial document analysis system that:
 1. Extracts structured data from PDFs using three distinct pipelines (vision, text, deep learning)
 2. Processes extracted data through Ollama models with retry logic and pattern detection
-3. Analyzes German financial documents (bank statements, investment accounts) and generates HTML reports
+3. Analyzes German financial documents (bank statements, investment accounts) and generates HTML/Excel reports
 
 The system processes 618+ financial documents across 6 account types with advanced visualizations and dual fiscal/calendar year tracking.
 
@@ -29,17 +29,17 @@ Detects stuck model responses with doubled thresholds:
 - 2-chunk patterns need 50 cycles
 - Longer patterns scale down progressively
 
-### Pipeline System (`pipelines/`)
+### Pipeline System
 
 Three extraction pipelines managed by `PipelineManager`:
 1. **pdf-extract-png** - Vision-based for Gemma models
-2. **pdf-extract-txt** - Multi-extractor text for Qwen models
+2. **pdf-extract-txt** - Multi-extractor text for Qwen models  
 3. **pdf-extract-docling** - ML-based with IBM Docling
 
 ### Financial Analyzers
 
-German document processors inheriting from `BaseKontoAnalyzer`:
-- **Depotkonto.py** - Investment accounts with dual FY/CY tracking
+German document processors inheriting from `BaseKontoAnalyzer` in `Konten.py`:
+- **Depotkonto.py** - Investment accounts with dual FY/CY tracking, Excel/HTML generation
 - **Girokonto.py** - Checking accounts with transaction categorization
 - **Geldmarktkonto.py** - Money market accounts with interest analysis
 
@@ -61,7 +61,7 @@ ollama pull qwen3:14b
 # Extract all account documents (~2-3 hours for 618 PDFs)
 npm run thea:konten:docling
 
-# Generate HTML reports
+# Generate HTML/Excel reports
 python3 Depotkonto.py     # Investment account reports
 python3 Girokonto.py      # Checking account reports
 python3 Geldmarktkonto.py # Money market reports
@@ -88,37 +88,59 @@ npm run thea:sidecars:docling
 - `--mode overwrite` - Force re-extraction
 - `--save-sidecars` - Save extraction artifacts
 
-## HTML Report Structure (`Depotkonto.py`)
+## Report Generation
 
-### Dual Year Tracking (lines 2400-3600)
-- **Fiscal Year (FY)**: April 1 - March 31 for accounting
-- **Calendar Year (CY)**: January 1 - December 31 for tax reporting
-- Yellow rows for FY transitions, blue for CY transitions
-- Automatic detection when FY ≠ CY
+### HTML Report Structure (`Depotkonto.py`)
 
-### 27-Column Table Layout
+#### Dual Year Tracking
+- **Fiscal Year (FY)**: April 1 - March 31 for accounting (lines 1714-1723)
+- **Calendar Year (CY)**: January 1 - December 31 for tax reporting (lines 1726-1740)
+- Cumulative values reset at year boundaries with proper rounding
+
+#### 27-Column Table Layout
 - Columns 1-16: Transaction data (date, order#, type, ISIN, shares, price)
 - Columns 17-20: FY/CY fees with visual separators
 - Columns 21-23: Stock P&L (G/V Aktien)
 - Columns 24-26: Non-stock P&L (G/V Nicht-Aktien)
 - Column 27: Document link
 
-### Failed Extraction Handling (lines 600-619)
+#### MiFID Section
+- Hidden by default (line 2620: `style="display: none;"`)
+- Toggle functionality preserved for future use
+- Removed from Excel generation (previously lines 4144-4180)
+
+### Excel Generation (`generate_excel()`)
+
+Creates `.xlsx` files with 4 worksheets:
+1. **Übersicht** - Account overview and summary
+2. **Depotabschlüsse** - Depot statements with balances
+3. **Transaktionen** - Full transaction table (27 columns)
+4. **Statistik** - Transaction type statistics
+
+### Data Enrichment (`enrich_transactions_with_cumulative_data()`)
+
+Lines 1630-1840: Enriches transactions with:
+- Cumulative P&L tracking (stock/non-stock)
+- Cumulative fee calculations (gross = net + VAT)
+- Fiscal and calendar year resets
+- Proper rounding to 2 decimal places
+
+## Critical Implementation Details
+
+### Failed Extraction Handling (lines 604-623)
 When extraction fails, the system:
 - Creates entry with type `⚠️ EXTRAKTION-FEHLGESCHLAGEN`
 - Preserves `original_file` for document link display
 - Allows easy identification of failed PDFs for re-processing
 
-## Critical Implementation Details
-
-### Stock Split Detection (lines 850-950)
+### Stock Split Detection (lines 750-762)
 Automatically detects splits like "1:2" or "3-for-1" and updates position tracking.
 
-### Vertical Layout Parser (lines 190-260)
-Handles Sparkasse's vertical format where values appear on separate lines by detecting patterns and extracting values from proximity.
+### Vertical Layout Parser (`extract_trading_details()`)
+Lines 164-350: Handles Sparkasse's vertical format where values appear on separate lines.
 
 ### German Format Handling
-- Numbers: 1.234,56 format (line 100 in Konten.py)
+- Numbers: 1.234,56 format (handled in `parse_german_number()` in Konten.py)
 - Dates: DD.MM.YYYY conversion
 - Trailing minus: "199.440,70-" bookkeeping format
 
@@ -150,6 +172,7 @@ The `docs/` folder contains 618 PDFs across 6 accounts:
 3. **Depot parsing failures**: Falls back to `parse_docling_table()` (line 673)
 4. **Column misalignment**: Verify 27-column structure in HTML output
 5. **Failed extractions**: Look for `⚠️ EXTRAKTION-FEHLGESCHLAGEN` in HTML, check document link for PDF filename
+6. **Cumulative value issues**: Check year reset logic (lines 1718-1723, 1735-1740)
 
 ### Debug Commands
 ```bash
@@ -161,6 +184,9 @@ grep -l '"errors"' docs/**/*.thea_extract
 
 # Re-process specific failed PDF
 python3 thea.py --pipeline pdf-extract-docling --model gemma3:27b --temperature 0.3 --mode overwrite "path/to/failed.pdf"
+
+# Check Excel column completeness
+python3 -c "import openpyxl; wb = openpyxl.load_workbook('BLUEITS-Depotkonto.xlsx'); ws = wb['Transaktionen']; print(f'Columns: {ws.max_column}, Rows: {ws.max_row}'); wb.close()"
 ```
 
 ## Environment Variables
@@ -173,9 +199,11 @@ python3 thea.py --pipeline pdf-extract-docling --model gemma3:27b --temperature 
 
 - **THEA extracts**: `<pdf>.<timestamp>.<model>.<pipeline>.thea_extract`
 - **Sidecars**: `.docling.txt`, `.docling.json`, `.docling.md`
-- **HTML reports**: `<Company>-<AccountType>.html`
+- **Report files**: `<Company>-<AccountType>.html`, `<Company>-<AccountType>.xlsx`
 
-## CSS Features (lines 1700-2000)
+## CSS Features (lines 1700-2400)
 - White backgrounds for Nr/Document columns in colored rows
 - Visual separators using `fee-block` and `non-stock-block` classes
 - Colorblind-friendly profit/loss colors (#28a745/#dc3545)
+- Sticky navigation TOC with smooth scrolling
+- Hidden MiFID section with toggle functionality
