@@ -43,9 +43,11 @@ Belege/
 !docs/BLUEITS-*/*.thea_extract
 !docs/BLUEITS-*/*.docling.json
 !docs/BLUEITS-*/*.docling.md
+!docs/BLUEITS-*/*.docling.txt
 !docs/Ramteid-*/*.thea_extract
 !docs/Ramteid-*/*.docling.json
 !docs/Ramteid-*/*.docling.md
+!docs/Ramteid-*/*.docling.txt
 # Ignore custom prompt files but keep default and prompts directory
 *.prompt
 !.prompt
