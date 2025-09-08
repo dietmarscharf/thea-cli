@@ -1,0 +1,21 @@
+{
+  "extractor": "docling",
+  "confidence": 0.9,
+  "character_count": 1972,
+  "extraction_metadata": {
+    "extraction_time": 3.1963469982147217,
+    "pages": 2,
+    "tables": [
+      "Table 1"
+    ],
+    "sections": [
+      "Wertpapier Abrechnung Verkauf",
+      "Depotnummer",
+      "Depotnummer"
+    ],
+    "has_tables": true,
+    "has_formulas": false,
+    "document_type": "invoice"
+  },
+  "file_size": 1993
+}
