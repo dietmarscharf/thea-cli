@@ -195,19 +195,30 @@ npm run thea:clean:docling
 
 ## Recent Enhancements (2024-2025)
 
-### Calendar Year Tracking
-- Added dual FY/CY tracking for tax compliance
-- Blue separator rows for calendar year transitions
-- Separate performance tables by fiscal and calendar years
+### Dual FY/CY Tracking System
+- Fiscal Year (FY): April 1 - March 31 accounting period
+- Calendar Year (CY): January 1 - December 31 for tax reporting
+- Yellow rows: FY transitions with cumulative P&L and fee totals
+- Blue rows: CY transitions (only when FY != CY)
+- 27-column table structure with visual separators for fee/P&L blocks
+- Automatic fee propagation from transactions to CY calculations
 
 ### Column Alignment Fixes
 - Fixed non-stock values in yellow FY rows (lines 3134-3136, 3177-3179)
 - Added fee storage in transactions for CY calculations (lines 2843-2844)
 - Corrected visual separator positions
+- Removed extra `<td></td>` elements causing 28 vs 27 column mismatches
+
+### CSS Border Fixes
+- Removed `year-separator` class from FY summary rows (line 3108)
+- Removed `calendar-year-separator` class from CY summary rows (line 3262)
+- Added `border-bottom: none !important` to depot-statement-year-end (line 1840)
+- Eliminated black borders between fiscal/calendar year transition rows
 
 ### Enhanced Visualizations
-- White background for Nr. and Document columns in colored rows
-- Black text for all document links
+- White background for Nr. and Document columns in colored rows (lines 1812-1831)
+- Black text with underlines for all document links (lines 1882-1885)
+- Purple background for capital action rows (Kapitalmaßnahme)
 - Improved CSS for print and screen display
 
 ## File Naming Conventions
@@ -215,3 +226,14 @@ npm run thea:clean:docling
 - **THEA extracts**: `<pdf>.<timestamp>.<model>.<suffix>.thea_extract`
 - **Sidecars**: `.docling.txt`, `.docling.json`, `.docling.md`
 - **HTML reports**: `<Company>-<AccountType>.html`
+
+## Backup Directory
+
+The `/backup/` directory contains archived test scripts, temporary files, and development artifacts.
+These files should only be consulted when explicitly asked about:
+- Old test scripts and their results
+- Previous development iterations
+- Backup versions of modified files
+
+Current backup structure:
+- `/backup/20250908/` - Test scripts, HTML generation utilities, and documentation from initial development
